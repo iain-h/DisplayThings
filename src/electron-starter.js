@@ -10,6 +10,7 @@ const url = require('url');
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
+let displayWindow;
 
 function createWindow() {
     // Create the browser window.
@@ -22,16 +23,42 @@ function createWindow() {
             slashes: true
         });
     mainWindow.loadURL(startUrl);
-    // Open the DevTools.
-    mainWindow.webContents.openDevTools();
 
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {
         // Dereference the window object, usually you would store windows
         // in an array if your app supports multi windows, this is the time
         // when you should delete the corresponding element.
-        mainWindow = null
-    })
+        mainWindow = null;
+    });
+
+    mainWindow.on('close', () => {
+        if (process.platform !== 'darwin') {
+            app.quit()
+        }
+    });
+
+  // Create the display window.
+  displayWindow = new BrowserWindow({
+    width: 500,
+    height: 500,
+    frame: false,
+    webSecurity: false
+  });
+
+  console.log('display');
+
+  displayWindow.loadURL(`file://${__dirname}/../public/display.html`);
+
+  displayWindow.webContents.once('dom-ready', () => {
+    displayWindow.webContents.send('ping', 'whoooooooh!');
+  });
+
+  displayWindow.show();
+
+  // Open the DevTools.
+   mainWindow.webContents.openDevTools();
+   displayWindow.webContents.openDevTools()
 }
 
 // This method will be called when Electron has finished
@@ -58,3 +85,9 @@ app.on('activate', function () {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+
+
+exports.runExec = name => {
+
+    displayWindow.webContents.send('ping', name);
+};
