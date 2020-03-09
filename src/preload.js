@@ -1,10 +1,15 @@
 
 
-console.log('hello');
-
 require('electron').ipcRenderer.on('ping', (event, message) => {
-    console.log(message); // Prints 'whoooooooh!'
 
-    var textnode = document.createTextNode(message);
-    document.getElementById("display").appendChild(textnode);
+    const displayDiv = document.getElementById("display");
+    displayDiv.innerHTML = '';
+
+    const lines = message.split('\n');
+    lines.forEach(l => {
+      const textnode = document.createTextNode(l);
+      displayDiv.appendChild(textnode);
+      displayDiv.appendChild(document.createElement('BR'));
+    });
+
   });

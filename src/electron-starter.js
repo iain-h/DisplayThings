@@ -61,7 +61,7 @@ function createWindow() {
 
   // Open the DevTools.
    mainWindow.webContents.openDevTools();
-   displayWindow.webContents.openDevTools()
+   //displayWindow.webContents.openDevTools()
 }
 
 // This method will be called when Electron has finished
