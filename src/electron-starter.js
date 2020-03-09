@@ -1,8 +1,4 @@
-const electron = require('electron');
-// Module to control application life.
-const app = electron.app;
-// Module to create native browser window.
-const BrowserWindow = electron.BrowserWindow;
+const {app, BrowserWindow, screen} = require('electron');
 
 const path = require('path');
 const url = require('url');
@@ -38,12 +34,19 @@ function createWindow() {
         }
     });
 
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+
   // Create the display window.
   displayWindow = new BrowserWindow({
-    width: 500,
-    height: 500,
+    x: 0,
+    y: 0,
+    width: width * 0.5,
+    height: height * 0.5,
     frame: false,
-    webSecurity: false
+    webSecurity: false,
+    webPreferences: {
+        preload: path.join(__dirname, 'preload.js')
+      }
   });
 
   console.log('display');
@@ -51,7 +54,7 @@ function createWindow() {
   displayWindow.loadURL(`file://${__dirname}/../public/display.html`);
 
   displayWindow.webContents.once('dom-ready', () => {
-    displayWindow.webContents.send('ping', 'whoooooooh!');
+    
   });
 
   displayWindow.show();

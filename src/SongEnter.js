@@ -64,8 +64,6 @@ export default () => {
   const handleOnSubmit = e => {
     e.preventDefault()
 
-    fs.writeFile('./data.txt', inputs.name);
-
     runExec(inputs.name);
   }
 

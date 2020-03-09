@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
-    "electron": "^1.7.9",
-    "foreman": "^2.0.0",
-    "react-scripts": "0.8.5"
+    "electron": "8.0.3",
+    "foreman": "^3.0.1",
+    "react-scripts": "3.4.0"
   },
   "dependencies": {
     "react": "^16.1.1",
@@ -23,5 +23,17 @@
     "electron": "electron .",
     "electron-start": "node src/electron-wait-react",
     "react-start": "react-scripts start"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
