@@ -18,3 +18,7 @@ body {
   top: 10px;
   width: 300px;
 }
+
+.songListRoot {
+  width: 400;
+}

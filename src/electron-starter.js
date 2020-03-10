@@ -2,6 +2,8 @@ const {app, BrowserWindow, screen} = require('electron');
 
 const path = require('path');
 const url = require('url');
+const fs = require('fs');
+const walk = require('walk');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -9,8 +11,26 @@ let mainWindow;
 let displayWindow;
 
 function createWindow() {
+
+    let prefs = {x: 20, y:20, width: 800, height: 800};
+
+    if (fs.existsSync("prefs.json")) {
+        try {
+            prefs = JSON.parse(fs.readFileSync("prefs.json"));
+        } catch (err) {
+            // Not json
+        }
+    }
+
     // Create the browser window.
-    mainWindow = new BrowserWindow({width: 800, height: 600, webPreferences: { nodeIntegration: true }});
+    mainWindow = new BrowserWindow({
+        x: prefs.x,
+        y: prefs.y,
+        width: prefs.width,
+        height: prefs.height,
+        center: true,
+        webPreferences: { nodeIntegration: true }
+    });
 
     // and load the index.html of the app.
     const startUrl = process.env.ELECTRON_START_URL || url.format({
@@ -29,39 +49,30 @@ function createWindow() {
     });
 
     mainWindow.on('close', () => {
+        fs.writeFileSync("prefs.json", JSON.stringify(mainWindow.getContentBounds()));
         if (process.platform !== 'darwin') {
             app.quit()
         }
     });
 
-  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+    // Create the display window.
+    displayWindow = new BrowserWindow({
+        frame: false,
+        show: false,
+        visible: false,
+        webSecurity: false,
+        webPreferences: {
+            preload: path.join(__dirname, 'preload.js')
+        }
+    });
 
-  // Create the display window.
-  displayWindow = new BrowserWindow({
-    x: 0,
-    y: 0,
-    width: width * 0.5,
-    height: height * 0.5,
-    frame: false,
-    webSecurity: false,
-    webPreferences: {
-        preload: path.join(__dirname, 'preload.js')
-      }
-  });
+    console.log('display');
+    displayWindow.loadURL(`file://${__dirname}/../public/display.html`);
+    displayWindow.webContents.once('dom-ready', () => {});
 
-  console.log('display');
-
-  displayWindow.loadURL(`file://${__dirname}/../public/display.html`);
-
-  displayWindow.webContents.once('dom-ready', () => {
-    
-  });
-
-  displayWindow.show();
-
-  // Open the DevTools.
-   mainWindow.webContents.openDevTools();
-   //displayWindow.webContents.openDevTools()
+    // Open the DevTools.
+    mainWindow.webContents.openDevTools();
+    //displayWindow.webContents.openDevTools()
 }
 
 // This method will be called when Electron has finished
@@ -90,7 +101,105 @@ app.on('activate', function () {
 // code. You can also put them in separate files and require them here.
 
 
-exports.runExec = name => {
+exports.setWords = words => {
 
-    displayWindow.webContents.send('ping', name);
+    displayWindow.webContents.send('words', words);
+};
+
+exports.setSong = async song => {
+
+    const fp = path.join(__dirname, '../public/Songs', `${song}.txt`);
+    let verses = [];
+    let chorus = '';
+    let bridge = '';
+    let author = '';
+    let order = '';
+
+    fs.readFile(fp, 'utf8', (err, data) => {
+        //if (err) return;
+        let dest = undefined;
+        let content = [];
+        const setContent = () => {
+            if (dest === undefined) return;
+            if (dest.startsWith('#1')) verses[0] = content.join('\n');
+            if (dest.startsWith('#1')) verses[1] = content.join('\n');
+            if (dest.startsWith('#1')) verses[2] = content.join('\n');
+            if (dest.startsWith('#4')) verses[3] = content.join('\n');
+            if (dest.startsWith('#5')) verses[4] = content.join('\n');
+            if (dest.startsWith('#6')) verses[5] = content.join('\n');
+            if (dest.startsWith('#7')) verses[5] = content.join('\n');
+            if (dest.startsWith('#8')) verses[5] = content.join('\n');
+            if (dest.startsWith('#9')) verses[5] = content.join('\n');
+            if (dest.startsWith('#C')) chorus = content.join('\n');
+            if (dest.startsWith('#B')) bridge = content.join('\n');
+            if (dest.startsWith('#A')) author = content[0];
+            if (dest.startsWith('#O')) order = content[0];
+        };
+        
+        data.split('\n').forEach(line => {
+            if (line.startsWith('#')) {
+                setContent();
+                dest = line;
+                content = [];
+            } else {
+                content.push(line);
+            }
+        });
+        setContent();
+
+        displayWindow.webContents.send('words', verses[0]);
+    });
+    
+};
+
+exports.setShow = show => {
+
+    if (show) {
+
+        const mainBounds = mainWindow.getContentBounds();
+  
+        let displays = screen.getAllDisplays();
+        displays.forEach(disp => {
+
+            // Check for main display.
+            if (mainBounds.x >= disp.bounds.x && mainBounds.x <= disp.bounds.x + disp.bounds.width &&
+                mainBounds.y >= disp.bounds.y && mainBounds.y <= disp.bounds.y + disp.bounds.height) {
+                return;
+            }
+
+            displayWindow.setBounds(disp.bounds);
+            displayWindow.setFullScreen(true);
+
+        });
+
+        if (!displayWindow.isVisible()) {
+            const disp = screen.getPrimaryDisplay();
+            displayWindow.setBounds({
+                x: disp.bounds.x,
+                y: disp.bounds.y,
+                width: disp.bounds.width * 0.5,
+                height: disp.bounds.height * 0.5
+            });
+            displayWindow.show();
+        }
+
+    } else {
+        displayWindow.hide();
+    }
+};
+
+
+exports.getSongs = songFunc => {
+
+    const songs = [];
+
+    const walker = walk.walk(path.join(__dirname, '../public/Songs'));
+    walker.on("file", function (root, fileStats, next) {
+        songs.push({name: fileStats.name.split('.')[0]});
+        next();
+    });
+
+    walker.on("end", function () {
+        songFunc(songs);
+    });
 };

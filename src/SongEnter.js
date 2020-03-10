@@ -5,10 +5,8 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 
 const electron = window.require('electron');
-const fs = electron.remote.require('fs');
-const ipcRenderer  = electron.ipcRenderer;
-var runExec = electron.remote.require('./electron-starter.js').runExec;
-
+const {setWords} = electron.remote.require('./electron-starter.js');
+const path = require('path');
 
 export default class SongEnter extends Component {
 
@@ -20,7 +18,7 @@ export default class SongEnter extends Component {
   }
 
   componentWillUpdate(nextProps, nextState) {
-    runExec(nextState.verse1);
+    setWords(nextState.verse1);
   }
 
   render() {

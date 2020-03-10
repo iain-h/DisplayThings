@@ -1,8 +1,10 @@
+const electron = require('electron');
+const ipcRenderer = electron.ipcRenderer;
 
 
-require('electron').ipcRenderer.on('ping', (event, message) => {
+ipcRenderer.on('words', (event, message) => {
 
-    const displayDiv = document.getElementById("display");
+    const displayDiv = document.getElementById("words");
     displayDiv.innerHTML = '';
 
     const lines = message.split('\n');
