@@ -62,12 +62,12 @@ function createWindow() {
         visible: false,
         webSecurity: false,
         webPreferences: {
-            preload: path.join(__dirname, 'preload.js')
+            preload: path.join(__dirname, '../build/preload.js')
         }
     });
 
     console.log('display');
-    displayWindow.loadURL(`file://${__dirname}/../public/display.html`);
+    displayWindow.loadURL(`file://${__dirname}/../build/display.html`);
     displayWindow.webContents.once('dom-ready', () => {});
 
     // Open the DevTools.
@@ -106,14 +106,17 @@ exports.setWords = words => {
     displayWindow.webContents.send('words', words);
 };
 
-exports.setSong = async song => {
+exports.setSong = async (songName, callback) => {
 
-    const fp = path.join(__dirname, '../public/Songs', `${song}.txt`);
-    let verses = [];
-    let chorus = '';
-    let bridge = '';
-    let author = '';
-    let order = '';
+    const fp = path.join(__dirname, '../build/Songs', `${songName}.txt`);
+
+    const songData = {
+       verses: [],
+       chorus: '',
+       bridge: '',
+       author: '',
+       order: ''
+    };
 
     fs.readFile(fp, 'utf8', (err, data) => {
         //if (err) return;
@@ -121,19 +124,19 @@ exports.setSong = async song => {
         let content = [];
         const setContent = () => {
             if (dest === undefined) return;
-            if (dest.startsWith('#1')) verses[0] = content.join('\n');
-            if (dest.startsWith('#1')) verses[1] = content.join('\n');
-            if (dest.startsWith('#1')) verses[2] = content.join('\n');
-            if (dest.startsWith('#4')) verses[3] = content.join('\n');
-            if (dest.startsWith('#5')) verses[4] = content.join('\n');
-            if (dest.startsWith('#6')) verses[5] = content.join('\n');
-            if (dest.startsWith('#7')) verses[5] = content.join('\n');
-            if (dest.startsWith('#8')) verses[5] = content.join('\n');
-            if (dest.startsWith('#9')) verses[5] = content.join('\n');
-            if (dest.startsWith('#C')) chorus = content.join('\n');
-            if (dest.startsWith('#B')) bridge = content.join('\n');
-            if (dest.startsWith('#A')) author = content[0];
-            if (dest.startsWith('#O')) order = content[0];
+            if (dest.startsWith('#1')) songData.verses[0] = content.join('\n');
+            if (dest.startsWith('#1')) songData.verses[1] = content.join('\n');
+            if (dest.startsWith('#1')) songData.verses[2] = content.join('\n');
+            if (dest.startsWith('#4')) songData.verses[3] = content.join('\n');
+            if (dest.startsWith('#5')) songData.verses[4] = content.join('\n');
+            if (dest.startsWith('#6')) songData.verses[5] = content.join('\n');
+            if (dest.startsWith('#7')) songData.verses[5] = content.join('\n');
+            if (dest.startsWith('#8')) songData.verses[5] = content.join('\n');
+            if (dest.startsWith('#9')) songData.verses[5] = content.join('\n');
+            if (dest.startsWith('#C')) songData.chorus = content.join('\n');
+            if (dest.startsWith('#B')) songData.bridge = content.join('\n');
+            if (dest.startsWith('#A')) songData.author = content[0];
+            if (dest.startsWith('#O')) songData.order = content[0];
         };
         
         data.split('\n').forEach(line => {
@@ -147,7 +150,7 @@ exports.setSong = async song => {
         });
         setContent();
 
-        displayWindow.webContents.send('words', verses[0]);
+        callback(songData);
     });
     
 };
@@ -193,7 +196,7 @@ exports.getSongs = songFunc => {
 
     const songs = [];
 
-    const walker = walk.walk(path.join(__dirname, '../public/Songs'));
+    const walker = walk.walk(path.join(__dirname, '../build/Songs'));
     walker.on("file", function (root, fileStats, next) {
         songs.push({name: fileStats.name.split('.')[0]});
         next();

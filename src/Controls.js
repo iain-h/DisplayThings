@@ -3,7 +3,7 @@ import React, {Component} from 'react'
 import {Checkbox, FormGroup, FormControlLabel} from '@material-ui/core';
 
 const electron = window.require('electron');
-const {setShow} = electron.remote.require('./electron-starter.js');
+const {setShow} = electron.remote.require('./electron.js');
 
 
 export default class Controls extends Component {

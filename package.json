@@ -1,9 +1,10 @@
 {
-  "name": "electron-with-create-react-app",
+  "name": "display-things",
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
     "electron": "8.0.3",
+    "electron-builder": "^22.4.0",
     "foreman": "^3.0.1",
     "react-scripts": "3.4.0"
   },
@@ -16,8 +17,21 @@
     "react-dom": "^16.1.1",
     "walk": "^2.3.14"
   },
+  "build": {
+    "appId": "display-things",
+    "mac": {
+      "category": "display-things.app.category.type"
+    },
+    "files": [
+      "build/**/*",
+      "node_modules/**/*"
+    ],
+    "directories":{
+      "buildResources": "assets"
+    }
+  },
   "homepage": "./",
-  "main": "src/electron-starter.js",
+  "main": "src/electron.js",
   "scripts": {
     "start": "export BROWSER=none && nf start -p 3000",
     "build": "react-scripts build",
@@ -25,7 +39,9 @@
     "eject": "react-scripts eject",
     "electron": "electron .",
     "electron-start": "node src/electron-wait-react",
-    "react-start": "react-scripts start"
+    "react-start": "react-scripts start",
+    "dist": "electron-builder",
+    "predist": "yarn build && cp src/electron.js build/electron.js"
   },
   "browserslist": {
     "production": [
