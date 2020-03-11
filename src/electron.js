@@ -111,11 +111,10 @@ exports.setSong = async (songName, callback) => {
     const fp = path.join(__dirname, '../build/Songs', `${songName}.txt`);
 
     const songData = {
-       verses: [],
-       chorus: '',
-       bridge: '',
-       author: '',
-       order: ''
+       name: songName,
+       fields: [],
+       ids: ['#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8', '#9', '#C', '#B', '#A', '#O'],
+       names: ['Verse 1', 'Verse 2', 'Verse 3', 'Verse 4', 'Verse 5', 'Verse 6', 'Verse 7', 'Verse 8', 'Verse 9', 'Chorus', 'Bridge', 'Author', 'Order']
     };
 
     fs.readFile(fp, 'utf8', (err, data) => {
@@ -124,19 +123,11 @@ exports.setSong = async (songName, callback) => {
         let content = [];
         const setContent = () => {
             if (dest === undefined) return;
-            if (dest.startsWith('#1')) songData.verses[0] = content.join('\n');
-            if (dest.startsWith('#1')) songData.verses[1] = content.join('\n');
-            if (dest.startsWith('#1')) songData.verses[2] = content.join('\n');
-            if (dest.startsWith('#4')) songData.verses[3] = content.join('\n');
-            if (dest.startsWith('#5')) songData.verses[4] = content.join('\n');
-            if (dest.startsWith('#6')) songData.verses[5] = content.join('\n');
-            if (dest.startsWith('#7')) songData.verses[5] = content.join('\n');
-            if (dest.startsWith('#8')) songData.verses[5] = content.join('\n');
-            if (dest.startsWith('#9')) songData.verses[5] = content.join('\n');
-            if (dest.startsWith('#C')) songData.chorus = content.join('\n');
-            if (dest.startsWith('#B')) songData.bridge = content.join('\n');
-            if (dest.startsWith('#A')) songData.author = content[0];
-            if (dest.startsWith('#O')) songData.order = content[0];
+            songData.ids.forEach((id, i) => {
+                if (dest.startsWith(id) ) {
+                    songData.fields[i] = content.join('\n');
+                }
+            });
         };
         
         data.split('\n').forEach(line => {
@@ -149,7 +140,6 @@ exports.setSong = async (songName, callback) => {
             }
         });
         setContent();
-
         callback(songData);
     });
     

@@ -10,7 +10,7 @@ const {getSongs, setSong} = electron.remote.require('./electron.js');
 
 class App extends Component {
 
-  state = {songList: [], songData: {verses: ['la La la']}};
+  state = {songList: [], songData: undefined};
 
   updateSong(songData) {
     console.log('app update song');

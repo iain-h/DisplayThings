@@ -12,14 +12,18 @@ export default class SongEnter extends Component {
 
   state = {songData: this.props.songData};
 
-  handleOnChange(e) {
+  handleOnChange(i, e) {
     e.persist();
-    this.setState({songData: {verses: [e.target.value]}});
+    let songData = Object.assign({}, this.state.songData);
+    songData.fields[i] = e.target.value;
+    this.setState({songData});
   }
 
   componentWillUpdate(nextProps, nextState) {
     console.log('component update')
-    setWords(nextState.songData.verses[0]);
+    if (nextState.songData !== undefined) {
+      setWords(nextState.songData.fields[0]);
+    }
     if (nextProps.songData !== this.props.songData) {
       console.log('prop change')
       this.setState({songData: nextProps.songData});
@@ -27,7 +31,10 @@ export default class SongEnter extends Component {
   }
 
   render() {
-    console.log('render update', this.props.songData.verses[0])
+
+    const songData = this.state.songData;
+    if (songData === undefined) return null;
+
     return (
       <main>
 
@@ -35,12 +42,19 @@ export default class SongEnter extends Component {
         <form>
         <FormControl >
          
-          <TextField className="verse" id="v1" 
-              label="Verse 1" multiline rows="5" 
-              variant="outlined" name="verse1"
-              value={this.state.songData.verses[0]}
-              onChange={this.handleOnChange.bind(this)}/>
-         
+          {songData.fields.map((f, i) => {
+
+            if (f === undefined || f.length === 0) return null;
+
+            return (
+
+              <TextField className="verse" id={songData.ids[i]} key={i}
+                label={songData.names[i]} multiline rows="1" rowsMax="20"
+                variant="outlined" name={songData.names[i]}
+                value={f}
+                onChange={this.handleOnChange.bind(this, i)}/>);
+          })}
+
         </FormControl>
         </form>
         </div>
