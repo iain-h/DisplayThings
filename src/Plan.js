@@ -32,7 +32,7 @@ const reorder = (list, startIndex, endIndex) => {
 
 const getItemStyle = (isDragging, draggableStyle) => ({
   // styles we need to apply on draggables
-  ...draggableStyle,
+  ...draggableStyle, height: '30px',
 
   ...(isDragging && {
     background: "rgb(235,235,235)"
@@ -73,7 +73,8 @@ export default class Plan extends Component {
   // But in this example everything is just done in one place for simplicity
   render() {
     return (
-      <DragDropContext onDragEnd={this.onDragEnd}>
+
+      <DragDropContext className="plan" onDragEnd={this.onDragEnd}>
         <Droppable droppableId="droppable">
           {(provided, snapshot) => (
             <RootRef rootRef={provided.innerRef}>
@@ -96,7 +97,6 @@ export default class Plan extends Component {
                         </ListItemIcon>
                         <ListItemText
                           primary={item.primary}
-                          secondary={item.secondary}
                         />
                         <ListItemSecondaryAction>
                           <IconButton>
@@ -113,6 +113,7 @@ export default class Plan extends Component {
           )}
         </Droppable>
       </DragDropContext>
+
     );
   }
 }

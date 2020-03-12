@@ -34,7 +34,7 @@ function createWindow() {
 
     // and load the index.html of the app.
     const startUrl = process.env.ELECTRON_START_URL || url.format({
-            pathname: path.join(__dirname, '/../build/index.html'),
+            pathname: path.join(__dirname, '/../public/index.html'),
             protocol: 'file:',
             slashes: true
         });
@@ -62,12 +62,12 @@ function createWindow() {
         visible: false,
         webSecurity: false,
         webPreferences: {
-            preload: path.join(__dirname, '../build/preload.js')
+            preload: path.join(__dirname, '../public/preload.js')
         }
     });
 
     console.log('display');
-    displayWindow.loadURL(`file://${__dirname}/../build/display.html`);
+    displayWindow.loadURL(`file://${__dirname}/../public/display.html`);
     displayWindow.webContents.once('dom-ready', () => {});
 
     // Open the DevTools.
@@ -108,7 +108,7 @@ exports.setWords = words => {
 
 exports.setSong = async (songName, callback) => {
 
-    const fp = path.join(__dirname, '../build/Songs', `${songName}.txt`);
+    const fp = path.join(__dirname, '../public/Songs', `${songName}.txt`);
 
     const songData = {
        name: songName,
@@ -186,7 +186,7 @@ exports.getSongs = songFunc => {
 
     const songs = [];
 
-    const walker = walk.walk(path.join(__dirname, '../build/Songs'));
+    const walker = walk.walk(path.join(__dirname, '../public/Songs'));
     walker.on("file", function (root, fileStats, next) {
         songs.push({name: fileStats.name.split('.')[0]});
         next();

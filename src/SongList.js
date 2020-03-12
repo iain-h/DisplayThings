@@ -21,7 +21,8 @@ import Tooltip from '@material-ui/core/Tooltip';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
 import DeleteIcon from '@material-ui/icons/Delete';
-import FilterListIcon from '@material-ui/icons/FilterList';
+import SearchIcon from '@material-ui/icons/Search';
+import Input from '@material-ui/core/Input';
 
 const electron = window.require('electron');
 const {getSongs, setSong} = electron.remote.require('./electron.js');
@@ -114,6 +115,23 @@ const useToolbarStyles = makeStyles(theme => ({
     paddingLeft: theme.spacing(2),
     paddingRight: theme.spacing(1),
   },
+  search: {
+    padding: '2px 4px',
+    display: 'flex',
+    alignItems: 'center',
+    width: 400,
+  },
+  input: {
+    marginLeft: theme.spacing(1),
+    flex: 1,
+  },
+  iconButton: {
+    padding: 10,
+  },
+  divider: {
+    height: 28,
+    margin: 4,
+  },
   highlight:
     theme.palette.type === 'light'
       ? {
@@ -125,8 +143,8 @@ const useToolbarStyles = makeStyles(theme => ({
           backgroundColor: theme.palette.secondary.dark,
         },
   title: {
-    flex: '1 1 100%',
-  },
+    flex: '1 1 100%'
+  }
 }));
 
 const EnhancedTableToolbar = props => {
@@ -135,30 +153,27 @@ const EnhancedTableToolbar = props => {
 
   return (
     <Toolbar
-      className={clsx(classes.root, {
+      className={clsx(classes.froot, {
         [classes.highlight]: numSelected > 0,
       })}
     >
-      {numSelected > 0 ? (
-        <Typography className={classes.title} color="inherit" variant="subtitle1">
-          {numSelected} selected
-        </Typography>
-      ) : (
-        <Typography className={classes.title} variant="h6" id="tableTitle">
-          Songs
-        </Typography>
+      {(
+       <div>
+       <Input
+         className={classes.input}
+         placeholder="Search Songs"
+         inputProps={{ 'aria-label': 'search for songs' }}
+       />
+       <IconButton type="submit" className={classes.iconButton} aria-label="search">
+         <SearchIcon />
+       </IconButton>
+       </div>
       )}
 
-      {numSelected > 0 ? (
+      {(
         <Tooltip title="Delete">
           <IconButton aria-label="delete">
             <DeleteIcon />
-          </IconButton>
-        </Tooltip>
-      ) : (
-        <Tooltip title="Filter list">
-          <IconButton aria-label="filter list">
-            <FilterListIcon />
           </IconButton>
         </Tooltip>
       )}
@@ -172,14 +187,14 @@ EnhancedTableToolbar.propTypes = {
 
 const useStyles = makeStyles(theme => ({
   root: {
-    width: '100%',
+    width: '100%x',
   },
   paper: {
-    width: '100%',
+    width: '90%',
     marginBottom: theme.spacing(2),
   },
   table: {
-    minWidth: 750,
+   
   },
   visuallyHidden: {
     border: 0,
@@ -200,7 +215,7 @@ export default function EnhancedTable(props) {
   const [orderBy, setOrderBy] = React.useState('calories');
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
-  const [dense, setDense] = React.useState(false);
+  const [dense, setDense] = React.useState(true);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
   const handleRequestSort = (event, property) => {
@@ -263,7 +278,7 @@ export default function EnhancedTable(props) {
   const emptyRows = rowsPerPage - Math.min(rowsPerPage, props.songList.length - page * rowsPerPage);
 
   return (
-    <div className={classes.root}>
+
       <Paper className={classes.paper}>
         <EnhancedTableToolbar numSelected={selected.length} />
         <TableContainer>
@@ -308,23 +323,19 @@ export default function EnhancedTable(props) {
                       <TableCell component="th" id={labelId} scope="row" padding="none">
                         {row.name}
                       </TableCell>
-                      <TableCell align="right">{row.calories}</TableCell>
-                      <TableCell align="right">{row.fat}</TableCell>
-                      <TableCell align="right">{row.carbs}</TableCell>
-                      <TableCell align="right">{row.protein}</TableCell>
                     </TableRow>
                   );
                 })}
               {emptyRows > 0 && (
                 <TableRow style={{ height: (dense ? 33 : 53) * emptyRows }}>
-                  <TableCell colSpan={6} />
+                  <TableCell colSpan={1} />
                 </TableRow>
               )}
             </TableBody>
           </Table>
         </TableContainer>
         <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
+          rowsPerPageOptions={[10]}
           component="div"
           count={props.songList.length}
           rowsPerPage={rowsPerPage}
@@ -333,10 +344,6 @@ export default function EnhancedTable(props) {
           onChangeRowsPerPage={handleChangeRowsPerPage}
         />
       </Paper>
-      <FormControlLabel
-        control={<Switch checked={dense} onChange={handleChangeDense} />}
-        label="Dense padding"
-      />
-    </div>
+
   );
 }

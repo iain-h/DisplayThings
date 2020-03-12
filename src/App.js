@@ -34,12 +34,28 @@ class App extends Component {
         <SongEnter songData={this.state.songData}/>
       </Grid>
       <Grid item xs={6}>
-        <Controls/>
-        <SongList
-          songList={this.state.songList}
-          updateSong={this.updateSong.bind(this)}/>
-        <Plan/>
+     
+      <Grid container
+        direction="column"
+        justify="flex-start"
+        alignItems="stretch" spacing={3}>
+
+       <Grid item xs={12}>
+          <Controls/>
         </Grid>
+
+        <Grid item xs={12}>
+          <Plan/>
+        </Grid>
+
+        <Grid item xs={12}></Grid>
+          <SongList
+            songList={this.state.songList}
+            updateSong={this.updateSong.bind(this)}/>
+        </Grid>
+
+      </Grid>
+
       </Grid>
       </div>
     );

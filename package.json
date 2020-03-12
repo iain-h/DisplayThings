@@ -42,7 +42,7 @@
     "electron-start": "node src/electron-wait-react",
     "react-start": "react-scripts start",
     "dist": "electron-builder",
-    "predist": "yarn build && cp src/electron.js build/electron.js"
+    "predist": "yarn build && cp src/electron.js build/electron.js && sed -i 's/public/build/' build/electron.js"
   },
   "browserslist": {
     "production": [
