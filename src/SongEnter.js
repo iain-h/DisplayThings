@@ -11,7 +11,47 @@ const path = require('path');
 
 export default class SongEnter extends Component {
 
-  state = {songData: this.props.songData};
+  state = {
+    songData: this.props.songData
+  };
+
+  lines = [0, 1];
+  field = 0;
+  orderIdx = 0;
+
+  getOrderField(songData) {
+    return songData.fields[songData.ids.indexOf('#O')];
+  }
+
+  setOrderIndex(orderIdx, songData) {
+    const orderField = this.getOrderField(songData);
+    if (orderIdx < orderField.length) {
+      const id = '#' + orderField[orderIdx];
+      this.setState({
+        songData,
+        lines: [0, 1],
+        orderIdx,
+        field: songData.ids.indexOf(id)});
+    }
+  }
+
+  nextField() {
+    const orderField = this.getOrderField();
+    let nextIdx = this.state.orderIdx += 1;
+    if (nextIdx >= orderField.length) {
+      nextIdx = 0;
+    }
+    setOrderIndex(nextIdx, this.state.songData);
+  }
+
+  nextLines() {
+    let lines = [this.state.lines[1] + 1, this.state.lines[1] + 2];
+    const fieldLines = getField().split('\n');
+
+    if (lines[0] >= fieldLines.length) {
+      nextField();
+    }
+  }
 
   handleOnChange(i, e) {
     e.persist();
@@ -23,11 +63,12 @@ export default class SongEnter extends Component {
   componentWillUpdate(nextProps, nextState) {
     console.log('component update')
     if (nextState.songData !== undefined) {
+      const fieldLines = getField().split('\n');
       setWords(nextState.songData.fields[0]);
     }
     if (nextProps.songData !== this.props.songData) {
       console.log('prop change')
-      this.setState({songData: nextProps.songData});
+      setOrderIndex(orderIdx, nextProps.songData);
     }
   }
 
