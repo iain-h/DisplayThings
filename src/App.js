@@ -7,9 +7,6 @@ import Controls from './Controls';
 import Plan from './Plan';
 import Grid from '@material-ui/core/Grid';
 
-const electron = window.require('electron');
-const {getSongs, setSong} = electron.remote.require('./electron.js');
-
 class App extends Component {
 
   state = {songList: [], songData: undefined};
@@ -20,7 +17,7 @@ class App extends Component {
   }
 
   componentDidMount() {
-    getSongs(songList => {
+    window.getSongs(songList => {
       this.setState({songList});
     });
   }

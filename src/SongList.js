@@ -24,9 +24,6 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import SearchIcon from '@material-ui/icons/Search';
 import Input from '@material-ui/core/Input';
 
-const electron = window.require('electron');
-const {getSongs, setSong} = electron.remote.require('./electron.js');
-
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -253,7 +250,7 @@ export default function EnhancedTable(props) {
     setSelected(newSelected);
 
     if (newSelected.length > 0) {
-      setSong(newSelected[0], songData => {
+      window.setSong(newSelected[0], songData => {
         props.updateSong(songData);
       });
     }

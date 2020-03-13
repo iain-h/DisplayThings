@@ -2,10 +2,6 @@ import React, {Component} from 'react'
 
 import {Checkbox, FormGroup, FormControlLabel} from '@material-ui/core';
 
-const electron = window.require('electron');
-const {setShow} = electron.remote.require('./electron.js');
-
-
 export default class Controls extends Component {
 
   state = {show: false};
@@ -15,7 +11,7 @@ export default class Controls extends Component {
   }
 
   componentWillUpdate(nextProps, nextState) {
-    setShow(nextState.show);
+    window.setShow(nextState.show);
   }
 
   render() {

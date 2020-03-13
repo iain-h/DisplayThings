@@ -29,7 +29,11 @@ function createWindow() {
         width: prefs.width,
         height: prefs.height,
         center: true,
-        webPreferences: { nodeIntegration: true }
+        
+        webPreferences: {
+            preload: path.join(__dirname, '../public/preloadMain.js'),
+            webSecurity: true
+        }
     });
 
     // and load the index.html of the app.
@@ -60,16 +64,16 @@ function createWindow() {
         frame: false,
         show: false,
         visible: false,
-        webSecurity: false,
         webPreferences: {
-            preload: path.join(__dirname, '../public/preload.js')
+            preload: path.join(__dirname, '../public/preload.js'),
+            webSecurity: true
         }
     });
 
     console.log('display');
     displayWindow.loadURL(`file://${__dirname}/../public/display.html`);
     displayWindow.webContents.once('dom-ready', () => {});
-
+    //displayWindow.show();
     // Open the DevTools.
     mainWindow.webContents.openDevTools();
     //displayWindow.webContents.openDevTools()
@@ -170,8 +174,8 @@ exports.setShow = show => {
             displayWindow.setBounds({
                 x: disp.bounds.x,
                 y: disp.bounds.y,
-                width: disp.bounds.width * 0.5,
-                height: disp.bounds.height * 0.5
+                width: Math.floor(disp.bounds.width * 0.5),
+                height: Math.floor(disp.bounds.height * 0.5)
             });
             displayWindow.show();
         }

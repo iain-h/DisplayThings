@@ -1,7 +1,6 @@
 const electron = require('electron');
 const ipcRenderer = electron.ipcRenderer;
 
-
 ipcRenderer.on('words', (event, message) => {
 
     const displayDiv = document.getElementById("words");
