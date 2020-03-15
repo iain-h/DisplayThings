@@ -121,7 +121,11 @@ exports.setSong = async (songName, callback) => {
        names: ['Verse 1', 'Verse 2', 'Verse 3', 'Verse 4', 'Verse 5', 'Verse 6', 'Verse 7', 'Verse 8', 'Verse 9', 'Chorus', 'Bridge', 'Author', 'Order']
     };
 
-    fs.readFile(fp, 'utf8', (err, data) => {
+    fs.readFile(fp, (err, byteArray) => {
+
+        let l1Buffer = Buffer.from(byteArray, 'latin1');
+        let data = l1Buffer.toString('latin1')
+
         //if (err) return;
         let dest = undefined;
         let content = [];
@@ -140,8 +144,9 @@ exports.setSong = async (songName, callback) => {
                 dest = line;
                 content = [];
             } else {
-                if (line.length > 0)
-                content.push(line);
+                if (line.length > 0) {
+                    content.push(line);
+                }
             }
         });
         setContent();

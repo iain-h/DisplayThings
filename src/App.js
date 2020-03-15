@@ -9,7 +9,9 @@ import Grid from '@material-ui/core/Grid';
 import Mousetrap from 'mousetrap';
 import FlexSearch from 'flexsearch';
 
-const keyCodeMap = {down: 40, up: 38};
+const keyCodeMap = {
+  down: [40], up: [38], 
+  1: [49,97], 2: [50,98], 3: [51,99], 4: [52,100], 5: [53,101], 6: [54,102], 7: [55,103], c: [67]};
 
 class App extends Component {
 
@@ -36,7 +38,10 @@ class App extends Component {
 
   mousetrap(key, callback) {
     Mousetrap.bind(key, callback);
-    this.keyMap[keyCodeMap[key]] = callback;
+    const codes = keyCodeMap[key];
+    if (codes) {
+      codes.forEach(code => this.keyMap[code] = callback);
+    }
   }
 
   render() {
@@ -44,7 +49,6 @@ class App extends Component {
       <div onKeyDownCapture = {e => {
         const callback = this.keyMap[e.which];
         if (callback) {
-          e.preventDefault();
           callback(e);
         }
       }} className="App">

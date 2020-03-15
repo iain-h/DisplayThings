@@ -17,20 +17,51 @@ export default class SongEnter extends Component {
   orderIdx = 0;
   nLines = 2;
   textInputs = {'#i': 'blur'};
+  started = false;
+  editing = false;
 
   componentDidMount() {
     this.props.mousetrap('down', e => {
       e.preventDefault();
       console.log('down');
-      this.nextLines();
+      if (this.started) {
+        this.nextLines();
+      } else {
+        this.highlightLines();
+        this.started = true;
+      }
     });
+
+    const ids = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'c', 'b'];
+
+    ids.forEach( id => {
+      this.props.mousetrap(id, e => {
+        if (this.editing) return;
+        if(!this.state.songData) return;
+        e.preventDefault();
+        console.log('pressed', id);
+        this.line = 0;
+        this.field = this.state.songData.ids.indexOf(`#${id.toUpperCase()}`);
+        this.orderIdx = this.getOrderField().indexOf(id.toUpperCase());
+
+        console.log(this.field,  this.orderIdx);
+        this.highlightLines();
+      });
+
+    });
+
     this.props.mousetrap('up', e => {
       e.preventDefault();
       console.log('up');
-      this.prevLines();
+      if (this.started) {
+        this.prevLines();
+      } else {
+        this.highlightLines();
+        this.started = true;
+      }
     });
 
-    window.addEventListener("resize", this.moveDot.bind(this));
+    window.addEventListener('resize', () => {this.updateDot();});
   }
 
   getOrderField() {
@@ -90,6 +121,12 @@ export default class SongEnter extends Component {
     this.highlightLines(fieldLines);
   }
 
+  updateDot() {
+    window.requestAnimationFrame(() => {
+      this.moveDot();
+    });
+  }
+
   moveDot() {
     const dot = document.getElementById('dot');
     if (!dot) return;
@@ -103,13 +140,14 @@ export default class SongEnter extends Component {
     const p2 = getCaretCoordinates(this.textInputs['#O'], this.orderIdx + 1);
     const rect = this.textInputs['#O'].getBoundingClientRect();
 
-    dot.style.top = (p1.top + rect.top) + "px";
-    dot.style.left = (p1.left + rect.left) + "px";
+    dot.style.top = (p1.top + rect.top + window.scrollY) + "px";
+    dot.style.left = (p1.left + rect.left + window.scrollX) + "px";
     dot.style.width = (p2.left - p1.left) + "px";
     dot.style.height = p1.height + "px";
   }
 
   highlightLines(fieldLines) {
+    fieldLines = fieldLines || this.getField(this.state.songData).split('\n');
     let count1 = 0;
     for (let i=0;i<this.line;++i) {
       count1 += fieldLines[i].length +1;
@@ -151,6 +189,7 @@ export default class SongEnter extends Component {
     let songData = Object.assign({}, this.state.songData);
     songData.fields[i] = e.target.value;
     this.setState({songData});
+    this.updateDot();
   }
 
   componentWillUpdate(nextProps, nextState) {
@@ -162,17 +201,20 @@ export default class SongEnter extends Component {
       console.log('prop change')
       this.setOrderIndex(0);
       this.setState({songData: nextProps.songData});
+      this.started = false;
+      window.setWords('');
     }
   }
 
   componentDidUpdate() {
-
+    this.updateDot();
   }
 
   render() {
 
     const songData = this.state.songData;
     if (songData === undefined) return null;
+    this.updateDot();
 
     return (
       <main>
@@ -191,6 +233,13 @@ export default class SongEnter extends Component {
                 label={songData.names[i]} multiline rows="1" rowsMax="20"
                 variant="outlined" name={songData.names[i]}
                 value={f}
+                onKeyDownCapture={e => {
+                  if (!this.editing) {
+                    e.preventDefault();
+                  }
+                }}
+                onBlur={e => {this.editing = false;}}
+                onClick={e => {this.editing = true;}}
                 onChange={this.handleOnChange.bind(this, i)}/>
                 
                 </Grid>
