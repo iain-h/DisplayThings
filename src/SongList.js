@@ -67,7 +67,6 @@ function EnhancedTableHead(props) {
           <Checkbox
             indeterminate={numSelected > 0 && numSelected < rowCount}
             checked={rowCount > 0 && numSelected === rowCount}
-            onChange={onSelectAllClick}
             inputProps={{ 'aria-label': 'select all desserts' }}
           />
         </TableCell>
@@ -148,6 +147,21 @@ const EnhancedTableToolbar = props => {
   const classes = useToolbarStyles();
   const { numSelected } = props;
 
+  const handleSearch = e => {
+    if (e.target.value.length === 0) {
+      props.setSearchResults([]);
+    }
+    //if (!props.searchIndex) return;
+    props.searchIndex.search(e.target.value, {
+      limit: 20
+    }, results => {
+      if (results.length > 0) {
+        props.setSearchResults(results.map(idx => props.songList[idx]));
+        props.handleChangePage(e, 0);
+      }
+    });
+  };
+
   return (
     <Toolbar
       className={clsx(classes.froot, {
@@ -160,6 +174,7 @@ const EnhancedTableToolbar = props => {
          className={classes.input}
          placeholder="Search Songs"
          inputProps={{ 'aria-label': 'search for songs' }}
+         onChange={handleSearch}
        />
        <IconButton type="submit" className={classes.iconButton} aria-label="search">
          <SearchIcon />
@@ -214,6 +229,7 @@ export default function EnhancedTable(props) {
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(true);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [searchResults, setSearchResults] = React.useState([]);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -221,31 +237,8 @@ export default function EnhancedTable(props) {
     setOrderBy(property);
   };
 
-  const handleSelectAllClick = event => {
-    if (event.target.checked) {
-      const newSelecteds = props.songList.map(n => n.name);
-      setSelected(newSelecteds);
-      return;
-    }
-    setSelected([]);
-  };
-
   const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1),
-      );
-    }
+    let newSelected = [name];
 
     setSelected(newSelected);
 
@@ -274,10 +267,18 @@ export default function EnhancedTable(props) {
 
   const emptyRows = rowsPerPage - Math.min(rowsPerPage, props.songList.length - page * rowsPerPage);
 
+  const rows = searchResults.length > 0 ? searchResults : props.songList;
+
   return (
 
       <Paper className={classes.paper}>
-        <EnhancedTableToolbar numSelected={selected.length} />
+        <EnhancedTableToolbar
+           numSelected={selected.length}
+           searchIndex={props.searchIndex}
+           setSearchResults={setSearchResults}
+           songList={props.songList}
+           handleChangePage={handleChangePage}
+        />
         <TableContainer>
           <Table
             className={classes.table}
@@ -290,12 +291,11 @@ export default function EnhancedTable(props) {
               numSelected={selected.length}
               order={order}
               orderBy={orderBy}
-              onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={props.songList.length}
+              rowCount={rows.length}
             />
             <TableBody>
-              {stableSort(props.songList, getComparator(order, orderBy))
+              {rows
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
                   const isItemSelected = isSelected(row.name);
@@ -308,7 +308,7 @@ export default function EnhancedTable(props) {
                       role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
-                      key={row.name}
+                      key={row.id}
                       selected={isItemSelected}
                     >
                       <TableCell padding="checkbox">
@@ -334,7 +334,7 @@ export default function EnhancedTable(props) {
         <TablePagination
           rowsPerPageOptions={[10]}
           component="div"
-          count={props.songList.length}
+          count={rows.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onChangePage={handleChangePage}

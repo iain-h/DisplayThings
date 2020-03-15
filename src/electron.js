@@ -134,12 +134,13 @@ exports.setSong = async (songName, callback) => {
             });
         };
         
-        data.split('\n').forEach(line => {
+        data.split(/\r?\n|\r/g).forEach(line => {
             if (line.startsWith('#')) {
                 setContent();
                 dest = line;
                 content = [];
             } else {
+                if (line.length > 0)
                 content.push(line);
             }
         });
@@ -192,8 +193,17 @@ exports.getSongs = songFunc => {
 
     const walker = walk.walk(path.join(__dirname, '../public/Songs'));
     walker.on("file", function (root, fileStats, next) {
-        songs.push({name: fileStats.name.split('.')[0]});
-        next();
+        const name = fileStats.name.split('.')[0];
+        const id = songs.length;
+        let search = name + ' ';
+        fs.readFile(path.join(__dirname, '../public/Songs', fileStats.name), 'utf8', (err, data) => {
+            data.split('\n').forEach(line => {
+                if (line.startsWith('#')) return;
+                search += line + ' ';
+            });
+            songs.push({id, name, search});
+            next();
+        });
     });
 
     walker.on("end", function () {
