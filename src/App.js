@@ -20,6 +20,7 @@ class App extends Component {
     threshold: 7,
     depth: 3
   });
+  editing=false;
 
   keyMap = {};
 
@@ -47,6 +48,7 @@ class App extends Component {
   render() {
     return (
       <div onKeyDownCapture = {e => {
+        if (this.editing) return;
         const callback = this.keyMap[e.which];
         if (callback) {
           callback(e);
@@ -76,7 +78,8 @@ class App extends Component {
           <SongList
             songList={this.state.songList}
             searchIndex={this.searchIndex}
-            updateSong={this.updateSong.bind(this)}/>
+            updateSong={this.updateSong.bind(this)}
+            handleEditing={editing => {this.editing = editing;}}/>
         </Grid>
 
       </Grid>

@@ -43,7 +43,7 @@ export default class SongEnter extends Component {
         this.line = 0;
         this.field = this.state.songData.ids.indexOf(`#${id.toUpperCase()}`);
         this.orderIdx = this.getOrderField().indexOf(id.toUpperCase());
-
+        this.started = true;
         console.log(this.field,  this.orderIdx);
         this.highlightLines();
       });

@@ -175,6 +175,8 @@ const EnhancedTableToolbar = props => {
          placeholder="Search Songs"
          inputProps={{ 'aria-label': 'search for songs' }}
          onChange={handleSearch}
+         onFocus={e => props.handleEditing(true)}
+         onBlur={e => props.handleEditing(false)}
        />
        <IconButton type="submit" className={classes.iconButton} aria-label="search">
          <SearchIcon />
@@ -278,6 +280,7 @@ export default function EnhancedTable(props) {
            setSearchResults={setSearchResults}
            songList={props.songList}
            handleChangePage={handleChangePage}
+           handleEditing={props.handleEditing}
         />
         <TableContainer>
           <Table
