@@ -11,12 +11,15 @@ import RootRef from "@material-ui/core/RootRef";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import InboxIcon from "@material-ui/icons/Inbox";
 import EditIcon from "@material-ui/icons/Edit";
+import PanoramaWideAngleIcon from '@material-ui/icons/PanoramaWideAngle';
 import DesktopWindowsIcon from '@material-ui/icons/DesktopWindows';
+import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import SongList from './SongList';
 import Tooltip from '@material-ui/core/Tooltip';
+import Toolbar from '@material-ui/core/Toolbar';
 
 // fake data generator
 const getItems = count =>
@@ -43,12 +46,15 @@ const insertItem = (list, endIndex, newItem) => {
   return result;
 };
 
-const getItemStyle = (isDragging, draggableStyle) => ({
+const getItemStyle = (isDragging, draggableStyle, selected) => ({
   // styles we need to apply on draggables
   ...draggableStyle, height: '30px',
 
   ...(isDragging && {
     background: "rgb(235,235,235)"
+  }),
+  ...(selected && {
+    background: "rgb(256,256,0)"
   })
 });
 
@@ -61,7 +67,7 @@ export default class Plan extends Component {
     super(props);
     this.state = {
       items: this.props.plan,
-      selected: -1
+      selected: ''
     };
     this.onDragEnd = this.onDragEnd.bind(this);
   }
@@ -102,10 +108,19 @@ export default class Plan extends Component {
     this.props.setPlan(items);
   }
 
-  handleEdit(name) {
+  handleEdit(name, index, e) {
+    if (this.state.selected === name) return this.deselect();
+    e.preventDefault();
     window.setSong(name, songData => {
       this.props.updateSong(songData);
     });
+    this.setState({selected: name});
+    return true;
+  }
+
+  deselect() {
+    this.setState({selected: ''});
+    window.setWords('');
   }
 
   handleRemove(name) {
@@ -126,7 +141,14 @@ export default class Plan extends Component {
       <DragDropContext className="plan" onDragEnd={this.onDragEnd}>
 
       <Paper className="paper">
-      <Typography>Plan</Typography>
+      <Toolbar>
+      <Typography >Plan</Typography>
+      <Tooltip title="Show nothing">
+      <IconButton onClick={this.deselect.bind(this)}>
+      <PanoramaWideAngleIcon/>
+      </IconButton>
+      </Tooltip>
+      </Toolbar>
         <Droppable droppableId="droppable">
           {(provided, snapshot) => (
             <RootRef rootRef={provided.innerRef}>
@@ -141,14 +163,20 @@ export default class Plan extends Component {
                         {...provided.dragHandleProps}
                         style={getItemStyle(
                           snapshot.isDragging,
-                          provided.draggableProps.style
+                          provided.draggableProps.style,
+                          this.state.selected === item
                         )}
                       >
                         <ListItemIcon>
                         <Tooltip title="Show this">
-                        <IconButton onClick={this.handleEdit.bind(this,item)}>
-                         <DesktopWindowsIcon/>{index + 1}
-                         </IconButton>
+                          {this.state.selected !== item ?
+                        <IconButton onClick={this.handleEdit.bind(this,item, index)}>
+                         <PlayArrowIcon/>{index + 1}
+                         </IconButton> : 
+                          <IconButton onClick={this.handleEdit.bind(this,item, index)}>
+                          <DesktopWindowsIcon />{index + 1}
+                          </IconButton> 
+                        }
                          </Tooltip>
                           </ListItemIcon>
                           <Tooltip title={item}>
@@ -156,6 +184,7 @@ export default class Plan extends Component {
                            primary={item.length > 28 ? item.substring(0, 25) + '...' :  item}
                         />
                         </Tooltip>
+                        
                         <ListItemSecondaryAction>
                           <Tooltip title="Remove from plan">
                            <IconButton onClick={this.handleRemove.bind(this,item)}>

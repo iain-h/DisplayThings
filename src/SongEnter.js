@@ -31,12 +31,7 @@ export default class SongEnter extends Component {
     this.props.mousetrap('down', e => {
       if (e) {e.preventDefault();}
       console.log('down');
-      if (this.started) {
-        this.nextLines();
-      } else {
-        this.highlightLines();
-        this.started = true;
-      }
+      this.nextLines();
     });
 
     const ids = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'c', 'b'];
@@ -152,7 +147,7 @@ export default class SongEnter extends Component {
     dot.style.top = (p1.top + rect.top + window.scrollY) + "px";
     dot.style.left = (p1.left + rect.left + window.scrollX) + "px";
     dot.style.width = (p2.left - p1.left) + "px";
-    dot.style.height = p1.height + "px";
+    dot.style.height = p1.height - 2 + "px";
   }
 
   highlightLines(fieldLines) {
@@ -228,7 +223,15 @@ export default class SongEnter extends Component {
 
     return (
       <main>
-
+        <div id="dot" style={{
+          position: 'absolute',
+          top: '-10px',
+          left: '-10px',
+          width: '4px',
+          height: '2px',
+          borderBottom: '2px solid black',
+          backgroundColor: '#FF0'
+          }}></div>
         <div id="songEnterRoot" className="root">
         <Grid container alignItems="stretch" direction="row" spacing={2}>
       
@@ -258,14 +261,7 @@ export default class SongEnter extends Component {
       
         </Grid>
 
-        <div id="dot" style={{
-          position: 'absolute',
-          top: '-10px',
-          left: '-10px',
-          width: '4px',
-          height: '2px',
-          borderTop: '2px solid black',
-          }}></div>
+        
         </div>
       </main>
     );

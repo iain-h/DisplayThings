@@ -10,6 +10,8 @@ const walk = require('walk');
 let mainWindow;
 let displayWindow;
 
+
+
 function createWindow() {
 
     let prefs = {x: 20, y:20, width: 800, height: 800};
@@ -76,7 +78,7 @@ function createWindow() {
     //displayWindow.show();
     // Open the DevTools.
     mainWindow.webContents.openDevTools();
-    //displayWindow.webContents.openDevTools()
+    displayWindow.webContents.openDevTools()
 }
 
 // This method will be called when Electron has finished
@@ -214,4 +216,31 @@ exports.getSongs = songFunc => {
     walker.on("end", function () {
         songFunc(songs);
     });
+};
+
+exports.savePlan = plan => {
+    fs.writeFile("plan.json", JSON.stringify(plan), err => {
+        if (err) {
+            console.log(err);
+        }
+    });
+};
+
+exports.loadPlan = callback => {
+    fs.readFile("plan.json", 'utf8', (err, data) => {
+        if (err === null) {
+            callback(JSON.parse(data));
+        } else {
+            callback([]);
+        }
+    });
+};
+
+let keyDownCallback = () => {};
+
+exports.displayKeyPressed = which => {
+   keyDownCallback(which);
+};
+exports.setKeyDownCallback = func => {
+    keyDownCallback = func;
 };

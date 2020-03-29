@@ -7,7 +7,13 @@
     <link rel="stylesheet" href="./display.css">
     <title>Things</title>
   </head>
-  <body>
-    <div id="words"></div>
+<body>
+    <script>
+      document.onkeydown = e => {
+          window.displayKeyPressed(e.which);
+      };
+    </script>
+    <div id='fade1' class="words">hello</div>
+    <div id='fade2' class="words">hi</div>
   </body>
 </html>

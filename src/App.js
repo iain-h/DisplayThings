@@ -41,8 +41,19 @@ class App extends Component {
     window.getSongs(songList => {
       this.searchIndex.clear();
       songList.forEach((song, i) => this.searchIndex.add(i, song.search));
-      this.setState({songList});
+
+      window.loadPlan(plan => {
+        this.setState({songList, plan});
+      });
     });
+    
+    window.setKeyDownCallback(which => {
+      const callback = this.keyMap[which];
+      if (callback) {
+        callback();
+      }
+    });
+    
   }
 
   mousetrap(key, callback) {
@@ -51,13 +62,6 @@ class App extends Component {
     if (codes) {
       codes.forEach(code => this.keyMap[code] = callback);
       this.keyMap[key] = callback;
-    }
-  }
-
-  doKey(which) {
-    const callback = this.keyMap[which];
-    if (callback) {
-      callback();
     }
   }
 
@@ -71,7 +75,7 @@ class App extends Component {
         }
       }} className="App">
 
-      <div style={{position: 'absolute', padding: '20px', top: '0px', left: '0px', height: '100%', right: '420px', overflowY: 'auto'}}>
+      <div style={{position: 'absolute', padding: '20px', top: '0px', left: '0px', height: '100%', right: '440px', overflowY: 'auto'}}>
 
       
         <SongEnter 
@@ -80,12 +84,12 @@ class App extends Component {
           setResetCallback={this.setResetCallback.bind(this)}/>
       </div>
      
-      <div style={{position: 'absolute', padding: '20px', top: '0px', right: '0px', height: '100%', width: '400px', overflowY: 'auto'}}>
+      <div style={{position: 'absolute', marginLeft: '20px', padding: '20px', top: '0px', right: '0px', height: '100%', width: '400px', overflowY: 'auto'}}>
 
         <Controls/>
         <Plan 
           plan={this.state.plan}
-          setPlan={plan => this.setState({plan})}
+          setPlan={plan => {this.setState({plan}); window.savePlan(plan);}}
           songList={this.state.songList}
           searchIndex={this.searchIndex}
           updateSong={this.updateSong.bind(this)}
@@ -93,7 +97,8 @@ class App extends Component {
           addToPlan={item =>{
             const plan2 = Array.from(this.state.plan);
             plan2.push(item);
-            this.setState({plan: plan2})
+            this.setState({plan: plan2});
+            window.savePlan(plan2);
             }}
           
           />

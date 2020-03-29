@@ -2,6 +2,7 @@ import React, {Component} from 'react'
 
 import {Checkbox, FormGroup, FormControlLabel} from '@material-ui/core';
 import Paper from '@material-ui/core/Paper';
+import Tooltip from '@material-ui/core/Tooltip';
 
 export default class Controls extends Component {
 
@@ -20,6 +21,7 @@ export default class Controls extends Component {
       <main>
         <Paper style={{paddingLeft: '16px', marginBottom: '20px'}}>
       <FormGroup row>
+        <Tooltip title="Display on the second screen">
             <FormControlLabel
               control={
                 <Checkbox
@@ -31,6 +33,7 @@ export default class Controls extends Component {
               }
               label="Show"
             />
+         </Tooltip>
        </FormGroup>
        </Paper>
       </main>
