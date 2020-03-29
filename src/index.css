@@ -15,3 +15,8 @@ body {
   max-height: 300px;
   width: 100%;
 }
+
+.paper {
+  margin-bottom: 20px;
+  padding: 16px;
+}

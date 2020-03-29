@@ -20,9 +20,16 @@ export default class SongEnter extends Component {
   started = false;
   editing = false;
 
+  reset() {
+    this.line = -this.nLines;
+    this.field = 0;
+    this.orderIdx = 0;
+    this.nextLines();
+  }
+
   componentDidMount() {
     this.props.mousetrap('down', e => {
-      e.preventDefault();
+      if (e) {e.preventDefault();}
       console.log('down');
       if (this.started) {
         this.nextLines();
@@ -38,7 +45,7 @@ export default class SongEnter extends Component {
       this.props.mousetrap(id, e => {
         if (this.editing) return;
         if(!this.state.songData) return;
-        e.preventDefault();
+        if (e) {e.preventDefault();}
         console.log('pressed', id);
         this.line = 0;
         this.field = this.state.songData.ids.indexOf(`#${id.toUpperCase()}`);
@@ -51,7 +58,7 @@ export default class SongEnter extends Component {
     });
 
     this.props.mousetrap('up', e => {
-      e.preventDefault();
+      if (e) {e.preventDefault();}
       console.log('up');
       if (this.started) {
         this.prevLines();
@@ -62,6 +69,8 @@ export default class SongEnter extends Component {
     });
 
     window.addEventListener('resize', () => {this.updateDot();});
+
+    this.props.setResetCallback(this.reset.bind(this));
   }
 
   getOrderField() {
@@ -194,8 +203,9 @@ export default class SongEnter extends Component {
 
   componentWillUpdate(nextProps, nextState) {
     console.log('component update')
-    if (nextState.songData !== undefined) {
-      
+    if (nextProps.reset !== undefined) {
+      this.reset();
+      this.props.reset = undefined;
     }
     if (nextProps.songData !== this.props.songData) {
       console.log('prop change')

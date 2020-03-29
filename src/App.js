@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import SongEnter from './SongEnter';
-import SongList from './SongList';
+
 import Controls from './Controls';
 import Plan from './Plan';
 import Grid from '@material-ui/core/Grid';
@@ -15,18 +15,26 @@ const keyCodeMap = {
 
 class App extends Component {
 
-  state = {songList: [], songData: undefined};
+  state = {songList: [], songData: undefined, plan: []};
   searchIndex = new FlexSearch({
     threshold: 7,
     depth: 3
   });
   editing=false;
+  resetSong=undefined;
 
   keyMap = {};
 
   updateSong(songData) {
     console.log('app update song');
     this.setState({songData});
+    if (this.resetSong) {
+      this.resetSong();
+    }
+  }
+
+  setResetCallback(callback) {
+    this.resetSong = callback;
   }
 
   componentDidMount() {
@@ -42,6 +50,14 @@ class App extends Component {
     const codes = keyCodeMap[key];
     if (codes) {
       codes.forEach(code => this.keyMap[code] = callback);
+      this.keyMap[key] = callback;
+    }
+  }
+
+  doKey(which) {
+    const callback = this.keyMap[which];
+    if (callback) {
+      callback();
     }
   }
 
@@ -55,36 +71,34 @@ class App extends Component {
         }
       }} className="App">
 
-      <Grid container spacing={3}>
-      <Grid item xs={6}>
-        <SongEnter mousetrap={this.mousetrap.bind(this)} songData={this.state.songData}/>
-      </Grid>
-      <Grid item xs={6}>
+      <div style={{position: 'absolute', padding: '20px', top: '0px', left: '0px', height: '100%', right: '420px', overflowY: 'auto'}}>
+
+      
+        <SongEnter 
+          mousetrap={this.mousetrap.bind(this)}
+          songData={this.state.songData}
+          setResetCallback={this.setResetCallback.bind(this)}/>
+      </div>
      
-      <Grid container
-        direction="column"
-        justify="flex-start"
-        alignItems="stretch" spacing={3}>
+      <div style={{position: 'absolute', padding: '20px', top: '0px', right: '0px', height: '100%', width: '400px', overflowY: 'auto'}}>
 
-       <Grid item xs={12}>
-          <Controls/>
-        </Grid>
+        <Controls/>
+        <Plan 
+          plan={this.state.plan}
+          setPlan={plan => this.setState({plan})}
+          songList={this.state.songList}
+          searchIndex={this.searchIndex}
+          updateSong={this.updateSong.bind(this)}
+          handleEditing={editing => {this.editing = editing;}}
+          addToPlan={item =>{
+            const plan2 = Array.from(this.state.plan);
+            plan2.push(item);
+            this.setState({plan: plan2})
+            }}
+          
+          />
 
-        <Grid item xs={12}>
-          <Plan/>
-        </Grid>
-
-        <Grid item xs={12}></Grid>
-          <SongList
-            songList={this.state.songList}
-            searchIndex={this.searchIndex}
-            updateSong={this.updateSong.bind(this)}
-            handleEditing={editing => {this.editing = editing;}}/>
-        </Grid>
-
-      </Grid>
-
-      </Grid>
+      </div>
       </div>
     );
   }

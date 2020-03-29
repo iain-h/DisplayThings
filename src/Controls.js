@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 
 import {Checkbox, FormGroup, FormControlLabel} from '@material-ui/core';
+import Paper from '@material-ui/core/Paper';
 
 export default class Controls extends Component {
 
@@ -17,6 +18,7 @@ export default class Controls extends Component {
   render() {
     return (
       <main>
+        <Paper style={{paddingLeft: '16px', marginBottom: '20px'}}>
       <FormGroup row>
             <FormControlLabel
               control={
@@ -30,7 +32,7 @@ export default class Controls extends Component {
               label="Show"
             />
        </FormGroup>
-
+       </Paper>
       </main>
     );
   }

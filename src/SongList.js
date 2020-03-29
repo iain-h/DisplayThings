@@ -3,6 +3,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
+import {
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  IconButton,
+  ListItemSecondaryAction
+} from "@material-ui/core";
+import InboxIcon from "@material-ui/icons/Inbox";
+import EditIcon from "@material-ui/icons/Edit";
 import { lighten, makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -16,43 +26,27 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import Checkbox from '@material-ui/core/Checkbox';
-import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
 import DeleteIcon from '@material-ui/icons/Delete';
 import SearchIcon from '@material-ui/icons/Search';
+
 import Input from '@material-ui/core/Input';
-
-function descendingComparator(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
-}
-
-function getComparator(order, orderBy) {
-  return order === 'desc'
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
-}
-
-function stableSort(array, comparator) {
-  const stabilizedThis = array.map((el, index) => [el, index]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-  return stabilizedThis.map(el => el[0]);
-}
-
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import RootRef from "@material-ui/core/RootRef";
 const headCells = [
   { id: 'name', numeric: false, disablePadding: true, label: 'Name' }
 ];
+
+const getItemStyle = (isDragging, draggableStyle) => ({
+  // styles we need to apply on draggables
+  ...draggableStyle, height: '30px',
+
+  ...(isDragging && {
+    background: "rgb(235,235,235)"
+  })
+});
 
 function EnhancedTableHead(props) {
   const { classes, onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props;
@@ -183,14 +177,6 @@ const EnhancedTableToolbar = props => {
        </IconButton>
        </div>
       )}
-
-      {(
-        <Tooltip title="Delete">
-          <IconButton aria-label="delete">
-            <DeleteIcon />
-          </IconButton>
-        </Tooltip>
-      )}
     </Toolbar>
   );
 };
@@ -204,7 +190,7 @@ const useStyles = makeStyles(theme => ({
     width: '100%x',
   },
   paper: {
-    width: '90%',
+    width: '100%',
     marginBottom: theme.spacing(2),
   },
   table: {
@@ -227,7 +213,6 @@ export default function EnhancedTable(props) {
   const classes = useStyles();
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('calories');
-  const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(true);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
@@ -240,16 +225,11 @@ export default function EnhancedTable(props) {
   };
 
   const handleClick = (event, name) => {
-    let newSelected = [name];
+    props.addToPlan(name);
 
-    setSelected(newSelected);
-
-    if (newSelected.length > 0) {
-      window.setSong(newSelected[0], songData => {
-        props.updateSong(songData);
-      });
-    }
-
+    window.setSong(name, songData => {
+      props.updateSong(songData);
+    });
   };
 
   const handleChangePage = (event, newPage) => {
@@ -261,11 +241,7 @@ export default function EnhancedTable(props) {
     setPage(0);
   };
 
-  const handleChangeDense = event => {
-    setDense(event.target.checked);
-  };
-
-  const isSelected = name => selected.indexOf(name) !== -1;
+  const isSelected = name => props.plan.indexOf(name) !== -1;
 
   const emptyRows = rowsPerPage - Math.min(rowsPerPage, props.songList.length - page * rowsPerPage);
 
@@ -275,65 +251,55 @@ export default function EnhancedTable(props) {
 
       <Paper className={classes.paper}>
         <EnhancedTableToolbar
-           numSelected={selected.length}
            searchIndex={props.searchIndex}
            setSearchResults={setSearchResults}
            songList={props.songList}
            handleChangePage={handleChangePage}
            handleEditing={props.handleEditing}
         />
-        <TableContainer>
-          <Table
-            className={classes.table}
-            aria-labelledby="tableTitle"
-            size={dense ? 'small' : 'medium'}
-            aria-label="enhanced table"
-          >
-            <EnhancedTableHead
-              classes={classes}
-              numSelected={selected.length}
-              order={order}
-              orderBy={orderBy}
-              onRequestSort={handleRequestSort}
-              rowCount={rows.length}
-            />
-            <TableBody>
-              {rows
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row, index) => {
-                  const isItemSelected = isSelected(row.name);
-                  const labelId = `enhanced-table-checkbox-${index}`;
+          <Droppable droppableId="songList">
+            {(provided, snapshot) => (
+              <RootRef rootRef={provided.innerRef}>
+                <List>
+                  {rows
+                        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage + props.plan.length)
+                        .filter((row, index) => props.plan.indexOf(row.name) == -1)
+                        .map((row, index) => {
+                          if (index >= rowsPerPage) return null;
+                       return (
+                    <Draggable key={row.name} draggableId={row.name} index={index}>
+                       {(provided, snapshot) => (
+                      <ListItem
+                          ContainerComponent="li"
+                          ContainerProps={{ ref: provided.innerRef }}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          style={getItemStyle(
+                            snapshot.isDragging,
+                            provided.draggableProps.style
+                          )}
+                        >
+                          <ListItemIcon>
+                            <InboxIcon />
+                          </ListItemIcon>
+                          <Tooltip title={row.name}>
+                          <ListItemText
+                            primary={row.name.length > 28 ? row.name.substring(0, 25) + '...' :  row.name}
+                          />
+                          </Tooltip>
+                          <ListItemSecondaryAction>
 
-                  return (
-                    <TableRow
-                      hover
-                      onClick={event => handleClick(event, row.name)}
-                      role="checkbox"
-                      aria-checked={isItemSelected}
-                      tabIndex={-1}
-                      key={row.id}
-                      selected={isItemSelected}
-                    >
-                      <TableCell padding="checkbox">
-                        <Checkbox
-                          checked={isItemSelected}
-                          inputProps={{ 'aria-labelledby': labelId }}
-                        />
-                      </TableCell>
-                      <TableCell component="th" id={labelId} scope="row" padding="none">
-                        {row.name}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              {emptyRows > 0 && (
-                <TableRow style={{ height: (dense ? 33 : 53) * emptyRows }}>
-                  <TableCell colSpan={1} />
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                          </ListItemSecondaryAction>
+                        </ListItem>)}
+                    </Draggable>
+                  );}
+                  )}
+                  {provided.placeholder}
+                </List>
+              </RootRef>
+            )}
+          </Droppable>
+
         <TablePagination
           rowsPerPageOptions={[10]}
           component="div"
