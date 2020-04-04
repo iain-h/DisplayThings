@@ -31,7 +31,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
 import DeleteIcon from '@material-ui/icons/Delete';
 import SearchIcon from '@material-ui/icons/Search';
-
+import AddIcon from '@material-ui/icons/Add';
 import Input from '@material-ui/core/Input';
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import RootRef from "@material-ui/core/RootRef";
@@ -164,6 +164,7 @@ const EnhancedTableToolbar = props => {
     >
       {(
        <div>
+      <Tooltip title="Search for a song">
        <Input
          className={classes.input}
          placeholder="Search Songs"
@@ -172,9 +173,16 @@ const EnhancedTableToolbar = props => {
          onFocus={e => props.handleEditing(true)}
          onBlur={e => props.handleEditing(false)}
        />
-       <IconButton type="submit" className={classes.iconButton} aria-label="search">
+       </Tooltip>
+       <IconButton className={classes.iconButton} aria-label="search">
          <SearchIcon />
        </IconButton>
+       
+       <Tooltip title="Add a song">
+        <IconButton>
+            <AddIcon/>
+          </IconButton>
+        </Tooltip>
        </div>
       )}
     </Toolbar>
@@ -224,9 +232,7 @@ export default function EnhancedTable(props) {
     setOrderBy(property);
   };
 
-  const handleClick = (event, name) => {
-    props.addToPlan(name);
-
+  const handleEdit = (name, event) => {
     window.setSong(name, songData => {
       props.updateSong(songData);
     });
@@ -280,7 +286,9 @@ export default function EnhancedTable(props) {
                           )}
                         >
                           <ListItemIcon>
-                            <InboxIcon />
+                          <IconButton onClick={handleEdit.bind(null,row.name, index)}>
+                            <EditIcon/>
+                          </IconButton>
                           </ListItemIcon>
                           <Tooltip title={row.name}>
                           <ListItemText
@@ -309,6 +317,7 @@ export default function EnhancedTable(props) {
           onChangePage={handleChangePage}
           onChangeRowsPerPage={handleChangeRowsPerPage}
         />
+
       </Paper>
 
   );

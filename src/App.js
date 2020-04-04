@@ -11,7 +11,8 @@ import FlexSearch from 'flexsearch';
 
 const keyCodeMap = {
   down: [40], up: [38], 
-  1: [49,97], 2: [50,98], 3: [51,99], 4: [52,100], 5: [53,101], 6: [54,102], 7: [55,103], c: [67]};
+  1: [49,97], 2: [50,98], 3: [51,99], 4: [52,100], 5: [53,101], 6: [54,102], 7: [55,103], c: [67],
+  escape: [27]};
 
 class App extends Component {
 
@@ -75,7 +76,7 @@ class App extends Component {
         }
       }} className="App">
 
-      <div style={{position: 'absolute', padding: '20px', top: '0px', left: '0px', height: '100%', right: '440px', overflowY: 'auto'}}>
+      <div style={{position: 'absolute', top: '20px', left: '20px', right: '440px', bottom: '20px', overflowY: 'auto'}}>
 
       
         <SongEnter 
@@ -84,10 +85,11 @@ class App extends Component {
           setResetCallback={this.setResetCallback.bind(this)}/>
       </div>
      
-      <div style={{position: 'absolute', marginLeft: '20px', padding: '20px', top: '0px', right: '0px', height: '100%', width: '400px', overflowY: 'auto'}}>
+      <div style={{position: 'absolute', top: '20px', width: '400px', paddingRight: '20px', right: '0px', bottom: '20px', overflowY: 'auto'}}>
 
         <Controls/>
         <Plan 
+          mousetrap={this.mousetrap.bind(this)}
           plan={this.state.plan}
           setPlan={plan => {this.setState({plan}); window.savePlan(plan);}}
           songList={this.state.songList}

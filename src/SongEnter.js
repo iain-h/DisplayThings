@@ -1,15 +1,29 @@
-import React, {Component} from 'react'
+import React, {Component, useCallback} from 'react'
 import { makeStyles } from '@material-ui/core/styles';
 import FormControl from '@material-ui/core/FormControl';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
+import AddIcon from '@material-ui/icons/Add';
+import {
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  IconButton
+} from "@material-ui/core";
+import Tooltip from '@material-ui/core/Tooltip';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+
 const getCaretCoordinates = require('textarea-caret');
+
 
 export default class SongEnter extends Component {
 
   state = {
-    songData: this.props.songData
+    songData: this.props.songData,
+    anchorEl: null
   };
 
   line = 0;
@@ -63,7 +77,7 @@ export default class SongEnter extends Component {
       }
     });
 
-    window.addEventListener('resize', () => {this.updateDot();});
+    //window.addEventListener('resize', () => {this.updateDot();});
 
     this.props.setResetCallback(this.reset.bind(this));
   }
@@ -126,9 +140,9 @@ export default class SongEnter extends Component {
   }
 
   updateDot() {
-    window.requestAnimationFrame(() => {
-      this.moveDot();
-    });
+      window.requestAnimationFrame(() => {
+        this.moveDot();
+      });
   }
 
   moveDot() {
@@ -142,10 +156,15 @@ export default class SongEnter extends Component {
     }
     const p1 = getCaretCoordinates(this.textInputs['#O'], this.orderIdx);
     const p2 = getCaretCoordinates(this.textInputs['#O'], this.orderIdx + 1);
-    const rect = this.textInputs['#O'].getBoundingClientRect();
+    
 
-    dot.style.top = (p1.top + rect.top + window.scrollY) + "px";
-    dot.style.left = (p1.left + rect.left + window.scrollX) + "px";
+    const rect = this.textInputs['#O'].getBoundingClientRect();
+    const rect2 = this.textInputs['#O'].parentElement.parentElement.parentElement.getBoundingClientRect();
+    const x = rect.left - rect2.left;
+    const y = rect.top - rect2.top;
+
+    dot.style.top = (p1.top + y ) + "px";
+    dot.style.left = (p1.left + x ) + "px";
     dot.style.width = (p2.left - p1.left) + "px";
     dot.style.height = p1.height - 2 + "px";
   }
@@ -215,6 +234,20 @@ export default class SongEnter extends Component {
     this.updateDot();
   }
 
+  handleClick(event) {
+    this.setState({anchorEl: event.currentTarget});
+  }
+
+  handleClose(id) {
+    if (id) {
+      let songData = Object.assign({}, this.state.songData);
+      songData.hasField[id] = true;
+      this.setState({anchorEl: null, songData});
+    } else {
+      this.setState({anchorEl: null});
+    }
+  }
+
   render() {
 
     const songData = this.state.songData;
@@ -223,25 +256,34 @@ export default class SongEnter extends Component {
 
     return (
       <main>
-        <div id="dot" style={{
-          position: 'absolute',
-          top: '-10px',
-          left: '-10px',
-          width: '4px',
-          height: '2px',
-          borderBottom: '2px solid black',
-          backgroundColor: '#FF0'
-          }}></div>
+       
         <div id="songEnterRoot" className="root">
-        <Grid container alignItems="stretch" direction="row" spacing={2}>
+        <Grid container alignItems="stretch" direction="row" spacing={2} 
+        style={{
+          margin: 0,
+          width: '100%',
+        }}>
       
-          {songData.fields.map((f, i) => {
+          {songData.ids.map((id, i) => {
+
+            const f = songData.fields[i];
             
-            if (f === undefined || f.length === 0) return null;
+            if (!songData.hasField[id] && (f === undefined || f.length === 0)) return null;
 
             return (
-              <Grid item xs={6}>
-              <TextField className="field" id={songData.ids[i]} key={songData.ids[i]}
+              <Grid item xs={6} key={songData.ids[i]}>
+                <div>
+                {songData.ids[i] === '#O' ?
+                (<div id="dot" style={{
+                  position: 'relative',
+                  top: '-10px',
+                  left: '-10px',
+                  width: '4px',
+                  height: '2px',
+                  borderBottom: '2px solid black',
+                  backgroundColor: '#FF0'
+                  }}></div>) : null}
+              <TextField className="field" id={songData.ids[i]} 
                 inputRef={x => this.textInputs[songData.ids[i]] = x}
                 label={songData.names[i]} multiline rows="1" rowsMax="20"
                 variant="outlined" name={songData.names[i]}
@@ -253,14 +295,38 @@ export default class SongEnter extends Component {
                 }}
                 onBlur={e => {this.editing = false;}}
                 onClick={e => {this.editing = true;}}
-                onChange={this.handleOnChange.bind(this, i)}/>
-                
+                onChange={this.handleOnChange.bind(this, i)}>
+                </TextField>
+                </div>
                 </Grid>
                 );
           })}
       
         </Grid>
 
+        <Tooltip title="Add a field">
+        <IconButton onClick={this.handleClick.bind(this)}>
+          <AddIcon/>
+        </IconButton>
+        </Tooltip>
+        <Menu
+          id="simple-menu"
+          anchorEl={this.state.anchorEl}
+          open={Boolean(this.state.anchorEl)}
+          onClose={this.handleClose.bind(this)}
+        >
+          {
+          songData.ids.map((id, i) => {
+
+            const f = songData.fields[i];
+            if (!songData.hasField[id] && (f === undefined || f.length === 0)) {
+              return (<MenuItem onClick={this.handleClose.bind(this, id)} key={id}>{songData.names[i]}</MenuItem>);
+            }
+            return null;
+
+          })
+          }
+        </Menu>
         
         </div>
       </main>

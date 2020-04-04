@@ -10,7 +10,7 @@ import {
 import RootRef from "@material-ui/core/RootRef";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import InboxIcon from "@material-ui/icons/Inbox";
-import EditIcon from "@material-ui/icons/Edit";
+
 import PanoramaWideAngleIcon from '@material-ui/icons/PanoramaWideAngle';
 import DesktopWindowsIcon from '@material-ui/icons/DesktopWindows';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
@@ -121,6 +121,14 @@ export default class Plan extends Component {
   deselect() {
     this.setState({selected: ''});
     window.setWords('');
+  }
+
+  componentDidMount() {
+    this.props.mousetrap('escape', e => {
+      if (e) {e.preventDefault();}
+      console.log('escape');
+      this.deselect();
+    });
   }
 
   handleRemove(name) {

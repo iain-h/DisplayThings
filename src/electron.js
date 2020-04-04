@@ -78,7 +78,7 @@ function createWindow() {
     //displayWindow.show();
     // Open the DevTools.
     mainWindow.webContents.openDevTools();
-    displayWindow.webContents.openDevTools()
+    //displayWindow.webContents.openDevTools()
 }
 
 // This method will be called when Electron has finished
@@ -119,8 +119,9 @@ exports.setSong = async (songName, callback) => {
     const songData = {
        name: songName,
        fields: [],
-       ids: ['#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8', '#9', '#C', '#B', '#A', '#O'],
-       names: ['Verse 1', 'Verse 2', 'Verse 3', 'Verse 4', 'Verse 5', 'Verse 6', 'Verse 7', 'Verse 8', 'Verse 9', 'Chorus', 'Bridge', 'Author', 'Order']
+       ids: ['#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8', '#9', '#C', '#B', '#A', '#O', '#T'],
+       names: ['Verse 1', 'Verse 2', 'Verse 3', 'Verse 4', 'Verse 5', 'Verse 6', 'Verse 7', 'Verse 8', 'Verse 9', 'Chorus', 'Bridge', 'Author', 'Order', 'Title'],
+       hasField: {}
     };
 
     fs.readFile(fp, (err, byteArray) => {
@@ -152,6 +153,9 @@ exports.setSong = async (songName, callback) => {
             }
         });
         setContent();
+
+        songData.fields[songData.ids.indexOf('#T')] = songName;
+
         callback(songData);
     });
     
