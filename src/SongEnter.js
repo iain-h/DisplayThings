@@ -29,6 +29,7 @@ export default class SongEnter extends Component {
   line = 0;
   field = 0;
   orderIdx = 0;
+  fieldId = -1;
   nLines = 2;
   textInputs = {'#i': 'blur'};
   started = false;
@@ -57,7 +58,8 @@ export default class SongEnter extends Component {
         if (e) {e.preventDefault();}
         console.log('pressed', id);
         this.line = 0;
-        this.field = this.state.songData.ids.indexOf(`#${id.toUpperCase()}`);
+        this.fieldId = `#${id.toUpperCase()}`;
+        this.field = this.state.songData.ids.indexOf(this.fieldId);
         this.orderIdx = this.getOrderField().indexOf(id.toUpperCase());
         this.started = true;
         console.log(this.field,  this.orderIdx);
@@ -183,13 +185,17 @@ export default class SongEnter extends Component {
     }
     window.setWords(fieldLines.slice(this.line, this.line+this.nLines).join('\n'));
 
-    const orderField = this.getOrderField();
-    if (this.orderIdx < orderField.length) {
-      const id = '#' + orderField.charAt(this.orderIdx).toUpperCase();
-      if (this.textInputs[id]) {
-        this.textInputs[id].setSelectionRange(count1, count2);
-        this.textInputs[id].focus();
-      }
+    let id;
+    if (this.orderIdx == -1) {
+      id = this.fieldId;
+    } else {
+      const orderField = this.getOrderField();
+      id = '#' + orderField.charAt(this.orderIdx).toUpperCase();
+    }
+    
+    if (id != -1 && this.textInputs[id]) {
+      this.textInputs[id].setSelectionRange(count1, count2);
+      this.textInputs[id].focus();
     }
 
     this.moveDot();
@@ -258,22 +264,27 @@ export default class SongEnter extends Component {
       <main>
        
         <div id="songEnterRoot" className="root">
-        <Grid container alignItems="stretch" direction="row" spacing={2} 
+        <Grid container alignItems="stretch" direction="row" spacing={2} justify="flex-start"
         style={{
           margin: 0,
           width: '100%',
         }}>
       
-          {songData.ids.map((id, i) => {
+          {songData.ids.filter((id, i) => {
 
             const f = songData.fields[i];
-            
-            if (!songData.hasField[id] && (f === undefined || f.length === 0)) return null;
+            return songData.hasField[id] || (f !== null && f !== undefined && f.length !== 0);
+
+          }).map(id => {
+
+            const idx = songData.ids.indexOf(id);
+            const f = songData.fields[idx];
+            const name = songData.names[idx];
 
             return (
-              <Grid item xs={6} key={songData.ids[i]}>
+              <Grid item xs={6} flex-grow={1} key={id}>
                 <div>
-                {songData.ids[i] === '#O' ?
+                {id === '#O' ?
                 (<div id="dot" style={{
                   position: 'relative',
                   top: '-10px',
@@ -283,10 +294,10 @@ export default class SongEnter extends Component {
                   borderBottom: '2px solid black',
                   backgroundColor: '#FF0'
                   }}></div>) : null}
-              <TextField className="field" id={songData.ids[i]} 
-                inputRef={x => this.textInputs[songData.ids[i]] = x}
-                label={songData.names[i]} multiline rows="1" rowsMax="20"
-                variant="outlined" name={songData.names[i]}
+              <TextField className="field" id={id} 
+                inputRef={x => this.textInputs[id] = x}
+                label={name} multiline rows="1" rowsMax="20"
+                variant="outlined" name={name}
                 value={f}
                 onKeyDownCapture={e => {
                   if (!this.editing) {
@@ -295,7 +306,7 @@ export default class SongEnter extends Component {
                 }}
                 onBlur={e => {this.editing = false;}}
                 onClick={e => {this.editing = true;}}
-                onChange={this.handleOnChange.bind(this, i)}>
+                onChange={this.handleOnChange.bind(this, idx)}>
                 </TextField>
                 </div>
                 </Grid>
@@ -319,7 +330,7 @@ export default class SongEnter extends Component {
           songData.ids.map((id, i) => {
 
             const f = songData.fields[i];
-            if (!songData.hasField[id] && (f === undefined || f.length === 0)) {
+            if (!songData.hasField[id] && (f === null || f === undefined || f.length === 0)) {
               return (<MenuItem onClick={this.handleClose.bind(this, id)} key={id}>{songData.names[i]}</MenuItem>);
             }
             return null;

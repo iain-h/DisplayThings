@@ -10,6 +10,7 @@ const walk = require('walk');
 let mainWindow;
 let displayWindow;
 
+let songDatabase = {};
 
 
 function createWindow() {
@@ -112,55 +113,6 @@ exports.setWords = words => {
     displayWindow.webContents.send('words', words);
 };
 
-exports.setSong = async (songName, callback) => {
-
-    const fp = path.join(__dirname, '../public/Songs', `${songName}.txt`);
-
-    const songData = {
-       name: songName,
-       fields: [],
-       ids: ['#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8', '#9', '#C', '#B', '#A', '#O', '#T'],
-       names: ['Verse 1', 'Verse 2', 'Verse 3', 'Verse 4', 'Verse 5', 'Verse 6', 'Verse 7', 'Verse 8', 'Verse 9', 'Chorus', 'Bridge', 'Author', 'Order', 'Title'],
-       hasField: {}
-    };
-
-    fs.readFile(fp, (err, byteArray) => {
-
-        let l1Buffer = Buffer.from(byteArray, 'latin1');
-        let data = l1Buffer.toString('latin1')
-
-        //if (err) return;
-        let dest = undefined;
-        let content = [];
-        const setContent = () => {
-            if (dest === undefined) return;
-            songData.ids.forEach((id, i) => {
-                if (dest.startsWith(id) ) {
-                    songData.fields[i] = content.join('\n');
-                }
-            });
-        };
-        
-        data.split(/\r?\n|\r/g).forEach(line => {
-            if (line.startsWith('#')) {
-                setContent();
-                dest = line;
-                content = [];
-            } else {
-                if (line.length > 0) {
-                    content.push(line);
-                }
-            }
-        });
-        setContent();
-
-        songData.fields[songData.ids.indexOf('#T')] = songName;
-
-        callback(songData);
-    });
-    
-};
-
 exports.setShow = show => {
 
     if (show) {
@@ -197,28 +149,111 @@ exports.setShow = show => {
     }
 };
 
+const readSong = async (songName, callback) => {
 
-exports.getSongs = songFunc => {
+    const fp = path.join(__dirname, '../public/Songs', `${songName}.txt`);
 
-    const songs = [];
+    const songData = {
+       name: songName,
+       fields: [],
+       ids: ['#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8', '#9', '#C', '#B', '#A', '#O', '#T'],
+       names: ['Verse 1', 'Verse 2', 'Verse 3', 'Verse 4', 'Verse 5', 'Verse 6', 'Verse 7', 'Verse 8', 'Verse 9', 'Chorus', 'Bridge', 'Author', 'Order', 'Title'],
+       hasField: {}
+    };
 
-    const walker = walk.walk(path.join(__dirname, '../public/Songs'));
-    walker.on("file", function (root, fileStats, next) {
-        const name = fileStats.name.split('.')[0];
-        const id = songs.length;
-        let search = name + ' ';
-        fs.readFile(path.join(__dirname, '../public/Songs', fileStats.name), 'utf8', (err, data) => {
-            data.split('\n').forEach(line => {
-                if (line.startsWith('#')) return;
-                search += line + ' ';
+    fs.readFile(fp, (err, byteArray) => {
+
+        if (err !== null) {
+            console.log(err);
+            callback();
+            return;
+        }
+
+        let l1Buffer = Buffer.from(byteArray, 'latin1');
+        let data = l1Buffer.toString('latin1')
+
+        //if (err) return;
+        let dest = undefined;
+        let content = [];
+        const setContent = () => {
+            if (dest === undefined) return;
+            songData.ids.forEach((id, i) => {
+                if (dest.startsWith(id) ) {
+                    songData.fields[i] = content.join('\n');
+                }
             });
-            songs.push({id, name, search});
-            next();
+        };
+        
+        data.split(/\r?\n|\r/g).forEach(line => {
+            if (line.startsWith('#')) {
+                setContent();
+                dest = line;
+                content = [];
+            } else {
+                if (line.length > 0) {
+                    content.push(line);
+                }
+            }
         });
-    });
+        setContent();
 
-    walker.on("end", function () {
-        songFunc(songs);
+        songData.fields[songData.ids.indexOf('#T')] = songName;
+
+        callback(songData);
+    });
+    
+};
+
+exports.getSongs = async songFunc => {
+
+    loadSongDatabase(() => {
+
+        if (Object.keys(songDatabase).length === 0) {
+
+            const walker = walk.walk(path.join(__dirname, '../public/Songs'));
+            walker.on("file", function (root, fileStats, next) {
+                const name = fileStats.name.replace('.txt', '');
+                fs.readFile(path.join(__dirname, '../public/Songs', fileStats.name), 'utf8', (err, data) => {
+
+                    readSong(name, songData => {
+                        if (songData) {
+                            songDatabase[name] = songData;
+                        }
+                        next();
+                    });
+                    
+                });
+            });
+
+            walker.on("end", function () {
+                saveSongDatabase();
+                songFunc(songDatabase);
+            });
+
+        } else {
+            songFunc(songDatabase);
+        }
+
+    });
+    
+};
+
+const saveSongDatabase = () => {
+    fs.writeFile("songDatabase.json", JSON.stringify(songDatabase), err => {
+        if (err) {
+            console.log(err);
+        }
+    });
+};
+
+const loadSongDatabase = callback => {
+    fs.readFile("songDatabase.json", 'utf8', (err, data) => {
+        if (err === null) {
+            songDatabase = JSON.parse(data);
+            callback();
+        } else {
+            callback();
+        }
     });
 };
 

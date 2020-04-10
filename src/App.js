@@ -23,6 +23,7 @@ class App extends Component {
   });
   editing=false;
   resetSong=undefined;
+  songDatabase={};
 
   keyMap = {};
 
@@ -39,9 +40,13 @@ class App extends Component {
   }
 
   componentDidMount() {
-    window.getSongs(songList => {
+    window.getSongs(songDatabase => {
+      this.songDatabase = songDatabase;
       this.searchIndex.clear();
-      songList.forEach((song, i) => this.searchIndex.add(i, song.search));
+
+      const songList = Object.keys(songDatabase);
+
+      songList.forEach((song, i) => this.searchIndex.add(i, song));
 
       window.loadPlan(plan => {
         this.setState({songList, plan});
@@ -76,7 +81,7 @@ class App extends Component {
         }
       }} className="App">
 
-      <div style={{position: 'absolute', top: '20px', left: '20px', right: '440px', bottom: '20px', overflowY: 'auto'}}>
+      <div style={{position: 'absolute', top: '0px', paddingTop: '10px', left: '20px', right: '440px', bottom: '0px', overflowY: 'auto'}}>
 
       
         <SongEnter 
@@ -85,7 +90,7 @@ class App extends Component {
           setResetCallback={this.setResetCallback.bind(this)}/>
       </div>
      
-      <div style={{position: 'absolute', top: '20px', width: '400px', paddingRight: '20px', right: '0px', bottom: '20px', overflowY: 'auto'}}>
+      <div style={{position: 'absolute', top: '0px', paddingTop: '10px', width: '400px', paddingRight: '20px', right: '0px', bottom: '0px', overflowY: 'auto'}}>
 
         <Controls/>
         <Plan 
@@ -102,7 +107,7 @@ class App extends Component {
             this.setState({plan: plan2});
             window.savePlan(plan2);
             }}
-          
+          setSong={name => {return this.songDatabase[name];}}
           />
 
       </div>

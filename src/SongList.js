@@ -233,9 +233,9 @@ export default function EnhancedTable(props) {
   };
 
   const handleEdit = (name, event) => {
-    window.setSong(name, songData => {
-      props.updateSong(songData);
-    });
+    const songData = props.setSong(name);
+    console.log(name, songData.fields);
+    props.updateSong(songData);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -269,11 +269,11 @@ export default function EnhancedTable(props) {
                 <List>
                   {rows
                         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage + props.plan.length)
-                        .filter((row, index) => props.plan.indexOf(row.name) == -1)
+                        .filter((row, index) => props.plan.indexOf(row) == -1)
                         .map((row, index) => {
                           if (index >= rowsPerPage) return null;
                        return (
-                    <Draggable key={row.name} draggableId={row.name} index={index}>
+                    <Draggable key={row} draggableId={row} index={index}>
                        {(provided, snapshot) => (
                       <ListItem
                           ContainerComponent="li"
@@ -286,13 +286,13 @@ export default function EnhancedTable(props) {
                           )}
                         >
                           <ListItemIcon>
-                          <IconButton onClick={handleEdit.bind(null,row.name, index)}>
+                          <IconButton onClick={handleEdit.bind(null,row, index)}>
                             <EditIcon/>
                           </IconButton>
                           </ListItemIcon>
-                          <Tooltip title={row.name}>
+                          <Tooltip title={row}>
                           <ListItemText
-                            primary={row.name.length > 28 ? row.name.substring(0, 25) + '...' :  row.name}
+                            primary={row.length > 28 ? row.substring(0, 25) + '...' :  row}
                           />
                           </Tooltip>
                           <ListItemSecondaryAction>

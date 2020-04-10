@@ -214,11 +214,16 @@ export default class Plan extends Component {
 
      <SongList
           songList={this.props.songList}
+          setSong={name=> {
+            this.deselect();
+            return this.props.setSong(name);
+          }}
           searchIndex={this.props.searchIndex}
           updateSong={this.props.updateSong}
           handleEditing={this.props.handleEditing}
           plan={this.props.plan}
-          addToPlan={this.props.addToPlan}/>
+          addToPlan={this.props.addToPlan}
+          />
 
       </DragDropContext>
      </div>
