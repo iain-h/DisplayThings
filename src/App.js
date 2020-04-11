@@ -31,7 +31,7 @@ class App extends Component {
     console.log('app update song');
     this.setState({songData});
     if (this.resetSong) {
-      this.resetSong();
+      this.resetSong(songData);
     }
   }
 
@@ -107,7 +107,9 @@ class App extends Component {
             this.setState({plan: plan2});
             window.savePlan(plan2);
             }}
-          setSong={name => {return this.songDatabase[name];}}
+          setSong={name => {
+            const songData = this.songDatabase[name];
+            return songData;}}
           />
 
       </div>

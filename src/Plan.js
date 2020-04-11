@@ -111,16 +111,15 @@ export default class Plan extends Component {
   handleEdit(name, index, e) {
     if (this.state.selected === name) return this.deselect();
     e.preventDefault();
-    window.setSong(name, songData => {
-      this.props.updateSong(songData);
-    });
+    const songData = this.props.setSong(name);
+    this.props.updateSong(songData);
     this.setState({selected: name});
     return true;
   }
 
   deselect() {
     this.setState({selected: ''});
-    window.setWords('');
+    this.props.updateSong();
   }
 
   componentDidMount() {
@@ -215,7 +214,7 @@ export default class Plan extends Component {
      <SongList
           songList={this.props.songList}
           setSong={name=> {
-            this.deselect();
+            this.setState({selected: ''});
             return this.props.setSong(name);
           }}
           searchIndex={this.props.searchIndex}

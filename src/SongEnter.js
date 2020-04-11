@@ -34,18 +34,23 @@ export default class SongEnter extends Component {
   textInputs = {'#i': 'blur'};
   started = false;
   editing = false;
+  resetting = 'done';
 
-  reset() {
+  reset(songData) {
     this.line = -this.nLines;
     this.field = 0;
     this.orderIdx = 0;
-    this.nextLines();
+    this.fieldId = -1;
+    this.started = false;
+    this.resetting = 'begin';
+    console.log('reset');
   }
 
   componentDidMount() {
     this.props.mousetrap('down', e => {
       if (e) {e.preventDefault();}
       console.log('down');
+      this.started = true;
       this.nextLines();
     });
 
@@ -85,9 +90,9 @@ export default class SongEnter extends Component {
   }
 
   getOrderField() {
-    if (!this.state.songData) return '#1';
+    if (!this.state.songData) return '';
     return this.state.songData.fields[
-      this.state.songData.ids.indexOf('#O')] || '#1';
+      this.state.songData.ids.indexOf('#O')] || '';
   }
 
   setOrderIndex(orderIdx) {
@@ -172,27 +177,38 @@ export default class SongEnter extends Component {
   }
 
   highlightLines(fieldLines) {
+    console.log('highlightLines');
+
+    if (!this.state.songData) {
+      window.setWords('');
+    }
+
     fieldLines = fieldLines || this.getField(this.state.songData).split('\n');
     let count1 = 0;
     for (let i=0;i<this.line;++i) {
+      if (!fieldLines[i]) continue;
       count1 += fieldLines[i].length +1;
     }
     let count2 = count1;
     for (let i=0;i<this.nLines;++i) {
+      if (!fieldLines[i]) continue;
       if (this.line + i < fieldLines.length) {
+        if (!fieldLines[this.line + i]) continue;
         count2 += fieldLines[this.line + i].length + 1;
       }
     }
-    window.setWords(fieldLines.slice(this.line, this.line+this.nLines).join('\n'));
+    const words = fieldLines.slice(this.line, this.line+this.nLines).join('\n');
+    window.setWords(words);
 
     let id;
     if (this.orderIdx == -1) {
       id = this.fieldId;
     } else {
       const orderField = this.getOrderField();
+ 
       id = '#' + orderField.charAt(this.orderIdx).toUpperCase();
     }
-    
+
     if (id != -1 && this.textInputs[id]) {
       this.textInputs[id].setSelectionRange(count1, count2);
       this.textInputs[id].focus();
@@ -223,20 +239,25 @@ export default class SongEnter extends Component {
 
   componentWillUpdate(nextProps, nextState) {
     console.log('component update')
-    if (nextProps.reset !== undefined) {
-      this.reset();
-      this.props.reset = undefined;
-    }
+
     if (nextProps.songData !== this.props.songData) {
-      console.log('prop change')
-      this.setOrderIndex(0);
+      console.log('prop change');
       this.setState({songData: nextProps.songData});
-      this.started = false;
-      window.setWords('');
+    }
+    if (nextState.songData !== this.state.songData) {
+      this.resetting = 'updating';
     }
   }
 
   componentDidUpdate() {
+    if (this.resetting === 'done') {
+      console.log('update - highlight');
+      this.highlightLines();
+    }
+    if (this.resetting === 'updating') {
+      this.nextLines();
+      this.resetting = 'done';
+    }
     this.updateDot();
   }
 

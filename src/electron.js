@@ -107,10 +107,13 @@ app.on('activate', function () {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 
+let message = '';
 
 exports.setWords = words => {
-
+    if (message === words) return;
+    console.log('setWords', words);
     displayWindow.webContents.send('words', words);
+    message = words;
 };
 
 exports.setShow = show => {
