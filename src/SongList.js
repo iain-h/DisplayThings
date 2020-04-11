@@ -149,16 +149,16 @@ const EnhancedTableToolbar = props => {
     >
       {(
        <div>
-      <Tooltip title="Search for a song">
+      
        <Input
          className={classes.input}
          placeholder="Search Songs"
          inputProps={{ 'aria-label': 'search for songs' }}
          onChange={props.handleSearch}
-         onFocus={e => props.handleEditing(true)}
-         onBlur={e => props.handleEditing(false)}
+         onFocus={e => {props.handleEditing(true);}}
+         onBlur={e => {props.handleEditing(false);}}
        />
-       </Tooltip>
+
        <IconButton className={classes.iconButton} aria-label="search">
          <SearchIcon />
        </IconButton>
@@ -219,6 +219,7 @@ export default function EnhancedTable(props) {
   };
 
   React.useEffect(() => {
+    console.log('doSearch');
     doSearch(searchTerm);
   }, [props.songList]);
 
@@ -237,10 +238,10 @@ export default function EnhancedTable(props) {
     props.searchIndex.search(value, {
       limit: 20
     }, results => {
-      if (results.length > 0) {
+      //if (results.length > 0) {
         setSearchResults(results.map(idx => props.songList[idx]));
         handleChangePage(null, 0);
-      }
+      //}
     });
   };
 
@@ -262,7 +263,7 @@ export default function EnhancedTable(props) {
 
   const emptyRows = rowsPerPage - Math.min(rowsPerPage, props.songList.length - page * rowsPerPage);
 
-  const rows = searchResults.length > 0 ? searchResults : props.songList;
+  const rows = searchTerm === '' ? props.songList : searchResults;
 
   return (
 

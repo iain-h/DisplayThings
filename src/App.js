@@ -44,9 +44,7 @@ class App extends Component {
     const songList = Object.keys(this.songDatabase)
       .filter(key => this.songDatabase[key] !== undefined);
     songList.forEach((song, i) => this.searchIndex.add(i, song));
-    window.loadPlan(plan => {
-      this.setState({songList});
-    });
+    this.setState({songList});
   }
 
   componentDidMount() {
@@ -100,6 +98,12 @@ class App extends Component {
               if (title != songData.name) {
                 deleteName = songData.name;
                 this.songDatabase[songData.name] = undefined;
+                const idx = this.state.plan.indexOf(deleteName);
+                if (idx != -1) {
+                  const newPlan = Array.from(this.state.plan);
+                  newPlan.splice(idx, 1, title);
+                  this.setState({plan: newPlan});
+                }
               }
               songData.name = title;
               this.songDatabase[songData.name] = songData;
@@ -107,6 +111,19 @@ class App extends Component {
               window.updateSongDatabase(JSON.stringify(songData), deleteName);
             }
           }
+          deleteSong={songData => {
+            const deleteName = songData.name;
+            this.songDatabase[deleteName] = undefined;
+            this.indexSongs();
+            window.updateSongDatabase('', deleteName);
+            this.setState({songData: undefined});
+            const idx = this.state.plan.indexOf(deleteName);
+            if (idx != -1) {
+              const newPlan = Array.from(this.state.plan);
+              newPlan.splice(idx, 1);
+              this.setState({plan: newPlan});
+            }
+          }}
           />
       </div>
      
@@ -120,7 +137,7 @@ class App extends Component {
           songList={this.state.songList}
           searchIndex={this.searchIndex}
           updateSong={this.updateSong.bind(this)}
-          handleEditing={editing => {this.editing = editing;}}
+          handleEditing={editing => { this.editing = editing;}}
           addToPlan={item =>{
             const plan2 = Array.from(this.state.plan);
             plan2.push(item);

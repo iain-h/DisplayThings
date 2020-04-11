@@ -15,6 +15,7 @@ import {
 import Tooltip from '@material-ui/core/Tooltip';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 const getCaretCoordinates = require('textarea-caret');
 
@@ -268,6 +269,12 @@ export default class SongEnter extends Component {
     this.setState({anchorEl: event.currentTarget});
   }
 
+  handleDelete(event) {
+    if (window.confirmDelete() === 1) {
+      this.props.deleteSong(this.state.songData);
+    }
+  }
+
   handleClose(id) {
     if (id) {
       let songData = Object.assign({}, this.state.songData);
@@ -350,6 +357,12 @@ export default class SongEnter extends Component {
           <AddIcon/>
         </IconButton>
         </Tooltip>
+        <Tooltip title="Delete this song">
+        <IconButton onClick={this.handleDelete.bind(this)}>
+        <DeleteIcon />
+        </IconButton>
+        </Tooltip>
+
         <Menu
           id="simple-menu"
           anchorEl={this.state.anchorEl}

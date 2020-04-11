@@ -8,7 +8,8 @@ const {
     savePlan, 
     loadPlan, 
     updateSongDatabase, 
-    setKeyDownCallback
+    setKeyDownCallback,
+    confirmDelete
 } = electron.remote.require('./electron.js');
 const path = require('path');
 
@@ -21,3 +22,4 @@ window.loadPlan = loadPlan;
 window.createSong = createSong;
 window.setKeyDownCallback = setKeyDownCallback;
 window.updateSongDatabase = updateSongDatabase;
+window.confirmDelete = confirmDelete;

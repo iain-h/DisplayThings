@@ -1,4 +1,4 @@
-const {app, BrowserWindow, screen} = require('electron');
+const {app, BrowserWindow, screen, dialog} = require('electron');
 
 const path = require('path');
 const url = require('url');
@@ -267,12 +267,17 @@ const saveSongDatabase = () => {
 };
 
 exports.updateSongDatabase = (songDataStr, deleteName) => {
-    const songData = JSON.parse(songDataStr);
-    console.log('Updating Song Database', songData.name);
+    console.log('Updating Song Database');
+
+    if (songDataStr) {
+        const songData = JSON.parse(songDataStr);
+        songDatabase[songData.name] = songData;
+    }
+    
     if (deleteName) {
         songDatabase[deleteName] = undefined;
     }
-    songDatabase[songData.name] = songData;
+    
     saveSongDatabase();
 };
 
@@ -312,4 +317,15 @@ exports.displayKeyPressed = which => {
 };
 exports.setKeyDownCallback = func => {
     keyDownCallback = func;
+};
+
+exports.confirmDelete = () => {
+    return dialog.showMessageBoxSync({
+        type: 'warning',
+        buttons: ['Cancel', 'OK'],
+        title: 'Confirm',
+        message: 'Are you sure you want to delete this song?',
+        defaultId: 1,
+        cancelId: 0
+    });
 };
