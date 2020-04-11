@@ -141,21 +141,6 @@ const EnhancedTableToolbar = props => {
   const classes = useToolbarStyles();
   const { numSelected } = props;
 
-  const handleSearch = e => {
-    if (e.target.value.length === 0) {
-      props.setSearchResults([]);
-    }
-    //if (!props.searchIndex) return;
-    props.searchIndex.search(e.target.value, {
-      limit: 20
-    }, results => {
-      if (results.length > 0) {
-        props.setSearchResults(results.map(idx => props.songList[idx]));
-        props.handleChangePage(e, 0);
-      }
-    });
-  };
-
   return (
     <Toolbar
       className={clsx(classes.froot, {
@@ -169,7 +154,7 @@ const EnhancedTableToolbar = props => {
          className={classes.input}
          placeholder="Search Songs"
          inputProps={{ 'aria-label': 'search for songs' }}
-         onChange={handleSearch}
+         onChange={props.handleSearch}
          onFocus={e => props.handleEditing(true)}
          onBlur={e => props.handleEditing(false)}
        />
@@ -179,7 +164,7 @@ const EnhancedTableToolbar = props => {
        </IconButton>
        
        <Tooltip title="Add a song">
-        <IconButton>
+        <IconButton onClick={props.createSong}>
             <AddIcon/>
           </IconButton>
         </Tooltip>
@@ -225,6 +210,7 @@ export default function EnhancedTable(props) {
   const [dense, setDense] = React.useState(true);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [searchResults, setSearchResults] = React.useState([]);
+  const [searchTerm, setSearchTerm] = React.useState('');
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -232,10 +218,35 @@ export default function EnhancedTable(props) {
     setOrderBy(property);
   };
 
+  React.useEffect(() => {
+    doSearch(searchTerm);
+  }, [props.songList]);
+
   const handleEdit = (name, event) => {
     const songData = props.setSong(name);
     console.log(name, songData.fields);
     props.updateSong(songData);
+  };
+
+  const doSearch = (value) => {
+    if (value.length === 0) {
+      setSearchResults([]);
+      console.log('no search');
+    }
+    //if (!props.searchIndex) return;
+    props.searchIndex.search(value, {
+      limit: 20
+    }, results => {
+      if (results.length > 0) {
+        setSearchResults(results.map(idx => props.songList[idx]));
+        handleChangePage(null, 0);
+      }
+    });
+  };
+
+  const handleSearch = e => {
+    setSearchTerm(e.target.value);
+    doSearch(e.target.value);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -258,10 +269,11 @@ export default function EnhancedTable(props) {
       <Paper className={classes.paper}>
         <EnhancedTableToolbar
            searchIndex={props.searchIndex}
-           setSearchResults={setSearchResults}
+           handleSearch={handleSearch}
            songList={props.songList}
            handleChangePage={handleChangePage}
            handleEditing={props.handleEditing}
+           createSong={props.createSong}
         />
           <Droppable droppableId="songList">
             {(provided, snapshot) => (

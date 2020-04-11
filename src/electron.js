@@ -152,17 +152,30 @@ exports.setShow = show => {
     }
 };
 
+const createSong = name => {
+    const songData = {
+        name: name,
+        fields: [],
+        ids: ['#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8', '#9', '#C', '#B', '#A', '#O', '#T'],
+        names: ['Verse 1', 'Verse 2', 'Verse 3', 'Verse 4', 'Verse 5', 'Verse 6', 'Verse 7', 'Verse 8', 'Verse 9', 'Chorus', 'Bridge', 'Author', 'Order', 'Title'],
+        hasField: {
+            '#1': true,
+            '#C': true,
+            '#T': true,
+            '#A': true,
+            '#O': true
+        }
+     };
+     return songData;
+};
+
+exports.createSong = createSong;
+
 const readSong = async (songName, callback) => {
 
     const fp = path.join(__dirname, '../public/Songs', `${songName}.txt`);
 
-    const songData = {
-       name: songName,
-       fields: [],
-       ids: ['#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8', '#9', '#C', '#B', '#A', '#O', '#T'],
-       names: ['Verse 1', 'Verse 2', 'Verse 3', 'Verse 4', 'Verse 5', 'Verse 6', 'Verse 7', 'Verse 8', 'Verse 9', 'Chorus', 'Bridge', 'Author', 'Order', 'Title'],
-       hasField: {}
-    };
+    const songData = createSong(songName);
 
     fs.readFile(fp, (err, byteArray) => {
 
@@ -242,11 +255,25 @@ exports.getSongs = async songFunc => {
 };
 
 const saveSongDatabase = () => {
+    console.log('Saving Song Database');
     fs.writeFile("songDatabase.json", JSON.stringify(songDatabase), err => {
         if (err) {
             console.log(err);
+        } else {
+            console.log('Finished saving Song Database');
         }
+
     });
+};
+
+exports.updateSongDatabase = (songDataStr, deleteName) => {
+    const songData = JSON.parse(songDataStr);
+    console.log('Updating Song Database', songData.name);
+    if (deleteName) {
+        songDatabase[deleteName] = undefined;
+    }
+    songDatabase[songData.name] = songData;
+    saveSongDatabase();
 };
 
 const loadSongDatabase = callback => {

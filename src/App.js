@@ -39,17 +39,22 @@ class App extends Component {
     this.resetSong = callback;
   }
 
+  indexSongs() {
+    this.searchIndex.clear();
+    const songList = Object.keys(this.songDatabase)
+      .filter(key => this.songDatabase[key] !== undefined);
+    songList.forEach((song, i) => this.searchIndex.add(i, song));
+    window.loadPlan(plan => {
+      this.setState({songList});
+    });
+  }
+
   componentDidMount() {
     window.getSongs(songDatabase => {
       this.songDatabase = songDatabase;
-      this.searchIndex.clear();
-
-      const songList = Object.keys(songDatabase);
-
-      songList.forEach((song, i) => this.searchIndex.add(i, song));
-
+      this.indexSongs();
       window.loadPlan(plan => {
-        this.setState({songList, plan});
+        this.setState({plan});
       });
     });
     
@@ -87,7 +92,22 @@ class App extends Component {
         <SongEnter 
           mousetrap={this.mousetrap.bind(this)}
           songData={this.state.songData}
-          setResetCallback={this.setResetCallback.bind(this)}/>
+          setResetCallback={this.setResetCallback.bind(this)}
+          saveSongChanges={
+            songData => {
+              const title = songData.fields[songData.ids.indexOf('#T')];
+              let deleteName;
+              if (title != songData.name) {
+                deleteName = songData.name;
+                this.songDatabase[songData.name] = undefined;
+              }
+              songData.name = title;
+              this.songDatabase[songData.name] = songData;
+              this.indexSongs();
+              window.updateSongDatabase(JSON.stringify(songData), deleteName);
+            }
+          }
+          />
       </div>
      
       <div style={{position: 'absolute', top: '0px', paddingTop: '10px', width: '400px', paddingRight: '20px', right: '0px', bottom: '0px', overflowY: 'auto'}}>
@@ -110,6 +130,9 @@ class App extends Component {
           setSong={name => {
             const songData = this.songDatabase[name];
             return songData;}}
+          createSong={() => {
+            this.setState({songData: window.createSong('Untitled')});
+          }}
           />
 
       </div>

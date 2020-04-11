@@ -34,6 +34,7 @@ export default class SongEnter extends Component {
   textInputs = {'#i': 'blur'};
   started = false;
   editing = false;
+  changed = false;
   resetting = 'done';
 
   reset(songData) {
@@ -235,6 +236,7 @@ export default class SongEnter extends Component {
     songData.fields[i] = e.target.value;
     this.setState({songData});
     this.updateDot();
+    this.changed = true;
   }
 
   componentWillUpdate(nextProps, nextState) {
@@ -250,6 +252,7 @@ export default class SongEnter extends Component {
   }
 
   componentDidUpdate() {
+    if (this.editing) return;
     if (this.resetting === 'done') {
       console.log('update - highlight');
       this.highlightLines();
@@ -319,13 +322,19 @@ export default class SongEnter extends Component {
                 inputRef={x => this.textInputs[id] = x}
                 label={name} multiline rows="1" rowsMax="20"
                 variant="outlined" name={name}
-                value={f}
+                value={f || ''}
                 onKeyDownCapture={e => {
                   if (!this.editing) {
                     e.preventDefault();
                   }
                 }}
-                onBlur={e => {this.editing = false;}}
+                onBlur={e => {
+                  this.editing = false;
+                  if (this.changed) {
+                    this.props.saveSongChanges(this.state.songData);
+                    this.changed = false;
+                  }
+                }}
                 onClick={e => {this.editing = true;}}
                 onChange={this.handleOnChange.bind(this, idx)}>
                 </TextField>

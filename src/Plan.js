@@ -222,6 +222,7 @@ export default class Plan extends Component {
           handleEditing={this.props.handleEditing}
           plan={this.props.plan}
           addToPlan={this.props.addToPlan}
+          createSong={this.props.createSong}
           />
 
       </DragDropContext>
