@@ -47,6 +47,7 @@ function SwatchButton(props) {
 
   const handleChange = (color) => {
     setColor(color.rgb);
+    props.onChange(color.rgb);
   };
 
   return (
@@ -100,7 +101,7 @@ export default function PictureSelect(props) {
   };
 
   const handleColor = color => {
-
+    window.setColor(color);
   };
 
   return (

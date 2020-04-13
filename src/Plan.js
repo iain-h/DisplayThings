@@ -20,10 +20,8 @@ import Typography from '@material-ui/core/Typography';
 import SongList from './SongList';
 import Tooltip from '@material-ui/core/Tooltip';
 import Toolbar from '@material-ui/core/Toolbar';
-
-// fake data generator
-const getItems = count =>
- [];
+import TheatersIcon from '@material-ui/icons/Theaters';
+import QueueMusicIcon from '@material-ui/icons/QueueMusic';
 
 // a little function to help us with reordering the result
 const reorder = (list, startIndex, endIndex) => {
@@ -108,12 +106,22 @@ export default class Plan extends Component {
     this.props.setPlan(items);
   }
 
-  handleEdit(name, index, e) {
+  handlePlay(name, index, e) {
     if (this.state.selected === name) return this.deselect();
     e.preventDefault();
+
+    // Check for video
+    if (name.startsWith('file') && name.endsWith('mp4')) {
+      this.props.updateSong(undefined);
+      this.props.setVideo(name);
+      this.setState({selected: name});
+      return;
+    }
+
     const songData = this.props.setSong(name);
     this.props.updateSong(songData);
     this.setState({selected: name});
+    this.props.setVideo(undefined);
     return true;
   }
 
@@ -177,21 +185,31 @@ export default class Plan extends Component {
                         <ListItemIcon>
                         <Tooltip title="Show this">
                           {this.state.selected !== item ?
-                        <IconButton onClick={this.handleEdit.bind(this,item, index)}>
+                        <IconButton onClick={this.handlePlay.bind(this,item, index)}>
                          <PlayArrowIcon/>{index + 1}
                          </IconButton> : 
-                          <IconButton onClick={this.handleEdit.bind(this,item, index)}>
+                          <IconButton onClick={this.handlePlay.bind(this,item, index)}>
                           <DesktopWindowsIcon />{index + 1}
                           </IconButton> 
                         }
                          </Tooltip>
                           </ListItemIcon>
+                          {item.endsWith('.mp4') ? <TheatersIcon/> : <QueueMusicIcon />}
                           <Tooltip title={item}>
                         <ListItemText
-                           primary={item.length > 28 ? item.substring(0, 25) + '...' :  item}
+                           primary={
+                            (() => {
+                              if (item.startsWith('file://')) {
+                                const bits = item.split('/');
+                                return bits[bits.length - 1];
+                              }
+                             return item.length > 28 ?
+                              item.substring(0, 25) + '...' : 
+                              item;
+                            })()}
                         />
                         </Tooltip>
-                        
+
                         <ListItemSecondaryAction>
                           <Tooltip title="Remove from plan">
                            <IconButton onClick={this.handleRemove.bind(this,item)}>

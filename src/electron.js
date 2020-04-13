@@ -348,11 +348,24 @@ exports.getBackdrops = async callback => {
     });
 };
 
-let backdropFile = '';
 
 exports.setBackdrop = file => {
     console.log('setBackdrop', file);
-    if (file === backdropFile) return;
     displayWindow.webContents.send('backdrop', file);
-    backdropFile = file;
+};
+
+
+exports.setColor = color => {
+    console.log('seColor', color);
+    displayWindow.webContents.send('color', JSON.stringify(color));
+};
+
+exports.setVideo = file => {
+    console.log('setVideo', file);
+    displayWindow.webContents.send('setVideo', file || '');
+};
+
+exports.playVideo = (control) => {
+    console.log('playVideo');
+    displayWindow.webContents.send('playVideo', JSON.stringify(control));
 };

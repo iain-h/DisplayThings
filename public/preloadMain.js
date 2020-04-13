@@ -11,7 +11,10 @@ const {
     setKeyDownCallback,
     confirmDelete,
     getBackdrops,
-    setBackdrop
+    setBackdrop,
+    setColor,
+    setVideo,
+    playVideo
 } = electron.remote.require('./electron.js');
 
 window.setWords = setWords;
@@ -26,3 +29,6 @@ window.updateSongDatabase = updateSongDatabase;
 window.confirmDelete = confirmDelete;
 window.getBackdrops = getBackdrops;
 window.setBackdrop = setBackdrop;
+window.setColor = setColor;
+window.setVideo = setVideo;
+window.playVideo = playVideo;

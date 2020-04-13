@@ -6,6 +6,7 @@ import SongEnter from './SongEnter';
 import Controls from './Controls';
 import Plan from './Plan';
 import Style from './Style';
+import VideoControls from './VideoControls';
 import Grid from '@material-ui/core/Grid';
 import Mousetrap from 'mousetrap';
 import FlexSearch from 'flexsearch';
@@ -88,7 +89,6 @@ class App extends Component {
 
       <div style={{position: 'absolute', top: '0px', paddingTop: '10px', left: '20px', right: '440px', bottom: '0px', overflowY: 'auto'}}>
 
-      
         <SongEnter 
           mousetrap={this.mousetrap.bind(this)}
           songData={this.state.songData}
@@ -127,6 +127,8 @@ class App extends Component {
             }
           }}
           />
+          {this.state.songData === undefined ? <VideoControls /> : null}
+        
       </div>
      
       <div style={{position: 'absolute', top: '0px', paddingTop: '10px', width: '400px', paddingRight: '20px', right: '0px', bottom: '0px', overflowY: 'auto'}}>
@@ -152,6 +154,7 @@ class App extends Component {
           createSong={() => {
             this.setState({songData: window.createSong('Untitled')});
           }}
+          setVideo={file => {window.setVideo(file);}}
           />
           <Style files={this.state.backdrops}/>
 
