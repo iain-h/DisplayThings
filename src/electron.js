@@ -35,7 +35,7 @@ function createWindow() {
         
         webPreferences: {
             preload: path.join(__dirname, '../public/preloadMain.js'),
-            webSecurity: true
+            webSecurity: false
         }
     });
 
@@ -79,7 +79,7 @@ function createWindow() {
     //displayWindow.show();
     // Open the DevTools.
     mainWindow.webContents.openDevTools();
-    //displayWindow.webContents.openDevTools()
+    displayWindow.webContents.openDevTools()
 }
 
 // This method will be called when Electron has finished
@@ -328,4 +328,31 @@ exports.confirmDelete = () => {
         defaultId: 1,
         cancelId: 0
     });
+};
+
+const rootDir = `file://${path.join(__dirname, '../public/')}`.replace(/\\/g ,'/');
+console.log('rootDir', rootDir);
+
+exports.rootDir = rootDir;
+
+exports.getBackdrops = async callback => {
+    const files = [];
+    const walker = walk.walk(path.join(__dirname, '../public/Backdrops'));
+    walker.on("file", function (root, fileStats, next) {
+        files.push(rootDir + 'Backdrops/' + fileStats.name);
+        console.log('backdrop:', fileStats.name);
+        next();
+    });
+    walker.on("end", function () {
+        callback(files);
+    });
+};
+
+let backdropFile = '';
+
+exports.setBackdrop = file => {
+    console.log('setBackdrop', file);
+    if (file === backdropFile) return;
+    displayWindow.webContents.send('backdrop', file);
+    backdropFile = file;
 };

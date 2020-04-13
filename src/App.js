@@ -5,6 +5,7 @@ import SongEnter from './SongEnter';
 
 import Controls from './Controls';
 import Plan from './Plan';
+import Style from './Style';
 import Grid from '@material-ui/core/Grid';
 import Mousetrap from 'mousetrap';
 import FlexSearch from 'flexsearch';
@@ -16,7 +17,7 @@ const keyCodeMap = {
 
 class App extends Component {
 
-  state = {songList: [], songData: undefined, plan: []};
+  state = {songList: [], songData: undefined, plan: [], backdrops: []};
   searchIndex = new FlexSearch({
     threshold: 7,
     depth: 3
@@ -54,6 +55,7 @@ class App extends Component {
       window.loadPlan(plan => {
         this.setState({plan});
       });
+      window.getBackdrops(files => this.setState({backdrops: files}));
     });
     
     window.setKeyDownCallback(which => {
@@ -151,6 +153,7 @@ class App extends Component {
             this.setState({songData: window.createSong('Untitled')});
           }}
           />
+          <Style files={this.state.backdrops}/>
 
       </div>
       </div>

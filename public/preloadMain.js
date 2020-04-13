@@ -9,9 +9,10 @@ const {
     loadPlan, 
     updateSongDatabase, 
     setKeyDownCallback,
-    confirmDelete
+    confirmDelete,
+    getBackdrops,
+    setBackdrop
 } = electron.remote.require('./electron.js');
-const path = require('path');
 
 window.setWords = setWords;
 window.getSongs = getSongs;
@@ -23,3 +24,5 @@ window.createSong = createSong;
 window.setKeyDownCallback = setKeyDownCallback;
 window.updateSongDatabase = updateSongDatabase;
 window.confirmDelete = confirmDelete;
+window.getBackdrops = getBackdrops;
+window.setBackdrop = setBackdrop;
