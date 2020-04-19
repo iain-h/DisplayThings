@@ -1,5 +1,5 @@
 const electron = require('electron');
-const {displayKeyPressed, rootDir} = electron.remote.require('./electron.js');
+const {displayKeyPressed, rootDir, setVideoStatus} = electron.remote.require('./electron.js');
 const ipcRenderer = electron.ipcRenderer;
 
 
@@ -82,13 +82,23 @@ ipcRenderer.on('setVideo', (event, file) => {
 
 ipcRenderer.on('playVideo', (event, controlStr) => {
   const videoElement = document.getElementById('video');
+
+  videoElement.ontimeupdate = () => {
+    let time = videoElement.currentTime;
+    let duration = videoElement.duration;
+    let paused = videoElement.paused;
+    const status = {time, duration, paused};
+    setVideoStatus(JSON.stringify(status));
+  };
+
   const control = JSON.parse(controlStr);
+  console.log(control);
   if (control.action === 'play') {
     videoElement.play();
   } else if (control.action === 'pause') {
     videoElement.pause();
-  } else if (control.action === 'skipStart') {
-    videoElement.currentTime = 0;
-  }
+  } else if (control.action === 'skip') {
+    videoElement.currentTime = control.time;
+  } 
+  
 });
-

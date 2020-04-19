@@ -14,7 +14,8 @@ const {
     setBackdrop,
     setColor,
     setVideo,
-    playVideo
+    playVideo,
+    getVideoStatus
 } = electron.remote.require('./electron.js');
 
 window.setWords = setWords;
@@ -32,3 +33,4 @@ window.setBackdrop = setBackdrop;
 window.setColor = setColor;
 window.setVideo = setVideo;
 window.playVideo = playVideo;
+window.getVideoStatus = getVideoStatus;

@@ -7,6 +7,7 @@ import Controls from './Controls';
 import Plan from './Plan';
 import Style from './Style';
 import VideoControls from './VideoControls';
+import PPT from './PPT';
 import Grid from '@material-ui/core/Grid';
 import Mousetrap from 'mousetrap';
 import FlexSearch from 'flexsearch';
@@ -128,6 +129,7 @@ class App extends Component {
           }}
           />
           {this.state.songData === undefined ? <VideoControls /> : null}
+          {/*this.state.songData === undefined ? <PPT /> : null*/}
         
       </div>
      

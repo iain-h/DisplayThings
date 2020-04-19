@@ -65,7 +65,8 @@ export default class Plan extends Component {
     super(props);
     this.state = {
       items: this.props.plan,
-      selected: ''
+      selected: '',
+      fileDragging: false
     };
     this.onDragEnd = this.onDragEnd.bind(this);
   }
@@ -77,6 +78,8 @@ export default class Plan extends Component {
   }
 
   onDragEnd(result) {
+
+    console.log('Drag end');
 
     let items;
     // dropped outside the list
@@ -115,6 +118,7 @@ export default class Plan extends Component {
       this.props.updateSong(undefined);
       this.props.setVideo(name);
       this.setState({selected: name});
+      window.playVideo({action: 'play'});
       return;
     }
 
@@ -127,7 +131,18 @@ export default class Plan extends Component {
 
   deselect() {
     this.setState({selected: ''});
+    this.props.setVideo(undefined);
     this.props.updateSong();
+  }
+
+
+  handleFileDrop(files) {
+    for (let i=0; i<files.length; ++i) {
+      const file = files[i];
+      const result = Array.from(this.state.items);
+      result.push(`file://${file.path.replace(/\\/g, '/')}`);
+      this.props.setPlan(result);
+    }
   }
 
   componentDidMount() {
@@ -136,6 +151,62 @@ export default class Plan extends Component {
       console.log('escape');
       this.deselect();
     });
+
+    const dropZone = document.createElement("DIV");
+    dropZone.id = "dropZone";
+    dropZone.style.top = "0px";
+    dropZone.style.left = "0px";
+    dropZone.style.width = "100%";
+    dropZone.style.width = "100%";
+    dropZone.style.height = "100%";
+    dropZone.style.position = "absolute";
+    //dropZone.style.pointerEvents = "none";
+    dropZone.style.backgroundColor = "#000000";
+    dropZone.style.opacity = 0.5;
+    dropZone.style.zIndex = 10;
+    dropZone.style.visibility = "hidden";
+    const message = document.createElement("h1");
+    message.style.textAlign = "center";
+    message.style.position = "absolute";
+    message.style.width = "100%";
+    message.style.display = "block";
+    message.style.top = "40%";
+    message.style.color = "#fff";
+    message.style.pointerEvents = "none";
+    const textnode = document.createTextNode("Drop here to add to plan");
+    message.appendChild(textnode);
+    dropZone.appendChild(message);
+    document.body.appendChild(dropZone);
+
+    const showDropZone = () => {
+      dropZone.style.visibility = "visible";
+    };
+    const hideDropZone = () => {
+      dropZone.style.visibility = "hidden";
+    };
+    const allowDrag = e => {
+      if (true) {  // Test that the item being dragged is a valid one
+        e.dataTransfer.dropEffect = 'copy';
+        e.preventDefault();
+      }
+    };
+    const handleDrop = e => {
+      e.preventDefault();
+      console.log('dropped');
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      this.handleFileDrop(files);
+      hideDropZone();
+    };
+    window.addEventListener('dragenter', e => {
+      showDropZone();
+    });
+    dropZone.addEventListener('dragenter', allowDrag);
+    dropZone.addEventListener('dragover', allowDrag);
+    dropZone.addEventListener('dragleave', e => {
+      hideDropZone();
+    });
+    dropZone.addEventListener('drop', handleDrop);
   }
 
   handleRemove(name) {
@@ -164,10 +235,13 @@ export default class Plan extends Component {
       </IconButton>
       </Tooltip>
       </Toolbar>
+
         <Droppable droppableId="droppable">
           {(provided, snapshot) => (
             <RootRef rootRef={provided.innerRef}>
+
               <List style={getListStyle(snapshot.isDraggingOver)}>
+
                 {this.state.items.map((item, index) => (
                   <Draggable key={item} draggableId={item} index={index}>
                     {(provided, snapshot) => (
@@ -199,13 +273,14 @@ export default class Plan extends Component {
                         <ListItemText
                            primary={
                             (() => {
-                              if (item.startsWith('file://')) {
+                              let displayName = item;
+                              if (displayName.startsWith('file://')) {
                                 const bits = item.split('/');
-                                return bits[bits.length - 1];
+                                displayName = bits[bits.length - 1];
                               }
-                             return item.length > 28 ?
-                              item.substring(0, 25) + '...' : 
-                              item;
+                             return displayName.length > 28 ?
+                               displayName.substring(0, 20) + '...' : 
+                               displayName;
                             })()}
                         />
                         </Tooltip>
@@ -244,6 +319,7 @@ export default class Plan extends Component {
           />
 
       </DragDropContext>
+
      </div>
     );
   }

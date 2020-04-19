@@ -4,6 +4,7 @@ const path = require('path');
 const url = require('url');
 const fs = require('fs');
 const walk = require('walk');
+const { exec } = require('child_process');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -365,7 +366,33 @@ exports.setVideo = file => {
     displayWindow.webContents.send('setVideo', file || '');
 };
 
-exports.playVideo = (control) => {
-    console.log('playVideo');
+exports.playVideo = control => {
+    console.log('playVideo', JSON.stringify(control));
     displayWindow.webContents.send('playVideo', JSON.stringify(control));
+};
+
+let videoStatus = '{}';
+
+exports.setVideoStatus = status => {
+    videoStatus = status;
+};
+
+exports.getVideoStatus = () => {
+    return videoStatus;
+};
+
+exports.convertPPTtoPDF = () => {
+    const ls = exec("C:\\Program Files\\LibreOffice\\program\\simpress.exe", function (error, stdout, stderr) {
+        if (error) {
+          console.log(error.stack);
+          console.log('Error code: '+error.code);
+          console.log('Signal received: '+error.signal);
+        }
+        console.log('Child Process STDOUT: '+stdout);
+        console.log('Child Process STDERR: '+stderr);
+      });
+      
+      ls.on('exit', function (code) {
+        console.log('Child process exited with exit code '+code);
+      });
 };
