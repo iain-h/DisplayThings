@@ -259,6 +259,8 @@ export default class SongEnter extends Component {
       this.highlightLines();
     }
     if (this.resetting === 'updating') {
+      this.setOrderIndex(0);
+      this.line = -this.nLines;
       this.nextLines();
       this.resetting = 'done';
     }
