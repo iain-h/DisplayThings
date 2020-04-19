@@ -31,6 +31,7 @@ export default class VideoControls extends Component {
   progressLeft=0;
   progressMax=10;
   leftDiff=0;
+  suspendProgress=false;
 
   handlePlay() {
       if (this.state.playing) {
@@ -45,9 +46,15 @@ export default class VideoControls extends Component {
 
   handleSkipStart() {
     window.playVideo({action: 'skip', time: 0});
+    this.suspendProgress = true;
   }
 
   updateStatus() {
+    if (this.suspendProgress) {
+      // Avoid jumping when skipping to time
+      this.suspendProgress = false;
+      return;
+    }
 
     if (this.draggingProgress) return;
 
@@ -60,10 +67,6 @@ export default class VideoControls extends Component {
       this.setState({playing: false});
     } else {
       this.setState({playing: true});
-    }
-
-    if (this.time === this.state.status.time) {
-      return;
     }
 
     this.time = this.state.status.time;
@@ -102,6 +105,7 @@ export default class VideoControls extends Component {
     const ratio = (e.clientX - this.progressLeft + this.leftDiff) / this.progressMax;
     const time = this.duration * ratio;
     window.playVideo({action: 'skip', time});
+    this.suspendProgress = true;
   }
 
   progressMove(e) {
@@ -131,9 +135,9 @@ export default class VideoControls extends Component {
     const min = Math.floor(seconds / 60.0);
     const sec = seconds - (60 * min);
 
-    if (min > 0) return `${min.toFixed(0)}m ${sec.toFixed(1)}s`;
+    if (min > 0) return `${min.toFixed(0)}m ${sec.toFixed(0)}s`;
 
-    return `${sec.toFixed(1)}s`;
+    return `${sec.toFixed(0)}s`;
   }
 
   render() {

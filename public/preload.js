@@ -1,7 +1,8 @@
 const electron = require('electron');
 const {displayKeyPressed, rootDir, setVideoStatus} = electron.remote.require('./electron.js');
 const ipcRenderer = electron.ipcRenderer;
-
+const {pdfjs} = require('react-pdf');
+pdfjs.GlobalWorkerOptions.workerSrc = `./pdf.worker.js`;
 
 let toggleFade1 = 'fade1';
 let toggleFade2 = 'fade2';
@@ -101,4 +102,51 @@ ipcRenderer.on('playVideo', (event, controlStr) => {
     videoElement.currentTime = control.time;
   } 
   
+});
+
+ipcRenderer.on('showPDF', async (event, controlStr) => {
+
+  
+  const control = JSON.parse(controlStr);
+  console.log('showPDF', control.file);
+  var canvas = document.getElementById('pdf');
+
+  if (!control.file) {
+    console.log('hide pdf');
+    canvas.style.visibility = 'hidden';
+    return;
+  }
+  console.log('show pdf');
+  const pdf = await pdfjs.getDocument(control.file);
+
+  console.log(pdf);
+  const page = await pdf.getPage(control.page);
+  console.log(page);
+  
+  var viewport = page.getViewport(2.0);
+  var context = canvas.getContext('2d');
+
+  const windowRatio = window.innerWidth / window.innerHeight;
+  const ratio = viewport.width / viewport.height;
+
+  if (windowRatio < ratio) {
+    console.log('use height');
+    canvas.height = viewport.height;
+    canvas.width = viewport.width;
+    canvas.style.height = window.innerWidth / ratio + 'px';
+    canvas.style.width = '100%';
+  } else {
+    console.log('use width');
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    canvas.style.height = '100%';
+    canvas.style.width = window.innerHeight * ratio + 'px';
+  }
+
+  var renderContext = {
+    canvasContext: context,
+    viewport: viewport
+  };
+  await page.render(renderContext);
+  canvas.style.visibility = 'visible';
 });

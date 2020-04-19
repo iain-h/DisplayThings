@@ -36,6 +36,13 @@ body {
     text-shadow: 1px 1px #000000;
 }
 
+.pdf {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 .fadeout {
   animation-name: fadeOut;
   animation-duration: 0.5s;

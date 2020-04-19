@@ -381,8 +381,19 @@ exports.getVideoStatus = () => {
     return videoStatus;
 };
 
-exports.convertPPTtoPDF = () => {
-    const ls = exec("C:\\Program Files\\LibreOffice\\program\\simpress.exe", function (error, stdout, stderr) {
+exports.convertPPTtoPDF = file => {
+
+    console.log('platform', process.platform);
+
+    const fileName = file.replace('file://', '').replace(/\//g, '\\');
+    const tempDir = "C:\\TEMP";
+    const outDir = `--outdir "${tempDir}"`;
+    const convertTo = `--convert-to pdf`;
+    const headless = "--headless --invisible";
+    const execPath = `"C:\\Program Files\\LibreOffice\\program\\simpress.exe"`;
+    const command = `${execPath} ${headless} ${convertTo} ${outDir} "${fileName}"`;
+    console.log(command);
+    const ls = exec(command, (error, stdout, stderr) => {
         if (error) {
           console.log(error.stack);
           console.log('Error code: '+error.code);
@@ -394,5 +405,17 @@ exports.convertPPTtoPDF = () => {
       
       ls.on('exit', function (code) {
         console.log('Child process exited with exit code '+code);
+        if (code === 0) {
+            let baseName = path.basename(fileName);
+            baseName = baseName.replace('pptx', 'pdf').replace('ppt', 'pdf');
+            const outName = `file://${tempDir.replace(/\\/g, '/')}/${baseName}`;
+            console.log('loadPDF', outName);
+            mainWindow.webContents.send('loadPDF', outName);
+        }
       });
+};
+
+exports.showPDF = control => {
+    console.log('showPDF', JSON.stringify(control));
+    displayWindow.webContents.send('showPDF', JSON.stringify(control));
 };

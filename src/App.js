@@ -19,7 +19,14 @@ const keyCodeMap = {
 
 class App extends Component {
 
-  state = {songList: [], songData: undefined, plan: [], backdrops: []};
+  state = {
+    songList: [],
+    songData: undefined,
+    video: undefined,
+    ppt: undefined,
+    plan: [],
+    backdrops: []
+  };
   searchIndex = new FlexSearch({
     threshold: 7,
     depth: 3
@@ -29,6 +36,7 @@ class App extends Component {
   songDatabase={};
 
   keyMap = {};
+  callbacks = {};
 
   updateSong(songData) {
     console.log('app update song');
@@ -66,15 +74,32 @@ class App extends Component {
         callback();
       }
     });
+
+    window.loadPDF = file => {
+      console.log('loadPDF', file);
+      if (this.state.ppt !== undefined) {
+        this.setState({ppt: file});
+      }
+    };
     
   }
 
   mousetrap(key, callback) {
-    Mousetrap.bind(key, callback);
+    if (this.callbacks[key] === undefined) {
+      this.callbacks[key] = [callback];
+    } else {
+      this.callbacks[key].push(callback);
+    }
+
+    const func = e => {
+      this.callbacks[key].forEach(f => f(e));
+    };
+
+    Mousetrap.bind(key, func);
     const codes = keyCodeMap[key];
     if (codes) {
-      codes.forEach(code => this.keyMap[code] = callback);
-      this.keyMap[key] = callback;
+      codes.forEach(code => this.keyMap[code] = func);
+      this.keyMap[key] = func;
     }
   }
 
@@ -128,8 +153,11 @@ class App extends Component {
             }
           }}
           />
-          {this.state.songData === undefined ? <VideoControls /> : null}
-          {/*this.state.songData === undefined ? <PPT /> : null*/}
+          {this.state.video !== undefined ? <VideoControls /> : null}
+          <PPT
+            pptFile={this.state.ppt}
+            handleEditing={editing => { this.editing = editing;}}
+            mousetrap={this.mousetrap.bind(this)}/>
         
       </div>
      
@@ -145,6 +173,7 @@ class App extends Component {
           updateSong={this.updateSong.bind(this)}
           handleEditing={editing => { this.editing = editing;}}
           addToPlan={item =>{
+            if (this.state.plan.indexOf(item) !== -1) return;
             const plan2 = Array.from(this.state.plan);
             plan2.push(item);
             this.setState({plan: plan2});
@@ -156,7 +185,18 @@ class App extends Component {
           createSong={() => {
             this.setState({songData: window.createSong('Untitled')});
           }}
-          setVideo={file => {window.setVideo(file);}}
+          setVideo={file => {
+              this.setState({video: file});
+              window.setVideo(file);
+          }}
+          setPPT={
+            file => {
+              console.log('setPPT', file);
+              if (typeof file === 'string') {
+                window.convertPPTtoPDF(file);
+              }
+              this.setState({ppt: file});
+          }}
           />
           <Style files={this.state.backdrops}/>
 

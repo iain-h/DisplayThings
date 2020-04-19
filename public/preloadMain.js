@@ -15,7 +15,9 @@ const {
     setColor,
     setVideo,
     playVideo,
-    getVideoStatus
+    getVideoStatus,
+    convertPPTtoPDF,
+    showPDF
 } = electron.remote.require('./electron.js');
 
 window.setWords = setWords;
@@ -34,3 +36,10 @@ window.setColor = setColor;
 window.setVideo = setVideo;
 window.playVideo = playVideo;
 window.getVideoStatus = getVideoStatus;
+window.convertPPTtoPDF = convertPPTtoPDF;
+window.showPDF = showPDF;
+
+const ipcRenderer = electron.ipcRenderer;
+ipcRenderer.on('loadPDF', (event, file) => {
+    window.loadPDF(file);
+});

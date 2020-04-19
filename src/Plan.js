@@ -22,6 +22,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Toolbar from '@material-ui/core/Toolbar';
 import TheatersIcon from '@material-ui/icons/Theaters';
 import QueueMusicIcon from '@material-ui/icons/QueueMusic';
+import PictureInPictureIcon from '@material-ui/icons/PictureInPicture';
 
 // a little function to help us with reordering the result
 const reorder = (list, startIndex, endIndex) => {
@@ -40,7 +41,9 @@ const removeItem = (list, startIndex) => {
 
 const insertItem = (list, endIndex, newItem) => {
   const result = Array.from(list);
-  result.splice(endIndex, 0, newItem);
+  if (result.indexOf(newItem) === -1) {
+    result.splice(endIndex, 0, newItem);
+  }
   return result;
 };
 
@@ -117,8 +120,19 @@ export default class Plan extends Component {
     if (name.startsWith('file') && name.endsWith('mp4')) {
       this.props.updateSong(undefined);
       this.props.setVideo(name);
+      this.props.setPPT(undefined);
       this.setState({selected: name});
       window.playVideo({action: 'play'});
+      return;
+    }
+
+     // Check for ppt
+     if (name.startsWith('file') && (name.endsWith('ppt') || name.endsWith('pptx'))) {
+      this.props.updateSong(undefined);
+      this.props.setVideo(undefined);
+      this.props.setPPT(name);
+      this.setState({selected: name});
+
       return;
     }
 
@@ -126,6 +140,7 @@ export default class Plan extends Component {
     this.props.updateSong(songData);
     this.setState({selected: name});
     this.props.setVideo(undefined);
+    this.props.setPPT(undefined);
     return true;
   }
 
@@ -139,8 +154,11 @@ export default class Plan extends Component {
   handleFileDrop(files) {
     for (let i=0; i<files.length; ++i) {
       const file = files[i];
+      const item = `file://${file.path.replace(/\\/g, '/')}`;
       const result = Array.from(this.state.items);
-      result.push(`file://${file.path.replace(/\\/g, '/')}`);
+      if (result.indexOf(item) === -1) {
+        result.push(item);
+      }
       this.props.setPlan(result);
     }
   }
@@ -268,7 +286,12 @@ export default class Plan extends Component {
                         }
                          </Tooltip>
                           </ListItemIcon>
-                          {item.endsWith('.mp4') ? <TheatersIcon/> : <QueueMusicIcon />}
+                          <div style={{paddingRight:'10px'}}>
+                          {item.endsWith('.mp4') ? 
+                            <TheatersIcon/> : 
+                            item.endsWith('.pptx') || item.endsWith('.ppt') ? 
+                            <PictureInPictureIcon/> :
+                            <QueueMusicIcon />}</div>
                           <Tooltip title={item}>
                         <ListItemText
                            primary={
