@@ -65,6 +65,13 @@ ipcRenderer.on('color', (event, color) => {
   displayDiv2.style.color = `rgb(${rgb.r},${rgb.g},${rgb.b})`;
 });
 
+ipcRenderer.on('size', (event, size) => {
+  const displayDiv1 = document.getElementById(toggleFade1);
+  const displayDiv2 = document.getElementById(toggleFade2);
+  displayDiv1.style.fontSize = `${size}vw`;
+  displayDiv2.style.fontSize = `${size}vw`;
+});
+
 ipcRenderer.on('setVideo', (event, file) => {
   const videoElement = document.getElementById('video');
 
@@ -104,18 +111,27 @@ ipcRenderer.on('playVideo', (event, controlStr) => {
   
 });
 
+
+
+let togglePDF1 = 'pdf1';
+let togglePDF2 = 'pdf2';
+
 ipcRenderer.on('showPDF', async (event, controlStr) => {
 
   
   const control = JSON.parse(controlStr);
   console.log('showPDF', control.file);
-  var canvas = document.getElementById('pdf');
+  var canvas = document.getElementById(togglePDF1);
+  var canvas2 = document.getElementById(togglePDF2);
 
   if (!control.file) {
     console.log('hide pdf');
     canvas.style.visibility = 'hidden';
+    canvas2.style.visibility = 'hidden';
     return;
   }
+  canvas.style.visibility = 'hidden';
+
   console.log('show pdf');
   const pdf = await pdfjs.getDocument(control.file);
 
@@ -148,5 +164,13 @@ ipcRenderer.on('showPDF', async (event, controlStr) => {
     viewport: viewport
   };
   await page.render(renderContext);
+
+  canvas2.className = 'pdf fadeout';
+  canvas.className = 'pdf fadein';
   canvas.style.visibility = 'visible';
+  canvas2.style.visibility = 'visible';
+
+  const temp = togglePDF1;
+  togglePDF1 = togglePDF2;
+  togglePDF2 = temp;
 });

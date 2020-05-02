@@ -25,7 +25,8 @@ class App extends Component {
     video: undefined,
     ppt: undefined,
     plan: [],
-    backdrops: []
+    backdrops: [],
+    styles: {}
   };
   searchIndex = new FlexSearch({
     threshold: 7,
@@ -40,10 +41,13 @@ class App extends Component {
 
   updateSong(songData) {
     console.log('app update song');
-    this.setState({songData});
-    if (this.resetSong) {
-      this.resetSong(songData);
-    }
+    window.setWords('');
+    setTimeout(() => {
+      this.setState({songData});
+      if (this.resetSong) {
+        this.resetSong(songData);
+      }
+    }, 200);
   }
 
   setResetCallback(callback) {
@@ -62,10 +66,18 @@ class App extends Component {
     window.getSongs(songDatabase => {
       this.songDatabase = songDatabase;
       this.indexSongs();
-      window.loadPlan(plan => {
-        this.setState({plan});
-      });
-      window.getBackdrops(files => this.setState({backdrops: files}));
+    });
+
+    window.loadPlan(plan => {
+      this.setState({plan});
+    });
+
+    window.getBackdrops(backdrops => {
+      this.setState({backdrops});
+    });
+
+    window.loadStyles(styles => {
+      this.setState({styles});
     });
     
     window.setKeyDownCallback(which => {
@@ -198,7 +210,25 @@ class App extends Component {
               this.setState({ppt: file});
           }}
           />
-          <Style files={this.state.backdrops}/>
+          <Style 
+            styles={this.state.styles}
+            backdrops={this.state.backdrops}
+            addStyle={(name, style) => {
+                const newStyles = Object.assign({}, this.state.styles);
+                newStyles[name] = style;
+                newStyles[name].title = name;
+                this.setState({styles: newStyles});
+                window.saveStyles(newStyles);
+              }}
+            songData={this.state.songData}
+            setSongStyle={style => {
+              if (this.state.songData) {
+                this.state.songData.style = style;
+                this.setState({songData: this.state.songData});
+                window.updateSongDatabase(JSON.stringify(this.state.songData), '');
+              }
+            }}
+          />
 
       </div>
       </div>

@@ -351,7 +351,14 @@ export default class SongEnter extends Component {
                 </Grid>
                 );
           })}
-      
+            <Grid item xs={6} flex-grow={1}>
+                <TextField className="field"
+                      label="Style"
+                      variant="outlined"
+                      disabled={true}
+                      value={this.state.songData.style || 'Default'}
+                    />
+            </Grid>
         </Grid>
 
         <Tooltip title="Add a field">

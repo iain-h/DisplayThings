@@ -17,7 +17,10 @@ const {
     playVideo,
     getVideoStatus,
     convertPPTtoPDF,
-    showPDF
+    showPDF,
+    loadStyles,
+    saveStyles,
+    setSize
 } = electron.remote.require('./electron.js');
 
 window.setWords = setWords;
@@ -38,6 +41,9 @@ window.playVideo = playVideo;
 window.getVideoStatus = getVideoStatus;
 window.convertPPTtoPDF = convertPPTtoPDF;
 window.showPDF = showPDF;
+window.loadStyles = loadStyles;
+window.saveStyles = saveStyles;
+window.setSize = setSize;
 
 const ipcRenderer = electron.ipcRenderer;
 ipcRenderer.on('loadPDF', (event, file) => {

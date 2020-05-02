@@ -11,8 +11,6 @@ import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
 import { Document, Page, pdfjs } from 'react-pdf';
 pdfjs.GlobalWorkerOptions.workerSrc = `./pdf.worker.js`;
 
-const url = 'file://C:/TEMP/CSM_Compute.pdf';
-
 const styles = {
     paper: {
       display: 'inline',
@@ -96,7 +94,7 @@ export default class PPT extends Component {
     return (
 
         <Document
-                file={url}
+                file={this.state.pptFile}
                 onLoadSuccess={this.onDocumentLoadSuccess}
                 >
 
