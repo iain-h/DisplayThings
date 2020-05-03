@@ -8,6 +8,7 @@ import PauseCircleFilledIcon from '@material-ui/icons/PauseCircleFilled';
 import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
 import Tooltip from '@material-ui/core/Tooltip';
 import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
+import Slider from '@material-ui/core/Slider';
 
 const styles = {
     paper: {
@@ -17,6 +18,16 @@ const styles = {
       paddingBottom: '10px'
     }
   };
+
+function ValueLabelComponent(props) {
+  const { children, open, value } = props;
+
+  return (
+    <Tooltip open={open} enterTouchDelay={0} placement="top" title={value}>
+      {children}
+    </Tooltip>
+  );
+}
 
 export default class VideoControls extends Component {
 
@@ -121,13 +132,6 @@ export default class VideoControls extends Component {
 
   componentDidMount() {
       this.getStatusTimer();
-      this.progressDiv = document.getElementById('progress');
-      this.progressBarDiv = document.getElementById('progressBar');
-      this.timeDiv = document.getElementById('timeDisplay');
-
-      this.progressDiv.addEventListener('mousedown', this.progressDown.bind(this));
-      window.addEventListener('mouseup', this.progressUp.bind(this));
-      window.addEventListener('mousemove', this.progressMove.bind(this));
   }
 
   printSeconds(seconds) {
@@ -145,7 +149,7 @@ export default class VideoControls extends Component {
 
         <Paper className={styles.paper}>
 
-          <div style={{display: 'grid', gridTemplateColumns: '50px 50px auto'}}>
+          <div style={{display: 'grid', paddingTop: '30px', paddingBottom: '50px', gridTemplateColumns: '50px 50px auto'}}>
             <Tooltip title="Skip to start">
             <IconButton aria-label="skip to start" onClick={this.handleSkipStart.bind(this)}>
                 <SkipPreviousIcon className={styles.playIcon} />
@@ -161,47 +165,32 @@ export default class VideoControls extends Component {
             </IconButton>
             </Tooltip>
 
-            <div id="progressBar" style={{display: 'inline-block', position: 'relative', left: '0px', top: '12px', width: '100%', height: '40px'}}>
-              <div style={{
-                display: 'block',
-                position: 'relative',
-                marginLeft: '20px',
-                top: '9px',
-                marginRight: '40px',
-                height: '6px',
-                backgroundColor: '#bbb'
-                }}>
-              </div>
+            <div id="progressBar" style={{display: 'inline-block', position: 'relative', left: '0px', top: '12px', marginRight: '20px', height: '40px'}}>
+              
+            <Slider
+              defaultValue={0}
+              getAriaValueText={value => this.printSeconds(value)}
+              valueLabelFormat={value => this.printSeconds(value)}
+              ValueLabelComponent={ValueLabelComponent}
+              aria-labelledby="continuous-slider"
+              step={0.2}
+              min={0}
+              max={this.duration}
+              valueLabelDisplay="on"
+              value={this.time ? this.time : 0}
+              onChange={(e, val) => {
+                this.time = val;
+                window.playVideo({action: 'skip', time: val});
+              }}
+              onChangeCommitted={e => {
+                window.playVideo({action: 'skip', time: this.time});
+              }}
+            />
 
-              <div id="progress" style={{
-                height: '24px',
-                width: '24px',
-                backgroundColor: '#fff',
-                borderStyle: 'solid',
-                borderWidth: '2px',
-                borderColor: '#bbb',
-                borderRadius: '50%',
-                display: 'inline-block',
-                position: 'relative',
-                top: '-7px'
-                }}>
-              </div>
-            </div>
-
-            <div></div>
-            <div></div>
-            <div>
-            <div id="timeDisplay"
-              style={{
-              textAlign: 'left',
-              paddingRight: '40px',
-              paddingBottom: '10px',
-              display: 'inline'
-            }}>{this.printSeconds(this.time)}</div>
             <div style={{
               float: 'right',
               textAlign: 'right',
-              paddingRight: '40px',
+              paddingRight: '10px',
               paddingBottom: '10px',
               display: 'inline'
             }}>{this.printSeconds(this.duration)}

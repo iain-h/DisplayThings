@@ -115,6 +115,16 @@ class App extends Component {
     }
   }
 
+  setSongStyle(style) {
+    if (this.state.songData && this.state.songData.style !== style) {
+      console.log('Update current song style', style);
+      const newSongData = Object.assign({}, this.state.songData);
+      newSongData.style = style;
+      this.setState({songData: newSongData});
+      window.updateSongDatabase(JSON.stringify(newSongData), '');
+    }
+  }
+
   render() {
     return (
       <div onKeyDownCapture = {e => {
@@ -214,6 +224,7 @@ class App extends Component {
             styles={this.state.styles}
             backdrops={this.state.backdrops}
             addStyle={(name, style) => {
+                console.log('Add style', name);
                 const newStyles = Object.assign({}, this.state.styles);
                 newStyles[name] = style;
                 newStyles[name].title = name;
@@ -221,13 +232,27 @@ class App extends Component {
                 window.saveStyles(newStyles);
               }}
             songData={this.state.songData}
-            setSongStyle={style => {
-              if (this.state.songData) {
-                this.state.songData.style = style;
-                this.setState({songData: this.state.songData});
-                window.updateSongDatabase(JSON.stringify(this.state.songData), '');
+            setSongStyle={styleName => this.setSongStyle(styleName)}
+            deleteStyle={style => {
+              const newStyles = Object.assign({}, this.state.styles);
+              delete newStyles[style];
+              this.setState({styles: newStyles});
+              Object.keys(this.songDatabase).forEach(key => {
+                const songData = this.songDatabase[key];
+                if (songData.style === style) {
+                  const newSongData = Object.assign({}, songData);
+                  delete newSongData.style;
+                  window.updateSongDatabase(JSON.stringify(newSongData), '');
+                }
+              });
+              const songData = this.state.songData;
+              if (songData && songData.style === style) {
+                const newSongData = Object.assign({}, songData);
+                delete newSongData.style;
+                this.setState({songData: newSongData});
               }
             }}
+            handleEditing={editing => { this.editing = editing;}}
           />
 
       </div>

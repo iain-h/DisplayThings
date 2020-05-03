@@ -3,9 +3,30 @@ const {displayKeyPressed, rootDir, setVideoStatus} = electron.remote.require('./
 const ipcRenderer = electron.ipcRenderer;
 const {pdfjs} = require('react-pdf');
 pdfjs.GlobalWorkerOptions.workerSrc = `./pdf.worker.js`;
+const async = require('async');
 
 let toggleFade1 = 'fade1';
 let toggleFade2 = 'fade2';
+
+const q = async.queue(function(task, callback) {
+  const displayDiv1 = document.getElementById(toggleFade1);
+  const displayDiv2 = document.getElementById(toggleFade2);
+  displayDiv2.innerHTML = '';
+  const lines = task.message.split('\n');
+  lines.forEach(l => {
+    const textnode = document.createTextNode(l);
+    displayDiv2.appendChild(textnode);
+    displayDiv2.appendChild(document.createElement('BR'));
+  });
+  displayDiv1.className = 'words fadeout';
+  setTimeout(() => {
+    displayDiv2.className = 'words fadein';
+    }, 300);
+  setTimeout(() => {callback();}, 700);
+  const temp = toggleFade1;
+  toggleFade1 = toggleFade2;
+  toggleFade2 = temp;
+}, 1);
 
 ipcRenderer.on('words', (event, message) => {
 
@@ -15,42 +36,16 @@ ipcRenderer.on('words', (event, message) => {
     videoElement.src = '';
   }
 
-  const displayDiv1 = document.getElementById(toggleFade1);
-  const displayDiv2 = document.getElementById(toggleFade2);
-  displayDiv2.innerHTML = '';
-  const lines = message.split('\n');
-  lines.forEach(l => {
-    const textnode = document.createTextNode(l);
-    displayDiv2.appendChild(textnode);
-    displayDiv2.appendChild(document.createElement('BR'));
-  });
-  displayDiv1.className = 'words fadeout';
-  displayDiv2.className = 'words fadein';
-  const temp = toggleFade1;
-  toggleFade1 = toggleFade2;
-  toggleFade2 = temp;
+  q.push({message});
 
 });
 
 window.displayKeyPressed = displayKeyPressed;
 
-let toggleBackFade1 = 'back_fade1';
-let toggleBackFade2 = 'back_fade2';
-
 const setBackdrop = file => {
-  const displayDiv1 = document.getElementById(toggleBackFade1);
-  const displayDiv2 = document.getElementById(toggleBackFade2);
-  if (file === 'black') {
-      displayDiv2.style.backgroundImage = '';
-      displayDiv2.style.background = '#000';
-  } else {
-      displayDiv2.style.backgroundImage = `url(${file})`;
-  }
-  displayDiv1.className = 'back fadeout';
-  displayDiv2.className = 'back fadein';
-  const temp = toggleBackFade1;
-  toggleBackFade1 = toggleBackFade2;
-  toggleBackFade2 = temp;
+  console.log('backdrop', file);
+  const displayDiv1 = document.getElementById('back_fade1');
+  displayDiv1.style.backgroundImage = `url(${file})`;
 };
 
 ipcRenderer.on('backdrop', (event, file) => {
@@ -82,10 +77,13 @@ ipcRenderer.on('setVideo', (event, file) => {
     return;
   }
 
-  setBackdrop('black');
+  setBackdrop('Backdrops/black.png');
   console.log('show video');
-  videoElement.style.display = 'inline-block';
-  videoElement.src = file;
+  setTimeout(() =>{
+    videoElement.style.display = 'inline-block';
+    videoElement.src = file;
+    videoElement.play();
+    }, 300);
 });
 
 ipcRenderer.on('playVideo', (event, controlStr) => {
@@ -111,14 +109,20 @@ ipcRenderer.on('playVideo', (event, controlStr) => {
   
 });
 
-
+ipcRenderer.on('hide', async event => {
+  //document.body.style.visibility = 'hidden';
+  document.body.className = 'fadeout';
+});
+ipcRenderer.on('show', async event => {
+  //document.body.style.visibility = 'visible';
+  document.body.className = 'fadein';
+});
 
 let togglePDF1 = 'pdf1';
 let togglePDF2 = 'pdf2';
 
 ipcRenderer.on('showPDF', async (event, controlStr) => {
 
-  
   const control = JSON.parse(controlStr);
   console.log('showPDF', control.file);
   var canvas = document.getElementById(togglePDF1);
@@ -165,12 +169,16 @@ ipcRenderer.on('showPDF', async (event, controlStr) => {
   };
   await page.render(renderContext);
 
-  canvas2.className = 'pdf fadeout';
-  canvas.className = 'pdf fadein';
+  canvas2.className = 'pdf fadeoutfast';
+  setTimeout(() => {
+     canvas.className = 'pdf fadein';
+  }, 200);
   canvas.style.visibility = 'visible';
   canvas2.style.visibility = 'visible';
 
   const temp = togglePDF1;
   togglePDF1 = togglePDF2;
   togglePDF2 = temp;
+
+  setBackdrop('Backdrops/black.png');
 });

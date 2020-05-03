@@ -69,7 +69,9 @@ if (typeof fs.existsSync === 'function') {
         displayWindow = new BrowserWindow({
             frame: false,
             show: false,
-            visible: false,
+            paintWhenInitiallyHidden: true,
+            backgroundColor: '#ffffff',
+            backgroundThrottling: false,
             webPreferences: {
                 preload: path.join(__dirname, '../public/preload.js'),
                 webSecurity: true
@@ -135,6 +137,7 @@ if (typeof fs.existsSync === 'function') {
                 }
 
                 displayWindow.setBounds(disp.bounds);
+                displayWindow.webContents.send('show');
                 displayWindow.setFullScreen(true);
 
             });
@@ -147,11 +150,14 @@ if (typeof fs.existsSync === 'function') {
                     width: Math.floor(disp.bounds.width * 0.5),
                     height: Math.floor(disp.bounds.height * 0.5)
                 });
+
+                displayWindow.webContents.send('show');
                 displayWindow.show();
             }
 
         } else {
-            displayWindow.hide();
+            displayWindow.webContents.send('hide');
+            setTimeout(() => displayWindow.hide(), 500);
         }
     };
 

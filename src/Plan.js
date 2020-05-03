@@ -122,7 +122,6 @@ export default class Plan extends Component {
       this.props.setVideo(name);
       this.props.setPPT(undefined);
       this.setState({selected: name});
-      window.playVideo({action: 'play'});
       return;
     }
 
@@ -132,7 +131,6 @@ export default class Plan extends Component {
       this.props.setVideo(undefined);
       this.props.setPPT(name);
       this.setState({selected: name});
-
       return;
     }
 

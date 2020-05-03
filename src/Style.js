@@ -13,7 +13,7 @@ import { withStyles } from '@material-ui/core/styles';
 import Select from '@material-ui/core/Select';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
-import AddIcon from '@material-ui/icons/Add';
+import DeleteIcon from '@material-ui/icons/Delete';
 import Tooltip from '@material-ui/core/Tooltip';
 import TextField from '@material-ui/core/TextField';
 import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete';
@@ -128,7 +128,9 @@ function FreeSoloCreateOption(props) {
         if (value === '') {
           setValue({title: 'Default'});
         }
+        props.handleEditing(false);
       }}
+      onFocus={e => {props.handleEditing(true);}}
       filterOptions={(options, params) => {
         const filtered = filter(options, params);
 
@@ -163,7 +165,7 @@ function FreeSoloCreateOption(props) {
       freeSolo
       disableClearable
       renderInput={(params) => (
-        <TextField {...params} label="Style" />
+        <TextField {...params} label="Style (type to add new)" />
       )}
     />
   );
@@ -230,10 +232,12 @@ export default function PictureSelect(props) {
       handleBackdrop(vals.backdrop, false);
       handleColor(vals.color, false);
       handleSize(vals.size, false);
-      if (props.songData) {
-        props.setSongStyle(style);
-      }
     }
+  };
+
+  const handleDelete = e => {
+    props.deleteStyle(currentStyle);
+    setCurrentStyle('Default');
   };
 
   React.useEffect(() => {
@@ -244,7 +248,11 @@ export default function PictureSelect(props) {
     if (!props.songData) return
     const style = props.songData.style || 'Default';
     handleStyleChange(style);
- }, [props.songData]);
+  }, [props.songData]);
+
+  React.useEffect(() => {
+    handleStyleChange(currentStyle);
+  }, [props.styles]);
 
   return (
 
@@ -254,11 +262,21 @@ export default function PictureSelect(props) {
       <FreeSoloCreateOption
         styles={props.styles}
         currentStyle={currentStyle}
-        changeStyle={handleStyleChange}
+        changeStyle={name => {
+          handleStyleChange(name);
+          if (props.songData) {
+            props.setSongStyle(name);
+          }
+        }}
         addStyle={newVal => {
           props.addStyle(newVal, {
             backdrop, color, size});
+          handleStyleChange(newVal);
+          if (props.songData) {
+            props.setSongStyle(newVal);
+          }
         }}
+        handleEditing={props.handleEditing}
       />
 
       <div className={classes.pictures}>
@@ -314,7 +332,16 @@ export default function PictureSelect(props) {
             onChangeCommitted={e => handleSize(size, true)}
           />
         </div>
-        
+
+        {currentStyle === 'Default' ? null :
+          <div style={{display: 'inline-block', float: 'right'}}>
+          <Tooltip title="Delete this style">
+          <IconButton onClick={handleDelete}>
+          <DeleteIcon disabled={true}/>
+          </IconButton>
+          </Tooltip>
+          </div>
+        }
         
      
       </div>

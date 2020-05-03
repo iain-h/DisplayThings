@@ -39,7 +39,7 @@ export default class SongEnter extends Component {
   resetting = 'done';
 
   reset(songData) {
-    this.line = -this.nLines;
+    this.line = 0;
     this.field = 0;
     this.orderIdx = 0;
     this.fieldId = -1;

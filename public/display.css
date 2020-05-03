@@ -11,6 +11,8 @@ body {
   position: absolute;
   top: 0px;
   left: 0px;
+  -webkit-transition: background 1.5s linear;
+  transition: background 1.5s linear;
 }
 
 #video {
@@ -51,6 +53,17 @@ body {
 .fadein {
   animation-name: fadeIn;
   animation-duration: 0.5s;
+  animation-fill-mode: forwards;
+}
+
+.fadeoutfast {
+  animation-name: fadeOut;
+  animation-duration: 0.3s;
+  animation-fill-mode: forwards;
+}
+.fadeintfast {
+  animation-name: fadeIn;
+  animation-duration: 0.3s;
   animation-fill-mode: forwards;
 }
 
