@@ -145,6 +145,7 @@ export default class Plan extends Component {
   deselect() {
     this.setState({selected: ''});
     this.props.setVideo(undefined);
+    this.props.setPPT(undefined);
     this.props.updateSong();
   }
 

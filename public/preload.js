@@ -8,6 +8,7 @@ const async = require('async');
 let toggleFade1 = 'fade1';
 let toggleFade2 = 'fade2';
 
+let wordsTimer1, wordsTimer2;
 const q = async.queue(function(task, callback) {
   const displayDiv1 = document.getElementById(toggleFade1);
   const displayDiv2 = document.getElementById(toggleFade2);
@@ -19,10 +20,12 @@ const q = async.queue(function(task, callback) {
     displayDiv2.appendChild(document.createElement('BR'));
   });
   displayDiv1.className = 'words fadeout';
-  setTimeout(() => {
+  clearTimeout(wordsTimer1);
+  clearTimeout(wordsTimer2);
+  wordsTimer1 = setTimeout(() => {
     displayDiv2.className = 'words fadein';
     }, 300);
-  setTimeout(() => {callback();}, 700);
+  wordsTimer2 = setTimeout(() => {callback();}, 700);
   const temp = toggleFade1;
   toggleFade1 = toggleFade2;
   toggleFade2 = temp;
@@ -126,10 +129,10 @@ ipcRenderer.on('show', async event => {
 
 let togglePDF1 = 'pdf1';
 let togglePDF2 = 'pdf2';
+let timer;
 
-ipcRenderer.on('showPDF', async (event, controlStr) => {
-
-  const control = JSON.parse(controlStr);
+const pdfQ = async.queue(async function(task, callback) {
+  const control = JSON.parse(task.controlStr);
   console.log('showPDF', control.file);
   var canvas = document.getElementById(togglePDF1);
   var canvas2 = document.getElementById(togglePDF2);
@@ -138,53 +141,70 @@ ipcRenderer.on('showPDF', async (event, controlStr) => {
     console.log('hide pdf');
     canvas.style.visibility = 'hidden';
     canvas2.style.visibility = 'hidden';
+    console.log('Finished showPDF no file');
+    callback();
     return;
   }
-  canvas.style.visibility = 'hidden';
+  try {
+    canvas.style.visibility = 'hidden';
 
-  console.log('show pdf');
-  const pdf = await pdfjs.getDocument(control.file);
+    console.log('getDocument');
+    const pdf = await pdfjs.getDocument(control.file);
 
-  console.log(pdf);
-  const page = await pdf.getPage(control.page);
-  console.log(page);
-  
-  var viewport = page.getViewport(2.0);
-  var context = canvas.getContext('2d');
+    console.log(pdf);
+    console.log('getPage');
+    const page = await pdf.getPage(control.page);
+    console.log(page);
+    
+    var viewport = page.getViewport(2.0);
+    var context = canvas.getContext('2d');
 
-  const windowRatio = window.innerWidth / window.innerHeight;
-  const ratio = viewport.width / viewport.height;
+    const windowRatio = window.innerWidth / window.innerHeight;
+    const ratio = viewport.width / viewport.height;
 
-  if (windowRatio < ratio) {
-    console.log('use height');
-    canvas.height = viewport.height;
-    canvas.width = viewport.width;
-    canvas.style.height = window.innerWidth / ratio + 'px';
-    canvas.style.width = '100%';
-  } else {
-    console.log('use width');
-    canvas.width = viewport.width;
-    canvas.height = viewport.height;
-    canvas.style.height = '100%';
-    canvas.style.width = window.innerHeight * ratio + 'px';
+    if (windowRatio < ratio) {
+      console.log('use height');
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
+      canvas.style.height = window.innerWidth / ratio + 'px';
+      canvas.style.width = '100%';
+    } else {
+      console.log('use width');
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      canvas.style.height = '100%';
+      canvas.style.width = window.innerHeight * ratio + 'px';
+    }
+
+    var renderContext = {
+      canvasContext: context,
+      viewport: viewport
+    };
+    console.log('Rendering');
+    await page.render(renderContext);
+
+    canvas2.className = 'pdf fadeoutfast';
+    timer = setTimeout(() => {
+      canvas.className = 'pdf fadein';
+    }, 200);
+    canvas.style.visibility = 'visible';
+    canvas2.style.visibility = 'visible';
+
+    const temp = togglePDF1;
+    togglePDF1 = togglePDF2;
+    togglePDF2 = temp;
+
+    setBackdrop('Backdrops/black.png');
+  } catch (err) {
+    console.log(err);
   }
+  console.log('Finished showPDF');
+  callback();
+}, 1);
 
-  var renderContext = {
-    canvasContext: context,
-    viewport: viewport
-  };
-  await page.render(renderContext);
+ipcRenderer.on('showPDF', async (event, controlStr) => {
 
-  canvas2.className = 'pdf fadeoutfast';
-  setTimeout(() => {
-     canvas.className = 'pdf fadein';
-  }, 200);
-  canvas.style.visibility = 'visible';
-  canvas2.style.visibility = 'visible';
-
-  const temp = togglePDF1;
-  togglePDF1 = togglePDF2;
-  togglePDF2 = temp;
-
-  setBackdrop('Backdrops/black.png');
+  console.log('showPDF - add to q');
+  pdfQ.remove(() => true);
+  pdfQ.push({controlStr});
 });

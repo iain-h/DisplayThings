@@ -3,6 +3,7 @@ const fs = require('fs');
 if (typeof fs.existsSync === 'function') {
     const {app, BrowserWindow, screen, dialog} = require('electron');
 
+    const util = require('util');
     const path = require('path');
     const url = require('url');
     const walk = require('walk');
@@ -428,7 +429,7 @@ if (typeof fs.existsSync === 'function') {
         return videoStatus;
     };
 
-    exports.convertPPTtoPDF = file => {
+    exports.convertPPTtoPDF = async file => {
 
         console.log('platform', process.platform);
 
@@ -440,6 +441,19 @@ if (typeof fs.existsSync === 'function') {
         const execPath = `"C:\\Program Files\\LibreOffice\\program\\simpress.exe"`;
         const command = `${execPath} ${headless} ${convertTo} ${outDir} "${fileName}"`;
         console.log(command);
+
+        let baseName = path.basename(fileName);
+        baseName = baseName.replace('pptx', 'pdf').replace('ppt', 'pdf');
+        const outName = `file://${tempDir.replace(/\\/g, '/')}/${baseName}`;
+        const pdfFile = path.join(tempDir, baseName);
+
+        const exists = fs.existsSync(pdfFile);
+        if (exists) {
+            console.log('loadPDF', outName);
+            mainWindow.webContents.send('loadPDF', outName);
+            return;
+        }
+
         const ls = exec(command, (error, stdout, stderr) => {
             if (error) {
             console.log(error.stack);
@@ -453,9 +467,6 @@ if (typeof fs.existsSync === 'function') {
         ls.on('exit', function (code) {
             console.log('Child process exited with exit code '+code);
             if (code === 0) {
-                let baseName = path.basename(fileName);
-                baseName = baseName.replace('pptx', 'pdf').replace('ppt', 'pdf');
-                const outName = `file://${tempDir.replace(/\\/g, '/')}/${baseName}`;
                 console.log('loadPDF', outName);
                 mainWindow.webContents.send('loadPDF', outName);
             }
@@ -463,7 +474,14 @@ if (typeof fs.existsSync === 'function') {
     };
 
     exports.showPDF = control => {
-        console.log('showPDF', JSON.stringify(control));
-        displayWindow.webContents.send('showPDF', JSON.stringify(control));
+        if (!control) {
+            displayWindow.webContents.send('showPDF', JSON.stringify({}));
+            return;
+        }
+        if (control.file && control.file.endsWith('.pdf')) {
+            console.log('showPDF', JSON.stringify(control));
+            displayWindow.webContents.send('showPDF', JSON.stringify(control));
+        }
+        
     };
 }

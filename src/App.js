@@ -218,6 +218,9 @@ class App extends Component {
                 window.convertPPTtoPDF(file);
               }
               this.setState({ppt: file});
+              if (file === undefined) {
+                window.showPDF();
+              }
           }}
           />
           <Style 

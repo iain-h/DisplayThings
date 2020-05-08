@@ -9,6 +9,8 @@ import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
 import Tooltip from '@material-ui/core/Tooltip';
 import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
 import { Document, Page, pdfjs } from 'react-pdf';
+import Button from '@material-ui/core/Button';
+
 pdfjs.GlobalWorkerOptions.workerSrc = `./pdf.worker.js`;
 
 const styles = {
@@ -44,6 +46,14 @@ export default class PPT extends Component {
       console.log('prev slide');
       this.prevSlide();
     });
+
+    for (let i=1; i<10; ++i) {
+      this.props.mousetrap(i.toFixed(0), e => {
+        if (e) {e.preventDefault();}
+        console.log('slide', i);
+        this.setState({selectedPage: i});
+      });
+    }
   }
 
   componentDidUpdate() {
@@ -54,7 +64,7 @@ export default class PPT extends Component {
 
     if (nextProps.pptFile !== this.props.pptFile) {
       console.log('prop change');
-      this.setState({pptFile: nextProps.pptFile});
+      this.setState({pptFile: nextProps.pptFile, selectedPage: 1});
 
       // Prevent key capture in app parent
       this.props.handleEditing(nextProps.pptFile !== undefined);
@@ -86,6 +96,10 @@ export default class PPT extends Component {
     console.log(prev);
   }
 
+  handleClick(page) {
+    this.setState({selectedPage: page});
+  }
+
   render() {
     if (this.state.pptFile === undefined) {
       return null;
@@ -111,6 +125,7 @@ export default class PPT extends Component {
                     width: '250px',
                     margin: '5px'
                     }}>
+                      <Button onClick={this.handleClick.bind(this, i+1)}>
                 <div style={{
                   display: 'inline-block',
                   width: '250px',
@@ -120,6 +135,7 @@ export default class PPT extends Component {
                   boxShadow: '5px 10px 8px ' + (selected ? '#998888' : '#888888')}}>
                   <Page width={250} pageNumber={i+1} />
                   </div>
+                  </Button>
                   <span style={{
                     display: 'block',
                     textAlign: 'center',
