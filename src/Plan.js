@@ -159,6 +159,9 @@ export default class Plan extends Component {
         result.push(item);
       }
       this.props.setPlan(result);
+      if (item.endsWith('.ppt') || item.endsWith('.pptx')) {
+        window.convertPPTtoPDF(item, false, true);
+      }
     }
   }
 

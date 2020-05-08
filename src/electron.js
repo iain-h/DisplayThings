@@ -429,9 +429,16 @@ if (typeof fs.existsSync === 'function') {
         return videoStatus;
     };
 
-    exports.convertPPTtoPDF = async file => {
+    const pdfConverting = {};
+
+    exports.convertPPTtoPDF = async (file, load, reconvert) => {
 
         console.log('platform', process.platform);
+
+        if (pdfConverting[file] && pdfConverting[file].converting) {
+            pdfConverting[file].load = load;
+            return;
+        }
 
         const fileName = file.replace('file://', '').replace(/\//g, '\\');
         const tempDir = "C:\\TEMP";
@@ -447,12 +454,16 @@ if (typeof fs.existsSync === 'function') {
         const outName = `file://${tempDir.replace(/\\/g, '/')}/${baseName}`;
         const pdfFile = path.join(tempDir, baseName);
 
-        const exists = fs.existsSync(pdfFile);
-        if (exists) {
-            console.log('loadPDF', outName);
-            mainWindow.webContents.send('loadPDF', outName);
-            return;
+        if (!reconvert) {
+            const exists = fs.existsSync(pdfFile);
+            if (exists) {
+                console.log('loadPDF', outName);
+                mainWindow.webContents.send('loadPDF', outName);
+                return;
+            }
         }
+
+        pdfConverting[file] = {converting: true, load: load};
 
         const ls = exec(command, (error, stdout, stderr) => {
             if (error) {
@@ -466,9 +477,12 @@ if (typeof fs.existsSync === 'function') {
         
         ls.on('exit', function (code) {
             console.log('Child process exited with exit code '+code);
-            if (code === 0) {
+            if (code === 0 && pdfConverting[file].load === true) {
                 console.log('loadPDF', outName);
                 mainWindow.webContents.send('loadPDF', outName);
+            }
+            if (pdfConverting[file]) {
+                pdfConverting[file].converting = false;
             }
         });
     };

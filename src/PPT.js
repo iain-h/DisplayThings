@@ -10,6 +10,8 @@ import Tooltip from '@material-ui/core/Tooltip';
 import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
 import { Document, Page, pdfjs } from 'react-pdf';
 import Button from '@material-ui/core/Button';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import RefreshIcon from '@material-ui/icons/Refresh';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `./pdf.worker.js`;
 
@@ -28,6 +30,7 @@ export default class PPT extends Component {
   state = {
     numPages: 0,
     selectedPage: 1,
+    pdfFile: this.props.pdfFile,
     pptFile: this.props.pptFile
   }
 
@@ -62,18 +65,18 @@ export default class PPT extends Component {
   componentWillUpdate(nextProps, nextState) {
     console.log('component update')
 
-    if (nextProps.pptFile !== this.props.pptFile) {
+    if (nextProps.pdfFile !== this.props.pdfFile ||
+      nextProps.pptFile !== this.props.pptFile) {
       console.log('prop change');
-      this.setState({pptFile: nextProps.pptFile, selectedPage: 1});
+      this.setState({pdfFile: nextProps.pdfFile, pptFile: nextProps.pptFile, selectedPage: 1});
 
       // Prevent key capture in app parent
-      this.props.handleEditing(nextProps.pptFile !== undefined);
-
+      this.props.handleEditing(nextProps.pdfFile !== undefined);
     }
 
-    if (nextState.pptFile != this.state.pptFile ||
+    if (nextState.pdfFile != this.state.pdfFile ||
         nextState.selectedPage != this.state.selectedPage) {
-        window.showPDF({file: nextState.pptFile, page: nextState.selectedPage});
+        window.showPDF({file: nextState.pdfFile, page: nextState.selectedPage});
       }
   }
 
@@ -100,15 +103,29 @@ export default class PPT extends Component {
     this.setState({selectedPage: page});
   }
 
+  reload() {
+    this.props.reload();
+  }
+
   render() {
     if (this.state.pptFile === undefined) {
       return null;
     }
+
+    if (!this.state.pdfFile) {
+      return <CircularProgress />;
+    }
+
     console.log('render');
     return (
-
+        <div>
+        <Tooltip title="Reload">
+        <IconButton onClick={this.reload.bind(this)}>
+          <RefreshIcon/>
+        </IconButton>
+        </Tooltip>
         <Document
-                file={this.state.pptFile}
+                file={this.state.pdfFile}
                 onLoadSuccess={this.onDocumentLoadSuccess}
                 >
 
@@ -148,9 +165,9 @@ export default class PPT extends Component {
           })()
            }
            </div>
-              
+   
         </Document>
-
+    </div>
     );
   }
 }

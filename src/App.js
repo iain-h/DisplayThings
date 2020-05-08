@@ -24,6 +24,7 @@ class App extends Component {
     songData: undefined,
     video: undefined,
     ppt: undefined,
+    pdf: undefined,
     plan: [],
     backdrops: [],
     styles: {}
@@ -90,7 +91,7 @@ class App extends Component {
     window.loadPDF = file => {
       console.log('loadPDF', file);
       if (this.state.ppt !== undefined) {
-        this.setState({ppt: file});
+        this.setState({pdf: file});
       }
     };
     
@@ -177,7 +178,12 @@ class App extends Component {
           />
           {this.state.video !== undefined ? <VideoControls /> : null}
           <PPT
+            pdfFile={this.state.pdf}
             pptFile={this.state.ppt}
+            reload={() => {
+              window.convertPPTtoPDF(this.state.ppt, true, true);
+              this.setState({pdf: undefined});
+            }}
             handleEditing={editing => { this.editing = editing;}}
             mousetrap={this.mousetrap.bind(this)}/>
         
@@ -215,9 +221,9 @@ class App extends Component {
             file => {
               console.log('setPPT', file);
               if (typeof file === 'string') {
-                window.convertPPTtoPDF(file);
+                window.convertPPTtoPDF(file, true, false);
               }
-              this.setState({ppt: file});
+              this.setState({ppt: file, pdf: undefined});
               if (file === undefined) {
                 window.showPDF();
               }
