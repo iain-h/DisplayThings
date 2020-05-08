@@ -36,6 +36,8 @@ body {
     transform: translate(-50%, -50%);
     opacity: 0;
     text-shadow: 1px 1px #000000;
+    -webkit-transition: color 0.8s linear;
+    transition: color 0.8s linear;
 }
 
 .pdf {

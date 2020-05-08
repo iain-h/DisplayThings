@@ -39,6 +39,7 @@ ipcRenderer.on('words', (event, message) => {
     videoElement.src = '';
   }
 
+  q.remove(() => true);
   q.push({message});
 
 });
@@ -130,23 +131,23 @@ ipcRenderer.on('show', async event => {
 let togglePDF1 = 'pdf1';
 let togglePDF2 = 'pdf2';
 let timer;
+let showingPDF = false;
 
 const pdfQ = async.queue(async function(task, callback) {
   const control = JSON.parse(task.controlStr);
   console.log('showPDF', control.file);
   var canvas = document.getElementById(togglePDF1);
   var canvas2 = document.getElementById(togglePDF2);
+  canvas.style.visibility = 'hidden';
 
   if (!control.file) {
     console.log('hide pdf');
-    canvas.style.visibility = 'hidden';
-    canvas2.style.visibility = 'hidden';
-    console.log('Finished showPDF no file');
-    callback();
-    return;
-  }
-  try {
-    canvas.style.visibility = 'hidden';
+
+    if (!showingPDF) {
+      return;
+    }
+
+  } else {
 
     console.log('getDocument');
     const pdf = await pdfjs.getDocument(control.file);
@@ -182,24 +183,44 @@ const pdfQ = async.queue(async function(task, callback) {
     };
     console.log('Rendering');
     await page.render(renderContext);
+  }
 
-    canvas2.className = 'pdf fadeoutfast';
+  if (control.file) {
     timer = setTimeout(() => {
       canvas.className = 'pdf fadein';
+      canvas.style.visibility = 'visible';
     }, 200);
-    canvas.style.visibility = 'visible';
-    canvas2.style.visibility = 'visible';
-
-    const temp = togglePDF1;
-    togglePDF1 = togglePDF2;
-    togglePDF2 = temp;
-
-    setBackdrop('Backdrops/black.png');
-  } catch (err) {
-    console.log(err);
   }
+
+  if (showingPDF) {
+    canvas2.className = 'pdf fadeoutfast';
+    canvas2.style.visibility = 'visible';
+  }
+
+  if (control.file) {
+    showingPDF = true;
+    setBackdrop('Backdrops/black.png');
+  }
+
+  const temp = togglePDF1;
+  togglePDF1 = togglePDF2;
+  togglePDF2 = temp;
+
+  if (!control.file) {
+    setTimeout(() => {
+      canvas2.style.visibility = 'hidden';
+      canvas.style.visibility = 'hidden';
+      showingPDF = false;
+      if (typeof callback === 'function') {
+        callback();
+      }
+    }, 200);
+  } else {
+    callback();
+  }
+
   console.log('Finished showPDF');
-  callback();
+  
 }, 1);
 
 ipcRenderer.on('showPDF', async (event, controlStr) => {
