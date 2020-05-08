@@ -67,6 +67,17 @@ ipcRenderer.on('size', (event, size) => {
   displayDiv2.style.fontSize = `${size}vw`;
 });
 
+const setupVideoUpdate = () => {
+  const videoElement = document.getElementById('video');
+  videoElement.ontimeupdate = () => {
+    let time = videoElement.currentTime;
+    let duration = videoElement.duration;
+    let paused = videoElement.paused;
+    const status = {time, duration, paused};
+    setVideoStatus(JSON.stringify(status));
+  };
+};
+
 ipcRenderer.on('setVideo', (event, file) => {
   const videoElement = document.getElementById('video');
 
@@ -83,19 +94,14 @@ ipcRenderer.on('setVideo', (event, file) => {
     videoElement.style.display = 'inline-block';
     videoElement.src = file;
     videoElement.play();
+    setupVideoUpdate();
     }, 300);
 });
 
 ipcRenderer.on('playVideo', (event, controlStr) => {
   const videoElement = document.getElementById('video');
 
-  videoElement.ontimeupdate = () => {
-    let time = videoElement.currentTime;
-    let duration = videoElement.duration;
-    let paused = videoElement.paused;
-    const status = {time, duration, paused};
-    setVideoStatus(JSON.stringify(status));
-  };
+  setupVideoUpdate();
 
   const control = JSON.parse(controlStr);
   console.log(control);
