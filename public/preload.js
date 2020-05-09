@@ -217,6 +217,10 @@ const pdfQ = async.queue(async function(task, callback) {
     setTimeout(() => {
       canvas2.style.visibility = 'hidden';
       canvas.style.visibility = 'hidden';
+      canvas.style.height = '0px';
+      canvas.style.width = '0px';
+      canvas2.style.height = '0px';
+      canvas2.style.width = '0px';
       showingPDF = false;
       if (typeof callback === 'function') {
         callback();

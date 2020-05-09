@@ -166,8 +166,10 @@ if (typeof fs.existsSync === 'function') {
         const songData = {
             name: name,
             fields: [],
-            ids: ['#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8', '#9', '#C', '#B', '#A', '#O', '#T'],
-            names: ['Verse 1', 'Verse 2', 'Verse 3', 'Verse 4', 'Verse 5', 'Verse 6', 'Verse 7', 'Verse 8', 'Verse 9', 'Chorus', 'Bridge', 'Author', 'Order', 'Title'],
+            ids: ['#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8', '#9', '#C', '#B', '#A', '#O', '#T', '#P', '#M', '#F', '#I', '#D'],
+            names: ['Verse 1', 'Verse 2', 'Verse 3', 'Verse 4', 'Verse 5',
+            'Verse 6', 'Verse 7', 'Verse 8', 'Verse 9', 'Chorus', 'Bridge', 'Author', 'Order', 'Title',
+            'Pre-Chorus', 'Middle Section', '2nd Chrous', 'Intro', 'Ending'],
             hasField: {
                 '#1': true,
                 '#C': true,
