@@ -15,15 +15,117 @@ import RefreshIcon from '@material-ui/icons/Refresh';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `./pdf.worker.js`;
 
-const styles = {
-    paper: {
-      display: 'inline',
-      width: '100%',
-      marginBottom: '10px',
-      paddingTop: '10px',
-      paddingBottom: '10px'
-    }
+
+function PDFPage(props) {
+  const [pageLoaded, setPageLoaded] = React.useState('not');
+  const [selected, setSelected] = React.useState(false);
+  const [id, setID] = React.useState(`pdfPage${props.page}`);
+  const [height, setHeight] = React.useState(200);
+
+  const loadPage = async () => {
+    if (pageLoaded !== 'not') return;
+    setPageLoaded('loading');
+    const page = await props.pdfDoc.getPage(props.page);
+    const viewport = page.getViewport(2.0);
+    const canvas = document.getElementById(id);
+    const context = canvas.getContext('2d');
+
+    const ratio = viewport.width / viewport.height;
+    canvas.height = viewport.height;
+    canvas.width = viewport.width;
+    canvas.style.height = 250 / ratio + 'px';
+    canvas.style.width = '100%';
+
+    setHeight(canvas.style.height - 20);
+
+    var renderContext = {
+      canvasContext: context,
+      viewport: viewport
+    };
+
+    await page.render(renderContext);
+    setPageLoaded('loaded');
+
   };
+
+  loadPage();
+
+  const handleClick = e => {
+    props.handleClick(props.page);
+  };
+
+  React.useEffect(() => {
+    setSelected(props.selected);
+  }, [props.selected]);
+
+  return  <div style={{
+    display: 'inline-block',
+    width: '250px',
+    height: height + 'px',
+    margin: '5px'
+    }}>
+      <Button onClick={handleClick}>
+
+      <canvas id={id}  style={{
+      display: 'inline-block',
+      border: selected ? '2px solid' : '1px solid',
+      borderColor: selected ? '#f00' : '#000',
+      padding: '0px',
+      boxShadow: '5px 10px 8px ' + (selected ? '#998888' : '#888888')}}/>
+
+      </Button>
+      <span style={{
+        display: 'block',
+        textAlign: 'center',
+        color: selected ? '#f00' : '#000'
+        }}>{props.page}</span>
+    </div>;
+}
+
+function PDFDocument(props) {
+  const [numPages, setNumPages] = React.useState(0);
+  const [pdfDoc, setPDFDoc] = React.useState(undefined);
+  const [selected, setSelected] = React.useState(undefined);
+
+  const loadFile = async file => {
+    if (numPages !== 0) return;
+    const pdfDoc = await pdfjs.getDocument(file);
+    setPDFDoc(pdfDoc);
+    setNumPages(pdfDoc.numPages);
+    props.onDocumentLoadSuccess(pdfDoc.numPages);
+  };
+
+  React.useEffect(() => {
+    if (props.file) {
+      loadFile(props.file);
+    }
+  }, [props.file]);
+
+  React.useEffect(() => {
+    if (props.selected) {
+      setSelected(props.selected);
+    }
+  }, [props.selected]);
+
+  loadFile(props.file);
+
+  return <div style={{display: 'float'}}>
+
+    {(() => {
+      const pages = [];
+      for (let i=0;i<numPages;++i) {
+        pages.push(<PDFPage 
+          page={i+1}
+          pdfDoc={pdfDoc}
+          handleClick={props.handleClick}
+          selected={selected === i+1}/>);
+      }
+      return pages;
+    })()}
+
+  </div>;
+}
+
 
 export default class PPT extends Component {
 
@@ -32,10 +134,6 @@ export default class PPT extends Component {
     selectedPage: 1,
     pdfFile: this.props.pdfFile,
     pptFile: this.props.pptFile
-  }
-
-  onDocumentLoadSuccess = ({ numPages }) => {
-    this.setState({ numPages });
   }
 
   componentDidMount() {
@@ -99,10 +197,6 @@ export default class PPT extends Component {
     console.log(prev);
   }
 
-  handleClick(page) {
-    this.setState({selectedPage: page});
-  }
-
   reload() {
     this.props.reload();
   }
@@ -124,49 +218,15 @@ export default class PPT extends Component {
           <RefreshIcon/>
         </IconButton>
         </Tooltip>
-        <Document
-                file={this.state.pdfFile}
-                onLoadSuccess={this.onDocumentLoadSuccess}
-                >
-
-             <div style={{
-                display: 'float'
-                }}>
-          {(() => {
-              const pages = [];
-              for (let i=0;i<this.state.numPages;++i) {
-                const selected = (i+1==this.state.selectedPage);
-                pages.push(
-                  <div style={{
-                    display: 'inline-block',
-                    width: '250px',
-                    margin: '5px'
-                    }}>
-                      <Button onClick={this.handleClick.bind(this, i+1)}>
-                <div style={{
-                  display: 'inline-block',
-                  width: '250px',
-                  border: selected ? '2px solid' : '1px solid',
-                  borderColor: selected ? '#f00' : '#000',
-                  padding: '0px',
-                  boxShadow: '5px 10px 8px ' + (selected ? '#998888' : '#888888')}}>
-                  <Page width={250} pageNumber={i+1} />
-                  </div>
-                  </Button>
-                  <span style={{
-                    display: 'block',
-                    textAlign: 'center',
-                    color: selected ? '#f00' : '#000'
-                    }}>{i+1}</span>
-                </div>
-                );
-              }
-              return pages;
-          })()
-           }
-           </div>
-   
-        </Document>
+        <PDFDocument
+          file={this.state.pdfFile}
+          selected={this.state.selectedPage}
+          onDocumentLoadSuccess={numPages => {
+            this.setState({ numPages });
+          }}
+          handleClick={page => {
+            this.setState({selectedPage: page});
+          }}/>
     </div>
     );
   }

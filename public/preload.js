@@ -71,6 +71,13 @@ ipcRenderer.on('size', (event, size) => {
   displayDiv2.style.fontSize = `${size}vw`;
 });
 
+ipcRenderer.on('font', (event, font) => {
+  const displayDiv1 = document.getElementById(toggleFade1);
+  const displayDiv2 = document.getElementById(toggleFade2);
+  displayDiv1.style.fontFamily = font;
+  displayDiv2.style.fontFamily = font;
+});
+
 const setupVideoUpdate = () => {
   const videoElement = document.getElementById('video');
   videoElement.ontimeupdate = () => {

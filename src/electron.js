@@ -375,6 +375,11 @@ if (typeof fs.existsSync === 'function') {
         displayWindow.webContents.send('size', size);
     };
 
+    exports.setFont = font => {
+        console.log('setFont', font);
+        displayWindow.webContents.send('font', font);
+    };
+
     exports.loadStyles = callback => {
         let styles;
         if (fs.existsSync("styles.json")) {

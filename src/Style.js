@@ -11,6 +11,7 @@ import { Popover } from '@material-ui/core';
 import MenuItem from '@material-ui/core/MenuItem';
 import { withStyles } from '@material-ui/core/styles';
 import Select from '@material-ui/core/Select';
+import InputLabel from '@material-ui/core/InputLabel';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -21,6 +22,7 @@ import { saveStyles } from './electron';
 import FormatColorTextIcon from '@material-ui/icons/FormatColorText';
 import FormatSizeIcon from '@material-ui/icons/FormatSize';
 import Slider from '@material-ui/core/Slider';
+import fontList from './font_list.json';
 
 function SwatchButton(props) {
 
@@ -171,6 +173,36 @@ function FreeSoloCreateOption(props) {
   );
 }
 
+function FontSelect(props) {
+  const [value, setValue] = React.useState(props.font || fontList[0]);
+
+  const handleChange = e => {
+    setValue(e.target.value);
+    props.setFont(e.target.value);
+  };
+
+  React.useEffect(() => {
+    setValue(props.font || fontList[0]);
+  }, [props.font]);
+
+  return (
+      <FormControl>
+        <Select
+          labelId="demo-simple-select-label"
+          id="demo-simple-select"
+          value={value}
+          onChange={handleChange}
+        >
+          {fontList.map((item, key) => {
+            return <MenuItem 
+              key={key}
+              value={item}><div style={{fontFamily: item}}>{item}</div></MenuItem>
+          })}
+        </Select>
+      </FormControl>
+  );
+}
+
 
 export default function PictureSelect(props) {
   const classes = useStyles();
@@ -178,6 +210,7 @@ export default function PictureSelect(props) {
   const [color, setColor] = React.useState({r:255, g:255, b:255, a:1});
   const [size, setSize] = React.useState(4.5);
   const [currentStyle, setCurrentStyle] = React.useState('Default');
+  const [font, setFont] = React.useState(fontList[0]);
 
   const handleBackdrop = (newBackdrop, save) => {
     newBackdrop = newBackdrop || props.backdrops[0];
@@ -188,7 +221,8 @@ export default function PictureSelect(props) {
       props.addStyle(currentStyle, {
         backdrop: newBackdrop,
         color,
-        size
+        size,
+        font
       });
     }
   };
@@ -206,7 +240,8 @@ export default function PictureSelect(props) {
       props.addStyle(currentStyle, {
         backdrop,
         color: newColor,
-        size
+        size,
+        font
       });
     }
   };
@@ -219,7 +254,21 @@ export default function PictureSelect(props) {
       props.addStyle(currentStyle, {
         backdrop,
         color,
-        size: newSize
+        size: newSize,
+        font
+      });
+    }
+  };
+
+  const handleFont = (newFont, save) => {
+    window.setFont(newFont);
+    setFont(newFont);
+    if (save) {
+      props.addStyle(currentStyle, {
+        backdrop,
+        color,
+        size,
+        font: newFont
       });
     }
   };
@@ -232,6 +281,7 @@ export default function PictureSelect(props) {
       handleBackdrop(vals.backdrop, false);
       handleColor(vals.color, false);
       handleSize(vals.size, false);
+      handleFont(vals.font, false);
     }
   };
 
@@ -315,7 +365,7 @@ export default function PictureSelect(props) {
           display: 'inline-block',
           position: 'relative',
           top: '10px',
-          width: '100px',
+          width: '250px',
           marginLeft: '10px'
           }}>
           <Slider
@@ -342,6 +392,10 @@ export default function PictureSelect(props) {
           </Tooltip>
           </div>
         }
+
+        <div style={{display: 'block', padding: '10px'}}>
+        <FontSelect font={font} setFont={font => handleFont(font, true)}/>
+        </div>
         
      
       </div>
