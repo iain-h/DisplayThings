@@ -127,7 +127,7 @@ function PDFDocument(props) {
 }
 
 
-export default class PPT extends Component {
+export default class PDF extends Component {
 
   state = {
     numPages: 0,
@@ -202,7 +202,7 @@ export default class PPT extends Component {
   }
 
   render() {
-    if (this.state.pptFile === undefined) {
+    if (this.state.pptFile === undefined && this.state.pdfFile === undefined) {
       return null;
     }
 
@@ -213,11 +213,14 @@ export default class PPT extends Component {
     console.log('render');
     return (
         <div>
+        {
+        this.state.pptFile ?
         <Tooltip title="Reload">
         <IconButton onClick={this.reload.bind(this)}>
           <RefreshIcon/>
         </IconButton>
-        </Tooltip>
+        </Tooltip> : null
+        }
         <PDFDocument
           file={this.state.pdfFile}
           selected={this.state.selectedPage}

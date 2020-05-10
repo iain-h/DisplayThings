@@ -21,7 +21,8 @@ const {
     loadStyles,
     saveStyles,
     setSize,
-    setFont
+    setFont,
+    setPicture
 } = electron.remote.require('./electron.js');
 
 window.setWords = setWords;
@@ -46,6 +47,7 @@ window.loadStyles = loadStyles;
 window.saveStyles = saveStyles;
 window.setSize = setSize;
 window.setFont = setFont;
+window.setPicture = setPicture;
 
 const ipcRenderer = electron.ipcRenderer;
 ipcRenderer.on('loadPDF', (event, file) => {

@@ -415,6 +415,11 @@ if (typeof fs.existsSync === 'function') {
         });
     };
 
+    exports.setPicture = file => {
+        console.log('setPicture', file);
+        displayWindow.webContents.send('setPicture', file || '');
+    };
+
 
     exports.setVideo = file => {
         console.log('setVideo', file);

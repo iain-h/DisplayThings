@@ -10,7 +10,7 @@ import {
 import RootRef from "@material-ui/core/RootRef";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import InboxIcon from "@material-ui/icons/Inbox";
-
+import ImageIcon from '@material-ui/icons/Image';
 import PanoramaWideAngleIcon from '@material-ui/icons/PanoramaWideAngle';
 import DesktopWindowsIcon from '@material-ui/icons/DesktopWindows';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
@@ -47,12 +47,18 @@ const insertItem = (list, endIndex, newItem) => {
   return result;
 };
 
-const getItemStyle = (isDragging, draggableStyle, selected) => ({
+const getItemStyle = (isDragging, draggableStyle, selected, index) => ({
   // styles we need to apply on draggables
   ...draggableStyle, height: '30px',
 
   ...(isDragging && {
     background: "rgb(235,235,235)"
+  }),
+  ...(index % 2 === 0 && {
+    background: "rgb(230,230,250)"
+  }),
+  ...(index % 2 !== 0 && {
+    background: "rgb(230,250,250)"
   }),
   ...(selected && {
     background: "rgb(256,256,0)"
@@ -61,7 +67,23 @@ const getItemStyle = (isDragging, draggableStyle, selected) => ({
 
 const getListStyle = isDraggingOver => ({
   //background: isDraggingOver ? 'lightblue' : 'lightgrey',
+  minHeight: '80px'
 });
+
+const isVideo = name => {
+  const lower = name.toLowerCase();
+  return lower.endsWith('.mp4');
+};
+
+const isPDF = name => {
+  const lower = name.toLowerCase();
+  return lower.endsWith('.pptx') || lower.endsWith('.ppt') || lower.endsWith('.pdf');
+};
+
+const isPicture = name => {
+  const lower = name.toLowerCase();
+  return lower.endsWith('.jpg') || lower.endsWith('.png') || lower.endsWith('.jpeg');
+};
 
 export default class Plan extends Component {
   constructor(props) {
@@ -117,19 +139,31 @@ export default class Plan extends Component {
     e.preventDefault();
 
     // Check for video
-    if (name.startsWith('file') && name.endsWith('mp4')) {
+    if (isVideo(name)) {
       this.props.updateSong(undefined);
       this.props.setVideo(name);
       this.props.setPPT(undefined);
+      this.props.setPicture(undefined);
       this.setState({selected: name});
       return;
     }
 
      // Check for ppt
-     if (name.startsWith('file') && (name.endsWith('ppt') || name.endsWith('pptx'))) {
+     if (isPDF(name)) {
       this.props.updateSong(undefined);
       this.props.setVideo(undefined);
       this.props.setPPT(name);
+      this.props.setPicture(undefined);
+      this.setState({selected: name});
+      return;
+    }
+
+    // Check for picture
+    if (isPicture(name)) {
+      this.props.updateSong(undefined);
+      this.props.setVideo(undefined);
+      this.props.setPPT(undefined);
+      this.props.setPicture(name);
       this.setState({selected: name});
       return;
     }
@@ -139,6 +173,7 @@ export default class Plan extends Component {
     this.setState({selected: name});
     this.props.setVideo(undefined);
     this.props.setPPT(undefined);
+    this.props.setPicture(undefined);
     return true;
   }
 
@@ -146,6 +181,7 @@ export default class Plan extends Component {
     this.setState({selected: ''});
     this.props.setVideo(undefined);
     this.props.setPPT(undefined);
+    this.props.setPicture(undefined);
     this.props.updateSong();
   }
 
@@ -249,11 +285,14 @@ export default class Plan extends Component {
       <Paper className="paper">
       <Toolbar>
       <Typography >Plan</Typography>
+      <div style={{position: 'absolute', right: '20px'}}>
       <Tooltip title="Show nothing">
       <IconButton onClick={this.deselect.bind(this)}>
       <PanoramaWideAngleIcon/>
       </IconButton>
       </Tooltip>
+      </div>
+
       </Toolbar>
 
         <Droppable droppableId="droppable">
@@ -262,7 +301,8 @@ export default class Plan extends Component {
 
               <List style={getListStyle(snapshot.isDraggingOver)}>
 
-                {this.state.items.map((item, index) => (
+                {this.state.items.length === 0 ? <div class="dragHint">Drag items here...</div> :
+                 this.state.items.map((item, index) => (
                   <Draggable key={item} draggableId={item} index={index}>
                     {(provided, snapshot) => (
                       <ListItem
@@ -273,27 +313,32 @@ export default class Plan extends Component {
                         style={getItemStyle(
                           snapshot.isDragging,
                           provided.draggableProps.style,
-                          this.state.selected === item
+                          this.state.selected === item,
+                          index+1
                         )}
                       >
                         <ListItemIcon>
                         <Tooltip title="Show this">
                           {this.state.selected !== item ?
                         <IconButton onClick={this.handlePlay.bind(this,item, index)}>
-                         <PlayArrowIcon/>{index + 1}
+                         <PlayArrowIcon/><span style={{width: '20px'}}>{index + 1}</span>
                          </IconButton> : 
                           <IconButton onClick={this.handlePlay.bind(this,item, index)}>
-                          <DesktopWindowsIcon />{index + 1}
+                          <DesktopWindowsIcon /><span style={{width: '20px'}}>{index + 1}</span>
                           </IconButton> 
                         }
                          </Tooltip>
                           </ListItemIcon>
                           <div style={{paddingRight:'10px'}}>
-                          {item.endsWith('.mp4') ? 
-                            <TheatersIcon/> : 
-                            item.endsWith('.pptx') || item.endsWith('.ppt') ? 
-                            <PictureInPictureIcon/> :
-                            <QueueMusicIcon />}</div>
+                          {isVideo(item) ? 
+                          <Tooltip title="Video">
+                            <TheatersIcon/></Tooltip> : 
+                            isPDF(item) ? 
+                            <Tooltip title="Presentation">
+                            <PictureInPictureIcon/></Tooltip> :
+                            isPicture(item) ? 
+                            <Tooltip title="Picture"><ImageIcon/></Tooltip> :
+                            <Tooltip title="Song"><QueueMusicIcon /></Tooltip>}</div>
                           <Tooltip title={item}>
                         <ListItemText
                            primary={

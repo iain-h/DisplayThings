@@ -1,6 +1,7 @@
 body {
     background: black;
-    
+    overflow-x: hidden;
+    overflow-y: hidden;
   }
 
 .back {
@@ -24,9 +25,22 @@ body {
   transform: translate(-50%, -50%);
 }
 
+#picture {
+  display: none;
+  height: 90%;
+  width: 90%;
+  padding: 0px;
+  margin: 0px;
+  object-fit: contain;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 .words {
     color: rgb(255, 231, 13);
-    width: 100%;
+    width: 90%;
     text-align: center;
     font-family: AbrilFatface-Regular;
     font-size: 4.5vw;
@@ -38,6 +52,8 @@ body {
     text-shadow: 1px 1px #000000;
     -webkit-transition: color 0.8s linear;
     transition: color 0.8s linear;
+    overflow-x: hidden;
+    overflow-y: hidden;
 }
 
 .pdf {

@@ -284,9 +284,11 @@ export default function EnhancedTable(props) {
                           )}
                         >
                           <ListItemIcon>
+                          <Tooltip title="Edit">
                           <IconButton onClick={handleEdit.bind(null,row, index)}>
                             <EditIcon/>
                           </IconButton>
+                          </Tooltip>
                           </ListItemIcon>
                           <Tooltip title={row}>
                           <ListItemText

@@ -109,6 +109,29 @@ ipcRenderer.on('setVideo', (event, file) => {
     }, 300);
 });
 
+ipcRenderer.on('setPicture', (event, file) => {
+  const pictureElement = document.getElementById('picture');
+
+  if (pictureElement.src !== '') {
+    pictureElement.className = 'picture fadeout';
+  }
+
+  setTimeout(() => {
+      if (file === '') {
+        console.log('hide picture');
+        pictureElement.style.display = 'none';
+        pictureElement.src = '';
+        return;
+      }
+
+      setBackdrop('Backdrops/black.png');
+      console.log('show picture');
+      pictureElement.src = file;
+      pictureElement.className = 'picture fadein';
+      pictureElement.style.display = 'inline';
+    }, 500);
+  });
+
 ipcRenderer.on('playVideo', (event, controlStr) => {
   const videoElement = document.getElementById('video');
 

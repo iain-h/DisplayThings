@@ -320,7 +320,7 @@ export default function PictureSelect(props) {
         }}
         addStyle={newVal => {
           props.addStyle(newVal, {
-            backdrop, color, size});
+            backdrop, color, size, font});
           handleStyleChange(newVal);
           if (props.songData) {
             props.setSongStyle(newVal);

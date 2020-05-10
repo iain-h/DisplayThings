@@ -7,14 +7,16 @@ import Controls from './Controls';
 import Plan from './Plan';
 import Style from './Style';
 import VideoControls from './VideoControls';
-import PPT from './PPT';
+import PDF from './PDF';
+import Picture from './Picture';
 import Grid from '@material-ui/core/Grid';
 import Mousetrap from 'mousetrap';
 import FlexSearch from 'flexsearch';
 
 const keyCodeMap = {
   down: [40], up: [38], 
-  1: [49,97], 2: [50,98], 3: [51,99], 4: [52,100], 5: [53,101], 6: [54,102], 7: [55,103], c: [67],
+  1: [49,97], 2: [50,98], 3: [51,99], 4: [52,100], 
+  5: [53,101], 6: [54,102], 7: [55,103], c: [67],
   escape: [27]};
 
 class App extends Component {
@@ -25,6 +27,7 @@ class App extends Component {
     video: undefined,
     ppt: undefined,
     pdf: undefined,
+    picture: undefined,
     plan: [],
     backdrops: [],
     styles: {}
@@ -177,7 +180,7 @@ class App extends Component {
           }}
           />
           {this.state.video !== undefined ? <VideoControls /> : null}
-          <PPT
+          <PDF
             pdfFile={this.state.pdf}
             pptFile={this.state.ppt}
             reload={() => {
@@ -186,6 +189,8 @@ class App extends Component {
             }}
             handleEditing={editing => { this.editing = editing;}}
             mousetrap={this.mousetrap.bind(this)}/>
+
+          <Picture file={this.state.picture}/>
         
       </div>
      
@@ -214,16 +219,24 @@ class App extends Component {
             this.setState({songData: window.createSong('Untitled')});
           }}
           setVideo={file => {
-              this.setState({video: file});
-              window.setVideo(file);
+            this.setState({video: file});
+            window.setVideo(file);
+          }}
+          setPicture={file => {
+            this.setState({picture: file});
+            window.setPicture(file);
           }}
           setPPT={
             file => {
               console.log('setPPT', file);
-              if (typeof file === 'string') {
+              if (typeof file === 'string' && !file.endsWith('pdf')) {
                 window.convertPPTtoPDF(file, true, false);
               }
-              this.setState({ppt: file, pdf: undefined});
+              if (typeof file === 'string' && file.endsWith('pdf')) {
+                this.setState({ppt: undefined, pdf: file});
+              } else {
+                this.setState({ppt: file, pdf: undefined});
+              }
               if (file === undefined) {
                 window.showPDF();
               }
@@ -246,6 +259,7 @@ class App extends Component {
               const newStyles = Object.assign({}, this.state.styles);
               delete newStyles[style];
               this.setState({styles: newStyles});
+              window.saveStyles(newStyles);
               Object.keys(this.songDatabase).forEach(key => {
                 const songData = this.songDatabase[key];
                 if (songData.style === style) {
