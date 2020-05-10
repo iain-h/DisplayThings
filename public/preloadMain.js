@@ -53,3 +53,18 @@ const ipcRenderer = electron.ipcRenderer;
 ipcRenderer.on('loadPDF', (event, file) => {
     window.loadPDF(file);
 });
+
+window.openFile = async () => {
+    const result = await electron.remote.dialog.showOpenDialog({ 
+        properties: ['openFile', 'multiSelections'],
+    filters: {
+        filters: [
+          { name: 'Images', extensions: ['jpg', 'png', 'gif'] },
+          { name: 'Movies', extensions: ['mkv', 'avi', 'mp4'] }
+        ]
+      } });
+
+    if (result.canceled) return [];
+
+    return result.filePaths;
+};

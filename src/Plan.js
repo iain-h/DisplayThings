@@ -23,6 +23,48 @@ import Toolbar from '@material-ui/core/Toolbar';
 import TheatersIcon from '@material-ui/icons/Theaters';
 import QueueMusicIcon from '@material-ui/icons/QueueMusic';
 import PictureInPictureIcon from '@material-ui/icons/PictureInPicture';
+import AddIcon from '@material-ui/icons/Add';
+import DeleteSweepIcon from '@material-ui/icons/DeleteSweep';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+
+function AddToPlanMenu(props) {
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const addFile = async () => {
+    setAnchorEl(null);
+    const files = await window.openFile();
+    props.addFiles(files);
+  };
+  const addWebpage = () => {
+    setAnchorEl(null);
+  };
+
+  return (
+    <div style={{display: 'inline'}}>
+      <Tooltip title="Add file or webpage">
+      <IconButton onClick={handleClick}>
+      <AddIcon/>
+      </IconButton>
+      </Tooltip>
+
+      <Menu
+      id="simple-menu"
+      anchorEl={anchorEl}
+      open={Boolean(anchorEl)}
+      onClose={() => setAnchorEl(null)}
+      >
+      <MenuItem onClick={addFile}>Add file</MenuItem>
+      <MenuItem onClick={addWebpage}>Add webpage</MenuItem>
+      </Menu>
+    </div>
+  );
+}
 
 // a little function to help us with reordering the result
 const reorder = (list, startIndex, endIndex) => {
@@ -286,6 +328,12 @@ export default class Plan extends Component {
       <Toolbar>
       <Typography >Plan</Typography>
       <div style={{position: 'absolute', right: '20px'}}>
+      <Tooltip title="Clear the plan">
+      <IconButton onClick={() => {this.setState({items: []}); this.props.setPlan([]);}}>
+      <DeleteSweepIcon/>
+      </IconButton>
+      </Tooltip>
+      <AddToPlanMenu addFiles={files => this.handleFileDrop(files.map(f => {return {path:f}}))}/>
       <Tooltip title="Show nothing">
       <IconButton onClick={this.deselect.bind(this)}>
       <PanoramaWideAngleIcon/>
