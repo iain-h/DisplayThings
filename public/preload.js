@@ -263,3 +263,79 @@ ipcRenderer.on('showPDF', async (event, controlStr) => {
   pdfQ.remove(() => true);
   pdfQ.push({controlStr});
 });
+
+
+
+let player;
+let youTubeTimer;
+let title = '';
+
+const setupYouTubeUpdate = () => {
+  if (youTubeTimer) clearTimeout(youTubeTimer);
+  if (!player) return;
+  youTubeTimer = setTimeout(() => {
+    let time = player.getCurrentTime();
+    let duration = player.getDuration();
+    let paused = player.getPlayerState() !== 1;
+    const status = {time, duration, paused, title};
+    setVideoStatus(JSON.stringify(status));
+    setupYouTubeUpdate();
+  }, 1000);
+};
+
+const playYouTube = control => {
+
+  if (!player) {
+    var tag = document.createElement('script');
+
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    window.onYouTubeIframeAPIReady = () => {
+      console.log('youtube api ready');
+      player = new YT.Player('player', {
+        height: '100%',
+        width: '100%',
+        videoId: 'cHoGEDQQ67o',
+        events: {
+          'onReady': onPlayerReady
+        }
+      });
+      title = '';
+    };
+  } else {
+    onPlayerReady();
+  }
+
+  function onPlayerReady() {
+    setupYouTubeUpdate();
+    if (control.action === 'play') {
+      player.playVideo();
+      title = player.getVideoData().title;
+    } else if (control.action === 'pause') {
+      player.pauseVideo();
+    } else if (control.action === 'skip') {
+      player.seekTo(control.time);
+    } 
+  }
+};
+
+ipcRenderer.on('setYouTube', async (event, name) => {
+  console.log('Set YouTube');
+  var element = document.getElementById("youtube");
+  if (name === '') {
+    element.style.visibility = 'hidden';
+    playYouTube({action: 'pause'});
+    if (youTubeTimer) clearTimeout(youTubeTimer);
+  } else {
+    element.style.visibility = 'visible';
+    setBackdrop('Backdrops/black.png');
+    playYouTube({action: 'play'});
+    setupYouTubeUpdate();
+  }
+});
+
+ipcRenderer.on('playYouTube', async (event, controlStr) => {
+  console.log('Play YouTube');
+  playYouTube(JSON.parse(controlStr));
+});

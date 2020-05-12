@@ -13,6 +13,7 @@ if (typeof fs.existsSync === 'function') {
     // be closed automatically when the JavaScript object is garbage collected.
     let mainWindow;
     let displayWindow;
+    let browserWindow;
 
     let songDatabase = {};
 
@@ -71,7 +72,7 @@ if (typeof fs.existsSync === 'function') {
             frame: false,
             show: false,
             paintWhenInitiallyHidden: true,
-            backgroundColor: '#ffffff',
+            backgroundColor: '#000000',
             backgroundThrottling: false,
             webPreferences: {
                 preload: path.join(__dirname, '../public/preload.js'),
@@ -82,6 +83,20 @@ if (typeof fs.existsSync === 'function') {
         console.log('display');
         displayWindow.loadURL(`file://${__dirname}/../public/display.html`);
         displayWindow.webContents.once('dom-ready', () => {});
+
+    /*    browserWindow = new BrowserWindow({
+            frame: false,
+            show: false,
+            paintWhenInitiallyHidden: true,
+            backgroundColor: '#ffffff',
+            backgroundThrottling: true,
+            webPreferences: {
+                preload: "https://www.youtube.com/iframe_api",
+                webSecurity: true
+            }
+        });
+        browserWindow.loadURL('https://www.youtube.com/watch?v=ULT4HDDsVHQ');
+*/
         //displayWindow.show();
         // Open the DevTools.
         mainWindow.webContents.openDevTools();
@@ -159,6 +174,47 @@ if (typeof fs.existsSync === 'function') {
         } else {
             displayWindow.webContents.send('hide');
             setTimeout(() => displayWindow.hide(), 500);
+        }
+        
+    };
+
+    exports.showBrowser = show => {
+
+        if (show) {
+
+            const mainBounds = mainWindow.getContentBounds();
+    
+            let displays = screen.getAllDisplays();
+            displays.forEach(disp => {
+
+                // Check for main display.
+                if (mainBounds.x >= disp.bounds.x && mainBounds.x <= disp.bounds.x + disp.bounds.width &&
+                    mainBounds.y >= disp.bounds.y && mainBounds.y <= disp.bounds.y + disp.bounds.height) {
+                    return;
+                }
+
+                browserWindow.setBounds(disp.bounds);
+                browserWindow.webContents.send('show');
+                browserWindow.setFullScreen(true);
+
+            });
+
+            if (!browserWindow.isVisible()) {
+                const disp = screen.getPrimaryDisplay();
+                browserWindow.setBounds({
+                    x: disp.bounds.x,
+                    y: disp.bounds.y,
+                    width: Math.floor(disp.bounds.width * 0.5),
+                    height: Math.floor(disp.bounds.height * 0.5)
+                });
+
+                browserWindow.webContents.send('show');
+                browserWindow.show();
+            }
+
+        } else {
+            browserWindow.webContents.send('hide');
+            setTimeout(() => browserWindow.hide(), 500);
         }
     };
 
@@ -429,6 +485,16 @@ if (typeof fs.existsSync === 'function') {
     exports.playVideo = control => {
         console.log('playVideo', JSON.stringify(control));
         displayWindow.webContents.send('playVideo', JSON.stringify(control));
+    };
+
+    exports.setYouTube = name => {
+        console.log('setYouTube', name);
+        displayWindow.webContents.send('setYouTube', name || '');
+    };
+
+    exports.playYouTube = control => {
+        console.log('playYouTube', JSON.stringify(control));
+        displayWindow.webContents.send('playYouTube', JSON.stringify(control));
     };
 
     let videoStatus = '{}';

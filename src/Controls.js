@@ -14,6 +14,7 @@ export default class Controls extends Component {
 
   componentWillUpdate(nextProps, nextState) {
     window.setShow(nextState.show);
+    
   }
 
   render() {

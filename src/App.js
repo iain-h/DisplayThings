@@ -25,6 +25,7 @@ class App extends Component {
     songList: [],
     songData: undefined,
     video: undefined,
+    youtube: undefined,
     ppt: undefined,
     pdf: undefined,
     picture: undefined,
@@ -179,7 +180,7 @@ class App extends Component {
             }
           }}
           />
-          {this.state.video !== undefined ? <VideoControls /> : null}
+          <VideoControls video={this.state.video} youtube={this.state.youtube}/>
           <PDF
             pdfFile={this.state.pdf}
             pptFile={this.state.ppt}
@@ -221,6 +222,10 @@ class App extends Component {
           setVideo={file => {
             this.setState({video: file});
             window.setVideo(file);
+          }}
+          setYouTube={name => {
+            this.setState({youtube: name});
+            window.setYouTube(name);
           }}
           setPicture={file => {
             this.setState({picture: file});

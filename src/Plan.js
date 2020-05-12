@@ -15,6 +15,7 @@ import PanoramaWideAngleIcon from '@material-ui/icons/PanoramaWideAngle';
 import DesktopWindowsIcon from '@material-ui/icons/DesktopWindows';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import DeleteIcon from '@material-ui/icons/Delete';
+import YouTubeIcon from '@material-ui/icons/YouTube';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import SongList from './SongList';
@@ -41,6 +42,11 @@ function AddToPlanMenu(props) {
     const files = await window.openFile();
     props.addFiles(files);
   };
+
+  const addYouTube = () => {
+    setAnchorEl(null);
+    props.addYouTube();
+  };
   const addWebpage = () => {
     setAnchorEl(null);
   };
@@ -59,8 +65,8 @@ function AddToPlanMenu(props) {
       open={Boolean(anchorEl)}
       onClose={() => setAnchorEl(null)}
       >
-      <MenuItem onClick={addFile}>Add file</MenuItem>
-      <MenuItem onClick={addWebpage}>Add webpage</MenuItem>
+      <MenuItem onClick={addFile}>Add File</MenuItem>
+      <MenuItem onClick={addYouTube}>Add YouTube</MenuItem>
       </Menu>
     </div>
   );
@@ -115,6 +121,10 @@ const getListStyle = isDraggingOver => ({
 const isVideo = name => {
   const lower = name.toLowerCase();
   return lower.endsWith('.mp4');
+};
+
+const isYouTube = name => {
+  return name.startsWith('youtube://');
 };
 
 const isPDF = name => {
@@ -184,6 +194,17 @@ export default class Plan extends Component {
     if (isVideo(name)) {
       this.props.updateSong(undefined);
       this.props.setVideo(name);
+      this.props.setYouTube(undefined);
+      this.props.setPPT(undefined);
+      this.props.setPicture(undefined);
+      this.setState({selected: name});
+      return;
+    }
+
+    if (isYouTube(name)) {
+      this.props.updateSong(undefined);
+      this.props.setVideo(undefined);
+      this.props.setYouTube(name);
       this.props.setPPT(undefined);
       this.props.setPicture(undefined);
       this.setState({selected: name});
@@ -194,6 +215,7 @@ export default class Plan extends Component {
      if (isPDF(name)) {
       this.props.updateSong(undefined);
       this.props.setVideo(undefined);
+      this.props.setYouTube(undefined);
       this.props.setPPT(name);
       this.props.setPicture(undefined);
       this.setState({selected: name});
@@ -204,6 +226,7 @@ export default class Plan extends Component {
     if (isPicture(name)) {
       this.props.updateSong(undefined);
       this.props.setVideo(undefined);
+      this.props.setYouTube(undefined);
       this.props.setPPT(undefined);
       this.props.setPicture(name);
       this.setState({selected: name});
@@ -214,6 +237,7 @@ export default class Plan extends Component {
     this.props.updateSong(songData);
     this.setState({selected: name});
     this.props.setVideo(undefined);
+    this.props.setYouTube(undefined);
     this.props.setPPT(undefined);
     this.props.setPicture(undefined);
     return true;
@@ -222,6 +246,7 @@ export default class Plan extends Component {
   deselect() {
     this.setState({selected: ''});
     this.props.setVideo(undefined);
+    this.props.setYouTube(undefined);
     this.props.setPPT(undefined);
     this.props.setPicture(undefined);
     this.props.updateSong();
@@ -333,7 +358,18 @@ export default class Plan extends Component {
       <DeleteSweepIcon/>
       </IconButton>
       </Tooltip>
-      <AddToPlanMenu addFiles={files => this.handleFileDrop(files.map(f => {return {path:f}}))}/>
+      <AddToPlanMenu 
+        addFiles={
+          files => this.handleFileDrop(files.map(f => {return {path:f}}))}
+        addYouTube={() => {
+          const item = `youtube://cHoGEDQQ67o`;
+          const result = Array.from(this.state.items);
+          if (result.indexOf(item) === -1) {
+            result.push(item);
+          }
+          this.props.setPlan(result);
+        }}
+      />
       <Tooltip title="Show nothing">
       <IconButton onClick={this.deselect.bind(this)}>
       <PanoramaWideAngleIcon/>
@@ -381,6 +417,9 @@ export default class Plan extends Component {
                           {isVideo(item) ? 
                           <Tooltip title="Video">
                             <TheatersIcon/></Tooltip> : 
+                            isYouTube(item) ? 
+                            <Tooltip title="YouTube">
+                              <YouTubeIcon/></Tooltip> : 
                             isPDF(item) ? 
                             <Tooltip title="Presentation">
                             <PictureInPictureIcon/></Tooltip> :
@@ -392,7 +431,8 @@ export default class Plan extends Component {
                            primary={
                             (() => {
                               let displayName = item;
-                              if (displayName.startsWith('file://')) {
+                              if (displayName.startsWith('file://') ||
+                                  displayName.startsWith('youtube://')) {
                                 const bits = item.split('/');
                                 displayName = bits[bits.length - 1];
                               }

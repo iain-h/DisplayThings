@@ -49,32 +49,37 @@ function ValueLabelComponent(props) {
 
 export default class VideoControls extends Component {
 
-  state = {playing: false, status: {}};
+  state = {playing: false, status: {}, youtube: this.props.youtube};
 
   progressDiv;
   progressBarDiv;
   timeDiv;
   time=0;
   duration=0;
-  draggingProgress=false;
-  progressLeft=0;
-  progressMax=10;
-  leftDiff=0;
+  title='';
   suspendProgress=false;
+
+  playVideo(control) {
+    if (this.state.youtube) {
+      window.playYouTube(control);
+    } else {
+      window.playVideo(control);
+    }
+  }
 
   handlePlay() {
       if (this.state.playing) {
-        window.playVideo({action: 'pause'});
+        this.playVideo({action: 'pause'});
         this.updateStatus();
         this.setState({playing: false});
       } else {
-        window.playVideo({action: 'play'});
+        this.playVideo({action: 'play'});
         this.setState({playing: true});
       }
   }
 
   handleSkipStart() {
-    window.playVideo({action: 'skip', time: 0});
+    this.playVideo({action: 'skip', time: 0});
     this.suspendProgress = true;
   }
 
@@ -84,8 +89,6 @@ export default class VideoControls extends Component {
       this.suspendProgress = false;
       return;
     }
-
-    if (this.draggingProgress) return;
 
     this.setState({status: JSON.parse(window.getVideoStatus())});
     if (this.state.status.time >= this.state.status.duration) {
@@ -100,14 +103,6 @@ export default class VideoControls extends Component {
 
     this.time = this.state.status.time;
     this.duration = this.state.status.duration;
-
-    if (this.progressDiv && this.progressBarDiv) {
-      const width = this.progressBarDiv.clientWidth - 50;
-      const ratio = this.state.status.time / this.state.status.duration;
-     // console.log('width', width, 'ratio', ratio);
-      const left = Math.floor(ratio * width);
-      this.progressDiv.style.left = left + 'px';
-    }
   }
 
   getStatusTimer() {
@@ -116,40 +111,17 @@ export default class VideoControls extends Component {
     this.updateStatus();
   }
 
-  progressDown(e) {
-    this.draggingProgress = true;
-    this.progressDiv.style.backgroundColor = '#bbb';
-    const rect =  this.progressBarDiv.getBoundingClientRect();
-    const rect2 =  this.progressDiv.getBoundingClientRect();
-    this.progressMax = rect.width - 50;
-    this.progressLeft = rect.left;
-    this.leftDiff = rect2.left - e.clientX;
-    e.preventDefault();
-  }
-
-  progressUp(e) {
-    if (!this.draggingProgress) return;
-    this.draggingProgress = false;
-    this.progressDiv.style.backgroundColor = '#fff';
-    const ratio = (e.clientX - this.progressLeft + this.leftDiff) / this.progressMax;
-    const time = this.duration * ratio;
-    window.playVideo({action: 'skip', time});
-    this.suspendProgress = true;
-  }
-
-  progressMove(e) {
-    if (!this.draggingProgress) return;
-    let left = e.clientX - this.progressLeft + this.leftDiff;
-    left = Math.min(left, this.progressMax);
-    left = Math.max(left, 0);
-    this.progressDiv.style.left = left + 'px';
-    const ratio = left / this.progressMax;
-    const time = this.duration * ratio;
-    this.timeDiv.innerHTML = this.printSeconds(time);
-  }
-
   componentDidMount() {
       this.getStatusTimer();
+  }
+
+  componentWillUpdate(nextProps, nextState) {
+    if (nextProps.video !== this.props.video) {
+      this.setState({video: nextProps.video});
+    }
+    if (nextProps.youtube !== this.props.youtube) {
+      this.setState({youtube: nextProps.youtube});
+    }
   }
 
   printSeconds(seconds) {
@@ -165,6 +137,8 @@ export default class VideoControls extends Component {
   }
 
   render() {
+    if (!this.state.video && !this.state.youtube) return null;
+
     return (
 
         <Paper className={styles.paper}>
@@ -200,12 +174,13 @@ export default class VideoControls extends Component {
               value={this.time ? this.time : 0}
               onChange={(e, val) => {
                 this.time = val;
-                window.playVideo({action: 'skip', time: val});
+                this.playVideo({action: 'skip', time: val});
+                this.suspendProgress = true;
               }}
               onChangeCommitted={e => {
-                window.playVideo({action: 'skip', time: this.time});
+                this.playVideo({action: 'skip', time: this.time});
+                this.suspendProgress = false;
               }}
-         
             />
 
             <div style={{
@@ -220,6 +195,8 @@ export default class VideoControls extends Component {
             
 
             </div>
+
+            {this.state.status.title ? this.state.status.title : null}
         </Paper>
 
     );
