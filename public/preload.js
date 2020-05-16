@@ -277,6 +277,10 @@ const setupYouTubeUpdate = () => {
     let time = player.getCurrentTime();
     let duration = player.getDuration();
     let paused = player.getPlayerState() !== 1;
+    const data = player.getVideoData();
+    if (data) {
+      title = data.title;
+    }
     const status = {time, duration, paused, title};
     setVideoStatus(JSON.stringify(status));
     setupYouTubeUpdate();
@@ -284,6 +288,8 @@ const setupYouTubeUpdate = () => {
 };
 
 const playYouTube = control => {
+
+  console.log('youtube videoId', control.videoId);
 
   if (!player) {
     var tag = document.createElement('script');
@@ -296,7 +302,7 @@ const playYouTube = control => {
       player = new YT.Player('player', {
         height: '100%',
         width: '100%',
-        videoId: 'cHoGEDQQ67o',
+        videoId: '',
         events: {
           'onReady': onPlayerReady
         }
@@ -310,12 +316,14 @@ const playYouTube = control => {
   function onPlayerReady() {
     setupYouTubeUpdate();
     if (control.action === 'play') {
+      player.loadVideoById(control.videoId);
       player.playVideo();
-      title = player.getVideoData().title;
+      var element = document.getElementById("youtube");
+      element.style.visibility = 'visible';
     } else if (control.action === 'pause') {
       player.pauseVideo();
     } else if (control.action === 'skip') {
-      player.seekTo(control.time);
+      player.seekTo(control.time, control.allowSeekAhead);
     } 
   }
 };
@@ -328,10 +336,9 @@ ipcRenderer.on('setYouTube', async (event, name) => {
     playYouTube({action: 'pause'});
     if (youTubeTimer) clearTimeout(youTubeTimer);
   } else {
-    element.style.visibility = 'visible';
+    const videoId = name.replace('youtube://', '');
     setBackdrop('Backdrops/black.png');
-    playYouTube({action: 'play'});
-    setupYouTubeUpdate();
+    playYouTube({action: 'play', videoId});
   }
 });
 

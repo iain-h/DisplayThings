@@ -334,7 +334,7 @@ export default function PictureSelect(props) {
           const selected = backdrop === file;
           console.log(`url(${file})`);
           return (
-            <Button onClick={handleBackdrop.bind(null, file, true)}>
+            <Button key={i} onClick={handleBackdrop.bind(null, file, true)}>
             <div style={{
               width:'100px', height:'60px',
               border: '2px solid',

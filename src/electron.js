@@ -1,13 +1,19 @@
 const fs = require('fs');
 
 if (typeof fs.existsSync === 'function') {
-    const {app, BrowserWindow, screen, dialog} = require('electron');
+    const {app, BrowserWindow, screen, dialog, session} = require('electron');
 
     const util = require('util');
     const path = require('path');
     const url = require('url');
     const walk = require('walk');
     const { exec } = require('child_process');
+    const express = require('express')
+    const server = express();
+    const port = 3002;
+    server.use(express.static(path.join(__dirname, '../public')));
+
+    const dev = 'public'.startsWith('p');
 
     // Keep a global reference of the window object, if you don't, the window will
     // be closed automatically when the JavaScript object is garbage collected.
@@ -19,6 +25,8 @@ if (typeof fs.existsSync === 'function') {
 
 
     function createWindow() {
+
+      server.listen(port, () => {
 
         let prefs = {x: 20, y:20, width: 800, height: 800};
 
@@ -45,12 +53,16 @@ if (typeof fs.existsSync === 'function') {
         });
 
         // and load the index.html of the app.
-        const startUrl = process.env.ELECTRON_START_URL || url.format({
+        if (dev) {
+            const startUrl = process.env.ELECTRON_START_URL || url.format({
                 pathname: path.join(__dirname, '/../public/index.html'),
                 protocol: 'file:',
                 slashes: true
             });
-        mainWindow.loadURL(startUrl);
+            mainWindow.loadURL(startUrl);
+        } else {
+            mainWindow.loadURL(`http://localhost:${port}/index.html`);
+        }
 
         // Emitted when the window is closed.
         mainWindow.on('closed', function () {
@@ -76,12 +88,12 @@ if (typeof fs.existsSync === 'function') {
             backgroundThrottling: false,
             webPreferences: {
                 preload: path.join(__dirname, '../public/preload.js'),
-                webSecurity: true
+                webSecurity: false
             }
         });
 
         console.log('display');
-        displayWindow.loadURL(`file://${__dirname}/../public/display.html`);
+        displayWindow.loadURL(`http://localhost:${port}/display.html`);
         displayWindow.webContents.once('dom-ready', () => {});
 
     /*    browserWindow = new BrowserWindow({
@@ -99,8 +111,12 @@ if (typeof fs.existsSync === 'function') {
 */
         //displayWindow.show();
         // Open the DevTools.
-        mainWindow.webContents.openDevTools();
-        displayWindow.webContents.openDevTools()
+        if (dev) {
+            mainWindow.webContents.openDevTools();
+            displayWindow.webContents.openDevTools();
+        }
+
+      });
     }
 
     // This method will be called when Electron has finished
@@ -489,7 +505,12 @@ if (typeof fs.existsSync === 'function') {
 
     exports.setYouTube = name => {
         console.log('setYouTube', name);
-        displayWindow.webContents.send('setYouTube', name || '');
+        let id = undefined;
+        if (name) {
+            id = name.split('youtube://')[1];
+            console.log(id);
+        }
+        displayWindow.webContents.send('setYouTube', id || '');
     };
 
     exports.playYouTube = control => {

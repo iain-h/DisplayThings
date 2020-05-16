@@ -49,15 +49,14 @@ function ValueLabelComponent(props) {
 
 export default class VideoControls extends Component {
 
-  state = {playing: false, status: {}, youtube: this.props.youtube};
+  state = {playing: false, status: {}, youtube: this.props.youtube, time: 0};
 
   progressDiv;
   progressBarDiv;
   timeDiv;
-  time=0;
   duration=0;
   title='';
-  suspendProgress=false;
+  timer;
 
   playVideo(control) {
     if (this.state.youtube) {
@@ -72,42 +71,45 @@ export default class VideoControls extends Component {
         this.playVideo({action: 'pause'});
         this.updateStatus();
         this.setState({playing: false});
+        this.getStatusTimer();
       } else {
         this.playVideo({action: 'play'});
         this.setState({playing: true});
+        this.getStatusTimer();
       }
   }
 
   handleSkipStart() {
     this.playVideo({action: 'skip', time: 0});
-    this.suspendProgress = true;
+    this.getStatusTimer();
   }
 
   updateStatus() {
     if (this.suspendProgress) {
-      // Avoid jumping when skipping to time
-      this.suspendProgress = false;
       return;
     }
 
-    this.setState({status: JSON.parse(window.getVideoStatus())});
-    if (this.state.status.time >= this.state.status.duration) {
+    const status = JSON.parse(window.getVideoStatus());
+    this.setState({
+      status: status,
+      time: status.time
+    });
+    if (status.time >= status.duration) {
       this.setState({playing: false});
     }
 
-    if (this.state.status.paused === true) {
+    if (status.paused === true) {
       this.setState({playing: false});
     } else {
       this.setState({playing: true});
     }
 
-    this.time = this.state.status.time;
-    this.duration = this.state.status.duration;
+    this.duration = status.duration;
   }
 
   getStatusTimer() {
-    //console.log(this.state.status);
-    setTimeout(this.getStatusTimer.bind(this), 200);
+    if (this.timer) clearTimeout(this.timer);
+    this.timer = setTimeout(this.getStatusTimer.bind(this), 200);
     this.updateStatus();
   }
 
@@ -171,15 +173,15 @@ export default class VideoControls extends Component {
               min={0}
               max={this.duration}
               valueLabelDisplay="on"
-              value={this.time ? this.time : 0}
+              value={this.state.time ? this.state.time : 0}
               onChange={(e, val) => {
-                this.time = val;
-                this.playVideo({action: 'skip', time: val});
-                this.suspendProgress = true;
+                this.setState({time: val});
+                this.playVideo({action: 'skip', time: val, allowSeekAhead: false});
+                if (this.timer) clearTimeout(this.timer);
               }}
               onChangeCommitted={e => {
-                this.playVideo({action: 'skip', time: this.time});
-                this.suspendProgress = false;
+                this.playVideo({action: 'skip', time: this.state.time, allowSeekAhead: true});
+                setTimeout(this.getStatusTimer.bind(this), 2000);
               }}
             />
 
@@ -196,7 +198,9 @@ export default class VideoControls extends Component {
 
             </div>
 
+            <div style={{padding: '20px'}}>
             {this.state.status.title ? this.state.status.title : null}
+            </div>
         </Paper>
 
     );

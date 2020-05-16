@@ -339,12 +339,13 @@ export default class SongEnter extends Component {
                 }}
                 onBlur={e => {
                   this.editing = false;
+                  this.props.handleEditing(false);
                   if (this.changed) {
                     this.props.saveSongChanges(this.state.songData);
                     this.changed = false;
                   }
                 }}
-                onClick={e => {this.editing = true;}}
+                onClick={e => {this.editing = true; this.props.handleEditing(true);}}
                 onChange={this.handleOnChange.bind(this, idx)}>
                 </TextField>
                 </div>

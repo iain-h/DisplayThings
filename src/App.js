@@ -146,6 +146,7 @@ class App extends Component {
           mousetrap={this.mousetrap.bind(this)}
           songData={this.state.songData}
           setResetCallback={this.setResetCallback.bind(this)}
+          handleEditing={editing => { this.editing = editing;}}
           saveSongChanges={
             songData => {
               const title = songData.fields[songData.ids.indexOf('#T')];

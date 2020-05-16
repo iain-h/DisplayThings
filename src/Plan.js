@@ -28,6 +28,132 @@ import AddIcon from '@material-ui/icons/Add';
 import DeleteSweepIcon from '@material-ui/icons/DeleteSweep';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
+import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
+
+let player;
+
+function YouTubeDialog(props) {
+  const [open, setOpen] = React.useState(false);
+  const [value, setValue] = React.useState('');
+  const [title, setTitle] = React.useState('');
+
+  let timer;
+  const onPlayerStateChange = () => {
+    console.log('play ready');
+    if (player) {
+      console.log('get title');
+      const data = player.getVideoData();
+      if (data) {
+        console.log(data.title);
+        setTitle(data.title);
+      } else {
+        setTimeout(onPlayerStateChange, 1000);
+      }
+    }
+  };
+
+  const onPlayerReady = () => {
+    if (player && value && typeof player.loadVideoById === 'function') {
+      player.loadVideoById(getVideoId(value));
+    }
+  };
+
+  const getVideoId = val => {
+    let videoId = val;
+    if (videoId.startsWith('http') || videoId.startsWith('www.')) {
+      const res = videoId.match(/v=([^ &]*)/);
+      if (res) {
+        videoId = res[1];
+      }
+    }
+    console.log('videoId', videoId);
+    return videoId;
+  };
+
+  const clearVideo = () => {
+    if (player && typeof player.loadVideoById === 'function') {
+      player.loadVideoById('');
+    }
+    setValue('');
+    setTitle('');
+  };
+
+  const handleAdd = () => {
+    props.onClose(getVideoId(value), title);
+    clearVideo();
+  };
+
+  const handleCancel = () => {
+    clearVideo();
+    props.onClose();
+  };
+
+  React.useEffect(() => {
+    setOpen(props.open);
+
+    if (props.open) {
+      clearVideo();
+      window.YT = undefined;
+      let tag = document.createElement('script');
+      tag.src = "https://www.youtube.com/iframe_api";
+      let firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+      window.onYouTubeIframeAPIReady = () => {
+        console.log('youtube api ready');
+        player = new window.YT.Player('player', {
+          height: '100%',
+          width: '100%',
+          videoId: '',
+          events: {
+            'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange
+          }
+        });
+      };
+    }
+  }, [props.open]);
+
+  return (
+    <Dialog open={open} onClose={handleCancel} aria-labelledby="form-dialog-title">
+      <DialogTitle id="form-dialog-title">Add YouTube to plan</DialogTitle>
+      <DialogContent>
+        <TextField
+          autoFocus
+          margin="dense"
+          id="name"
+          label="YouTube video"
+          fullWidth
+          value={value}
+          onChange={e => {
+            setValue(e.target.value);
+            if (player && typeof player.loadVideoById === 'function') {
+              player.loadVideoById(getVideoId(e.target.value));
+            }
+          }}
+          onFocus={e => props.handleEditing(true)}
+          onBlur={e => props.handleEditing(false)}
+        />
+        
+        <div style={{width: '300px', height: '200px'}}>{title}<div id="player"></div></div>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleCancel} color="primary">
+          Cancel
+        </Button>
+        <Button onClick={handleAdd} color="primary">
+          Add
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
 
 function AddToPlanMenu(props) {
 
@@ -65,8 +191,8 @@ function AddToPlanMenu(props) {
       open={Boolean(anchorEl)}
       onClose={() => setAnchorEl(null)}
       >
-      <MenuItem onClick={addFile}>Add File</MenuItem>
-      <MenuItem onClick={addYouTube}>Add YouTube</MenuItem>
+      <MenuItem onClick={addFile}><InsertDriveFileIcon/> <span style={{width: '5px'}}/>Add File</MenuItem>
+      <MenuItem onClick={addYouTube}><YouTubeIcon/> <span style={{width: '5px'}}/>Add YouTube</MenuItem>
       </Menu>
     </div>
   );
@@ -124,7 +250,7 @@ const isVideo = name => {
 };
 
 const isYouTube = name => {
-  return name.startsWith('youtube://');
+  return name.includes('youtube://');
 };
 
 const isPDF = name => {
@@ -143,7 +269,8 @@ export default class Plan extends Component {
     this.state = {
       items: this.props.plan,
       selected: '',
-      fileDragging: false
+      fileDragging: false,
+      youtubeOpen: false
     };
     this.onDragEnd = this.onDragEnd.bind(this);
   }
@@ -300,6 +427,9 @@ export default class Plan extends Component {
     message.appendChild(textnode);
     dropZone.appendChild(message);
     document.body.appendChild(dropZone);
+    dropZone.onclick = e => {
+      dropZone.style.visibility = "hidden";
+    };
 
     const showDropZone = () => {
       dropZone.style.visibility = "visible";
@@ -362,12 +492,7 @@ export default class Plan extends Component {
         addFiles={
           files => this.handleFileDrop(files.map(f => {return {path:f}}))}
         addYouTube={() => {
-          const item = `youtube://cHoGEDQQ67o`;
-          const result = Array.from(this.state.items);
-          if (result.indexOf(item) === -1) {
-            result.push(item);
-          }
-          this.props.setPlan(result);
+          this.setState({youtubeOpen: true});
         }}
       />
       <Tooltip title="Show nothing">
@@ -385,7 +510,7 @@ export default class Plan extends Component {
 
               <List style={getListStyle(snapshot.isDraggingOver)}>
 
-                {this.state.items.length === 0 ? <div class="dragHint">Drag items here...</div> :
+                {this.state.items.length === 0 ? <div className="dragHint">Drag items here...</div> :
                  this.state.items.map((item, index) => (
                   <Draggable key={item} draggableId={item} index={index}>
                     {(provided, snapshot) => (
@@ -465,7 +590,7 @@ export default class Plan extends Component {
      <SongList
           songList={this.props.songList}
           setSong={name=> {
-            this.setState({selected: ''});
+            this.setState({selected: name});
             return this.props.setSong(name);
           }}
           searchIndex={this.props.searchIndex}
@@ -477,6 +602,22 @@ export default class Plan extends Component {
           />
 
       </DragDropContext>
+
+      <YouTubeDialog 
+        open={this.state.youtubeOpen}
+        handleEditing={this.props.handleEditing}
+        onClose={(value, title) => {
+          this.setState({youtubeOpen: false});
+          if (value) {
+            const item = `${title} youtube://${value}`;
+            const result = Array.from(this.state.items);
+            if (result.indexOf(item) === -1) {
+              result.push(item);
+            }
+            this.props.setPlan(result);
+          }
+        }}
+      />
 
      </div>
     );
