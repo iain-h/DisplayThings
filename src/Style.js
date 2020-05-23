@@ -23,6 +23,7 @@ import FormatColorTextIcon from '@material-ui/icons/FormatColorText';
 import FormatSizeIcon from '@material-ui/icons/FormatSize';
 import Slider from '@material-ui/core/Slider';
 import fontList from './font_list.json';
+import {Checkbox, FormGroup, FormControlLabel} from '@material-ui/core';
 
 function SwatchButton(props) {
 
@@ -204,26 +205,42 @@ function FontSelect(props) {
 }
 
 
-export default function PictureSelect(props) {
+export default function(props) {
   const classes = useStyles();
   const [backdrop, setBackdrop] = React.useState('');
   const [color, setColor] = React.useState({r:255, g:255, b:255, a:1});
   const [size, setSize] = React.useState(4.5);
   const [currentStyle, setCurrentStyle] = React.useState('Default');
   const [font, setFont] = React.useState(fontList[0]);
+  const [allCaps, setAllCaps] = React.useState(false);
+  const [shadow, setShadow] = React.useState(false);
+  const [shadowRad, setShadowRad] = React.useState(3);
+  const [border, setBorder] = React.useState(false);
+
+  const addStyle = (styleName, newStyle) => {
+    const fullStyle = {
+      backdrop,
+      color,
+      size,
+      font,
+      allCaps,
+      shadow,
+      shadowRad,
+      border
+    };
+    Object.keys(newStyle).forEach(s => {
+      fullStyle[s] = newStyle[s];
+    });
+    props.addStyle(styleName, fullStyle);
+  };
 
   const handleBackdrop = (newBackdrop, save) => {
     newBackdrop = newBackdrop || props.backdrops[0];
     if (!newBackdrop) return;
-    window.setBackdrop(newBackdrop);
+    window.setWordsStyle({'backdrop': newBackdrop});
     setBackdrop(newBackdrop);
     if (save) {
-      props.addStyle(currentStyle, {
-        backdrop: newBackdrop,
-        color,
-        size,
-        font
-      });
+      addStyle(currentStyle, {backdrop: newBackdrop});
     }
   };
 
@@ -234,42 +251,59 @@ export default function PictureSelect(props) {
       b: '19',
       a: '1',
     };
-    window.setColor(newColor);
+    window.setWordsStyle({'color': newColor});
     setColor(newColor);
     if (save) {
-      props.addStyle(currentStyle, {
-        backdrop,
-        color: newColor,
-        size,
-        font
-      });
+      addStyle(currentStyle, {color: newColor});
     }
   };
 
   const handleSize = (newSize, save) => {
     newSize = newSize || 4.5;
-    window.setSize(newSize);
+    window.setWordsStyle({'size': newSize});
     setSize(newSize);
     if (save) {
-      props.addStyle(currentStyle, {
-        backdrop,
-        color,
-        size: newSize,
-        font
-      });
+      addStyle(currentStyle, {size: newSize});
+    }
+  };
+
+  const handleAllCaps = (newAllCaps, save) => {
+    window.setWordsStyle({'allCaps': newAllCaps});
+    setAllCaps(newAllCaps || false);
+    if (save) {
+      addStyle(currentStyle, {allCaps: newAllCaps});
     }
   };
 
   const handleFont = (newFont, save) => {
-    window.setFont(newFont);
+    window.setWordsStyle({'font': newFont});
     setFont(newFont);
     if (save) {
-      props.addStyle(currentStyle, {
-        backdrop,
-        color,
-        size,
-        font: newFont
-      });
+      addStyle(currentStyle, {font: newFont});
+    }
+  };
+
+  const handleShadow = (newShadow, save) => {
+    window.setWordsStyle({'shadow': newShadow});
+    setShadow(newShadow || false);
+    if (save) {
+      addStyle(currentStyle, {shadow: newShadow});
+    }
+  };
+
+  const handleShadowRad = (newShadowRad, save) => {
+    window.setWordsStyle({'shadowRad': newShadowRad});
+    setShadowRad(newShadowRad || false);
+    if (save) {
+      addStyle(currentStyle, {shadowRad: newShadowRad});
+    }
+  };
+
+  const handleBorder = (newBorder, save) => {
+    window.setWordsStyle({'border': newBorder});
+    setBorder(newBorder || false);
+    if (save) {
+      addStyle(currentStyle, {border: newBorder});
     }
   };
 
@@ -282,6 +316,10 @@ export default function PictureSelect(props) {
       handleColor(vals.color, false);
       handleSize(vals.size, false);
       handleFont(vals.font, false);
+      handleAllCaps(vals.allCaps, false);
+      handleShadow(vals.shadow, false);
+      handleShadowRad(vals.shadowRad, false);
+      handleBorder(vals.border, false);
     }
   };
 
@@ -319,8 +357,7 @@ export default function PictureSelect(props) {
           }
         }}
         addStyle={newVal => {
-          props.addStyle(newVal, {
-            backdrop, color, size, font});
+          addStyle(newVal, {});
           handleStyleChange(newVal);
           if (props.songData) {
             props.setSongStyle(newVal);
@@ -383,6 +420,73 @@ export default function PictureSelect(props) {
           />
         </div>
 
+
+        <div style={{display: 'block', padding: '10px'}}>
+        <FontSelect font={font} setFont={font => handleFont(font, true)}/>
+        </div>
+        
+        
+
+        <FormControlLabel
+              control={
+                <Checkbox
+                checked={allCaps}
+                onChange={e => handleAllCaps(e.target.checked, true)}
+                value="allCaps"
+                color="secondary"
+              />
+              }
+              label="All Caps"
+            />
+        <FormControlLabel
+              control={
+                <Checkbox
+                checked={shadow}
+                onChange={e => handleShadow(e.target.checked, true)}
+                value="shadow"
+                color="secondary"
+              />
+              }
+              label="Shadow"
+            />
+         <div style={{
+          display: 'block',
+          position: 'relative',
+          top: '10px',
+          width: '250px',
+          marginLeft: '10px'
+          }}>
+            Shadow Blur
+          <Slider
+            defaultValue={3}
+            getAriaValueText={value => `${value}`}
+            aria-labelledby="discrete-slider-small-steps"
+            step={1}
+            marks
+            min={0}
+            max={15}
+            valueLabelDisplay="auto"
+            value={shadowRad}
+            onChange={(e, val) => {handleShadow(true, false); handleShadowRad(val, false);}}
+            onChangeCommitted={e => {
+              handleShadowRad(shadowRad, true);
+              handleShadow(true, true);
+            }}
+          />
+        </div>
+
+        <FormControlLabel
+              control={
+                <Checkbox
+                checked={border}
+                onChange={e => handleBorder(e.target.checked, true)}
+                value="border"
+                color="secondary"
+              />
+              }
+              label="Border"
+            />
+
         {currentStyle === 'Default' ? null :
           <div style={{display: 'inline-block', float: 'right'}}>
           <Tooltip title="Delete this style">
@@ -392,11 +496,6 @@ export default function PictureSelect(props) {
           </Tooltip>
           </div>
         }
-
-        <div style={{display: 'block', padding: '10px'}}>
-        <FontSelect font={font} setFont={font => handleFont(font, true)}/>
-        </div>
-        
      
       </div>
       </Paper>

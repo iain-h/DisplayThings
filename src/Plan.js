@@ -599,6 +599,7 @@ export default class Plan extends Component {
           plan={this.props.plan}
           addToPlan={this.props.addToPlan}
           createSong={this.props.createSong}
+          selected={this.state.selected}
           />
 
       </DragDropContext>

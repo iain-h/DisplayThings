@@ -39,12 +39,15 @@ const headCells = [
   { id: 'name', numeric: false, disablePadding: true, label: 'Name' }
 ];
 
-const getItemStyle = (isDragging, draggableStyle) => ({
+const getItemStyle = (isDragging, draggableStyle, selected) => ({
   // styles we need to apply on draggables
   ...draggableStyle, height: '30px',
 
   ...(isDragging && {
     background: "rgb(235,235,235)"
+  }),
+    ...(selected && {
+      background: "rgb(256,256,0)"
   })
 });
 
@@ -280,7 +283,8 @@ export default function EnhancedTable(props) {
                           {...provided.dragHandleProps}
                           style={getItemStyle(
                             snapshot.isDragging,
-                            provided.draggableProps.style
+                            provided.draggableProps.style,
+                            props.selected === row
                           )}
                         >
                           <ListItemIcon>

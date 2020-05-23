@@ -23,6 +23,17 @@ if (typeof fs.existsSync === 'function') {
 
     let songDatabase = {};
 
+    const homedir = require('os').homedir();
+    const basePath = path.join(homedir, '.displayThings');
+
+    if (!fs.existsSync(basePath)) {
+        fs.mkdir(basePath, (err) => { 
+            if (err) { 
+                return console.error(err); 
+            } 
+            console.log('Directory created successfully!'); 
+        }); 
+    }
 
     function createWindow() {
 
@@ -30,9 +41,9 @@ if (typeof fs.existsSync === 'function') {
 
         let prefs = {x: 20, y:20, width: 800, height: 800};
 
-        if (fs.existsSync("prefs.json")) {
+        if (fs.existsSync(path.join(basePath, "prefs.json"))) {
             try {
-                prefs = JSON.parse(fs.readFileSync("prefs.json"));
+                prefs = JSON.parse(fs.readFileSync(path.join(basePath, "prefs.json")));
             } catch (err) {
                 // Not json
             }
@@ -73,7 +84,7 @@ if (typeof fs.existsSync === 'function') {
         });
 
         mainWindow.on('close', () => {
-            fs.writeFileSync("prefs.json", JSON.stringify(mainWindow.getContentBounds()));
+            fs.writeFileSync(path.join(basePath, "prefs.json"), JSON.stringify(mainWindow.getContentBounds()));
             if (process.platform !== 'darwin') {
                 app.quit()
             }
@@ -257,7 +268,7 @@ if (typeof fs.existsSync === 'function') {
 
     const readSong = async (songName, callback) => {
 
-        const fp = path.join(__dirname, '../public/Songs', `${songName}.txt`);
+        const fp = path.join(basePath, 'Songs', `${songName}.txt`);
 
         const songData = createSong(songName);
 
@@ -310,10 +321,10 @@ if (typeof fs.existsSync === 'function') {
 
             if (Object.keys(songDatabase).length === 0) {
 
-                const walker = walk.walk(path.join(__dirname, '../public/Songs'));
+                const walker = walk.walk(path.join(basePath, 'Songs'));
                 walker.on("file", function (root, fileStats, next) {
                     const name = fileStats.name.replace('.txt', '');
-                    fs.readFile(path.join(__dirname, '../public/Songs', fileStats.name), 'utf8', (err, data) => {
+                    fs.readFile(path.join(basePath, 'Songs', fileStats.name), 'utf8', (err, data) => {
 
                         readSong(name, songData => {
                             if (songData) {
@@ -340,7 +351,7 @@ if (typeof fs.existsSync === 'function') {
 
     const saveSongDatabase = () => {
         console.log('Saving Song Database');
-        fs.writeFile("songDatabase.json", JSON.stringify(songDatabase), err => {
+        fs.writeFile(path.join(basePath, "songDatabase.json"), JSON.stringify(songDatabase), err => {
             if (err) {
                 console.log(err);
             } else {
@@ -366,7 +377,7 @@ if (typeof fs.existsSync === 'function') {
     };
 
     const loadSongDatabase = callback => {
-        fs.readFile("songDatabase.json", 'utf8', (err, data) => {
+        fs.readFile(path.join(basePath, "songDatabase.json"), 'utf8', (err, data) => {
             if (err === null) {
                 songDatabase = JSON.parse(data);
                 callback();
@@ -377,7 +388,7 @@ if (typeof fs.existsSync === 'function') {
     };
 
     exports.savePlan = plan => {
-        fs.writeFile("plan.json", JSON.stringify(plan), err => {
+        fs.writeFile(path.join(basePath, "plan.json"), JSON.stringify(plan), err => {
             if (err) {
                 console.log(err);
             }
@@ -385,7 +396,7 @@ if (typeof fs.existsSync === 'function') {
     };
 
     exports.loadPlan = callback => {
-        fs.readFile("plan.json", 'utf8', (err, data) => {
+        fs.readFile(path.join(basePath, "plan.json"), 'utf8', (err, data) => {
             if (err === null) {
                 callback(JSON.parse(data));
             } else {
@@ -433,32 +444,22 @@ if (typeof fs.existsSync === 'function') {
     };
 
 
-    exports.setBackdrop = file => {
-        console.log('setBackdrop', file);
-        displayWindow.webContents.send('backdrop', file);
-    };
-
-
-    exports.setColor = color => {
-        console.log('setColor', color);
-        displayWindow.webContents.send('color', JSON.stringify(color));
-    };
-
-    exports.setSize = size => {
-        console.log('setSize', size);
-        displayWindow.webContents.send('size', size);
-    };
-
-    exports.setFont = font => {
-        console.log('setFont', font);
-        displayWindow.webContents.send('font', font);
+    exports.setWordsStyle = style => {
+        console.log(JSON.stringify(style));
+        Object.keys(style).forEach(s => {
+            if (typeof style[s] === 'object' ) {
+                displayWindow.webContents.send(s, JSON.stringify(style[s]));
+            } else {
+                displayWindow.webContents.send(s, style[s]);
+            }
+        });
     };
 
     exports.loadStyles = callback => {
         let styles;
-        if (fs.existsSync("styles.json")) {
+        if (fs.existsSync(path.join(basePath, "styles.json"))) {
             try {
-                styles = JSON.parse(fs.readFileSync("styles.json"));
+                styles = JSON.parse(fs.readFileSync(path.join(basePath, "styles.json")));
             } catch (err) {
                 // Not json
             }
@@ -477,7 +478,7 @@ if (typeof fs.existsSync === 'function') {
 
     exports.saveStyles = styles => {
 
-        fs.writeFile("styles.json", JSON.stringify(styles), err => {
+        fs.writeFile(path.join(basePath, "styles.json"), JSON.stringify(styles), err => {
             if (err) {
                 console.log(err);
             } else {

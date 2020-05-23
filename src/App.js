@@ -52,7 +52,7 @@ class App extends Component {
       if (this.resetSong) {
         this.resetSong(songData);
       }
-    }, 200);
+    }, 400);
   }
 
   setResetCallback(callback) {
@@ -136,11 +136,20 @@ class App extends Component {
         if (this.editing) return;
         const callback = this.keyMap[e.which];
         if (callback) {
+          e.preventDefault();
           callback(e);
         }
       }} className="App">
 
-      <div style={{position: 'absolute', top: '0px', paddingTop: '10px', left: '20px', right: '440px', bottom: '0px', overflowY: 'auto'}}>
+      <div style={{
+        position: 'absolute',
+        backgroundColor: 'rgb(247, 240, 218)',
+        top: '0px',
+        paddingTop: '10px',
+        left: '0px',
+        right: '440px',
+        bottom: '0px',
+        overflowY: 'auto'}}>
 
         <SongEnter 
           mousetrap={this.mousetrap.bind(this)}

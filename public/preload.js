@@ -9,12 +9,18 @@ let toggleFade1 = 'fade1';
 let toggleFade2 = 'fade2';
 
 let wordsTimer1, wordsTimer2;
+
 const q = async.queue(function(task, callback) {
   const displayDiv1 = document.getElementById(toggleFade1);
   const displayDiv2 = document.getElementById(toggleFade2);
   displayDiv2.innerHTML = '';
   const lines = task.message.split('\n');
+  currentWords = task.message;
+
   lines.forEach(l => {
+    if (allCaps) {
+      l = l.toUpperCase();
+    }
     const textnode = document.createTextNode(l);
     displayDiv2.appendChild(textnode);
     displayDiv2.appendChild(document.createElement('BR'));
@@ -24,12 +30,25 @@ const q = async.queue(function(task, callback) {
   clearTimeout(wordsTimer2);
   wordsTimer1 = setTimeout(() => {
     displayDiv2.className = 'words fadein';
+    doBorder(displayDiv2);
     }, 300);
+
   wordsTimer2 = setTimeout(() => {callback();}, 700);
   const temp = toggleFade1;
   toggleFade1 = toggleFade2;
   toggleFade2 = temp;
 }, 1);
+
+let allCaps = false;
+let currentWords = '';
+ipcRenderer.on('allCaps', (event, newAllCaps) => {
+  console.log('allcaps called');
+  if (allCaps !== newAllCaps) {
+    allCaps = newAllCaps;
+    q.push({message: currentWords});
+  }
+});
+
 
 ipcRenderer.on('words', (event, message) => {
 
@@ -56,12 +75,61 @@ ipcRenderer.on('backdrop', (event, file) => {
   setBackdrop(file);
 });
 
-ipcRenderer.on('color', (event, color) => {
-  const rgb = JSON.parse(color);
+let color =  `rgb(255, 255, 0)`;
+
+ipcRenderer.on('color', (event, newColor) => {
+  const rgb = JSON.parse(newColor);
   const displayDiv1 = document.getElementById(toggleFade1);
   const displayDiv2 = document.getElementById(toggleFade2);
-  displayDiv1.style.color = `rgb(${rgb.r},${rgb.g},${rgb.b})`;
-  displayDiv2.style.color = `rgb(${rgb.r},${rgb.g},${rgb.b})`;
+  color = `rgb(${rgb.r},${rgb.g},${rgb.b})`;
+  displayDiv1.style.color = color;
+  displayDiv2.style.color = color;
+});
+
+let shadowRad = 3;
+let shadow = false;
+
+ipcRenderer.on('shadow', (event, newShadow) => {
+  console.log('shadow', newShadow);
+  shadow = newShadow;
+  const displayDiv1 = document.getElementById(toggleFade1);
+  const displayDiv2 = document.getElementById(toggleFade2);
+  if (newShadow) {
+    displayDiv1.style.textShadow = `2px 2px ${shadowRad}px #000000`;
+    displayDiv2.style.textShadow = `2px 2px ${shadowRad}px #000000`;
+  } else {
+    displayDiv1.style.textShadow = '';
+    displayDiv2.style.textShadow = '';
+  }
+});
+
+ipcRenderer.on('shadowRad', (event, newShadowRad) => {
+  console.log('shadowRad', newShadowRad);
+  shadowRad = newShadowRad || 0;
+  const displayDiv1 = document.getElementById(toggleFade1);
+  const displayDiv2 = document.getElementById(toggleFade2);
+  if (displayDiv1.style.textShadow) {
+    displayDiv1.style.textShadow = `1px 1px ${shadowRad}px #000000`;
+    displayDiv2.style.textShadow = `1px 1px ${shadowRad}px #000000`;
+  }
+});
+
+let border = false;
+
+const doBorder = element => {
+  if (border && currentWords) {
+    element.style.borderTop = `thick solid ${color}`;
+    element.style.borderBottom = `thick solid ${color}`;
+  } else {
+    element.style.borderTop = '';
+    element.style.borderBottom = '';
+  }};
+
+ipcRenderer.on('border', (event, newBorder) => {
+  console.log('border', newBorder);
+  border = newBorder;
+  const displayDiv1 = document.getElementById(toggleFade1);
+  doBorder(displayDiv1);
 });
 
 ipcRenderer.on('size', (event, size) => {

@@ -50,7 +50,10 @@ export default class SongEnter extends Component {
 
   componentDidMount() {
     this.props.mousetrap('down', e => {
-      if (e) {e.preventDefault();}
+      if (e) {
+        e.preventDefault();
+        if (e.repeat) return;
+      }
       console.log('down');
       this.started = true;
       this.nextLines();
@@ -76,7 +79,10 @@ export default class SongEnter extends Component {
     });
 
     this.props.mousetrap('up', e => {
-      if (e) {e.preventDefault();}
+      if (e) {
+        e.preventDefault();
+        if (e.repeat) return;
+      }
       console.log('up');
       if (this.started) {
         this.prevLines();

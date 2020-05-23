@@ -11,8 +11,6 @@ const {
     setKeyDownCallback,
     confirmDelete,
     getBackdrops,
-    setBackdrop,
-    setColor,
     setVideo,
     playVideo,
     getVideoStatus,
@@ -20,12 +18,11 @@ const {
     showPDF,
     loadStyles,
     saveStyles,
-    setSize,
-    setFont,
     setPicture,
     showBrowser,
     setYouTube,
-    playYouTube
+    playYouTube,
+    setWordsStyle
 } = electron.remote.require('./electron.js');
 
 window.setWords = setWords;
@@ -39,8 +36,6 @@ window.setKeyDownCallback = setKeyDownCallback;
 window.updateSongDatabase = updateSongDatabase;
 window.confirmDelete = confirmDelete;
 window.getBackdrops = getBackdrops;
-window.setBackdrop = setBackdrop;
-window.setColor = setColor;
 window.setVideo = setVideo;
 window.playVideo = playVideo;
 window.getVideoStatus = getVideoStatus;
@@ -48,8 +43,7 @@ window.convertPPTtoPDF = convertPPTtoPDF;
 window.showPDF = showPDF;
 window.loadStyles = loadStyles;
 window.saveStyles = saveStyles;
-window.setSize = setSize;
-window.setFont = setFont;
+window.setWordsStyle = setWordsStyle;
 window.setPicture = setPicture;
 window.showBrowser = showBrowser;
 window.playYouTube = playYouTube;

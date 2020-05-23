@@ -47,6 +47,7 @@ body {
   z-index: 20;
 }
 
+
 .words {
     color: rgb(255, 231, 13);
     width: 90%;
@@ -58,11 +59,12 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
     opacity: 0;
-    text-shadow: 1px 1px #000000;
     -webkit-transition: color 0.8s linear;
     transition: color 0.8s linear;
     overflow-x: hidden;
     overflow-y: hidden;
+    padding-top: 30px;
+    padding-bottom: 30px;
 }
 
 .pdf {
