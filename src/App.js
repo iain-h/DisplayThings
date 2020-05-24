@@ -109,8 +109,11 @@ class App extends Component {
     }
 
     const func = e => {
-      this.callbacks[key].forEach(f => f(e));
-    };
+      this.callbacks[key].forEach(f => {
+        if (e.defaultPrevented) return;
+        f(e);
+      }
+      )};
 
     Mousetrap.bind(key, func);
     const codes = keyCodeMap[key];
@@ -134,9 +137,9 @@ class App extends Component {
     return (
       <div onKeyDownCapture = {e => {
         if (this.editing) return;
+        if (e.defaultPrevented) return;
         const callback = this.keyMap[e.which];
         if (callback) {
-          e.preventDefault();
           callback(e);
         }
       }} className="App">
@@ -146,6 +149,8 @@ class App extends Component {
         backgroundColor: 'rgb(247, 240, 218)',
         top: '0px',
         paddingTop: '10px',
+        paddingLeft: '10px',
+        paddingRight: '10px',
         left: '0px',
         right: '440px',
         bottom: '0px',

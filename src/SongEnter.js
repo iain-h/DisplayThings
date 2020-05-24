@@ -49,6 +49,7 @@ export default class SongEnter extends Component {
   }
 
   componentDidMount() {
+    console.log('mount song enter');
     this.props.mousetrap('down', e => {
       if (e) {
         e.preventDefault();

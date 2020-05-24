@@ -529,12 +529,12 @@ export default class Plan extends Component {
                         <ListItemIcon>
                         <Tooltip title="Show this">
                           {this.state.selected !== item ?
-                        <IconButton onClick={this.handlePlay.bind(this,item, index)}>
+                        <Button onClick={this.handlePlay.bind(this,item, index)}>
                          <PlayArrowIcon/><span style={{width: '20px'}}>{index + 1}</span>
-                         </IconButton> : 
-                          <IconButton onClick={this.handlePlay.bind(this,item, index)}>
+                         </Button> : 
+                          <Button onClick={this.handlePlay.bind(this,item, index)}>
                           <DesktopWindowsIcon /><span style={{width: '20px'}}>{index + 1}</span>
-                          </IconButton> 
+                          </Button> 
                         }
                          </Tooltip>
                           </ListItemIcon>
@@ -570,9 +570,9 @@ export default class Plan extends Component {
 
                         <ListItemSecondaryAction>
                           <Tooltip title="Remove from plan">
-                           <IconButton onClick={this.handleRemove.bind(this,item)}>
+                           <Button onClick={this.handleRemove.bind(this,item)}>
                             <DeleteIcon />
-                            </IconButton>
+                            </Button>
                             </Tooltip>
                         </ListItemSecondaryAction>
                       </ListItem>
@@ -591,6 +591,10 @@ export default class Plan extends Component {
           songList={this.props.songList}
           setSong={name=> {
             this.setState({selected: name});
+            this.props.setVideo(undefined);
+            this.props.setYouTube(undefined);
+            this.props.setPPT(undefined);
+            this.props.setPicture(undefined);
             return this.props.setSong(name);
           }}
           searchIndex={this.props.searchIndex}

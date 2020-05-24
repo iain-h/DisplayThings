@@ -9,10 +9,12 @@ import {
   ListItemText,
   ListItemIcon,
   IconButton,
+  Button,
   ListItemSecondaryAction
 } from "@material-ui/core";
 import InboxIcon from "@material-ui/icons/Inbox";
 import EditIcon from "@material-ui/icons/Edit";
+import EditOutlinedIcon from "@material-ui/icons/EditOutlined";
 import { lighten, makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -212,9 +214,14 @@ export default function EnhancedTable(props) {
   }, [props.songList]);
 
   const handleEdit = (name, event) => {
-    const songData = props.setSong(name);
-    console.log(name, songData.fields);
-    props.updateSong(songData);
+    if (props.selected === name) {
+      props.setSong('');
+      props.updateSong();
+    } else {
+      const songData = props.setSong(name);
+      console.log(name, songData.fields);
+      props.updateSong(songData);
+    }
   };
 
   const doSearch = (value) => {
@@ -246,8 +253,6 @@ export default function EnhancedTable(props) {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-
-  const isSelected = name => props.plan.indexOf(name) !== -1;
 
   const emptyRows = rowsPerPage - Math.min(rowsPerPage, props.songList.length - page * rowsPerPage);
 
@@ -289,9 +294,9 @@ export default function EnhancedTable(props) {
                         >
                           <ListItemIcon>
                           <Tooltip title="Edit">
-                          <IconButton onClick={handleEdit.bind(null,row, index)}>
-                            <EditIcon/>
-                          </IconButton>
+                          <Button onClick={handleEdit.bind(null,row, index)}>
+                            {props.selected === row ? <EditOutlinedIcon/> : <EditIcon/>}
+                          </Button>
                           </Tooltip>
                           </ListItemIcon>
                           <Tooltip title={row}>
