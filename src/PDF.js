@@ -138,11 +138,13 @@ export default class PDF extends Component {
 
   componentDidMount() {
     this.props.mousetrap('down', e => {
+      if (!this.state.pdfFile) return;
       if (e) {e.preventDefault();}
       this.nextSlide();
     });
 
     this.props.mousetrap('up', e => {
+      if (!this.state.pdfFile) return;
       if (e) {e.preventDefault();}
       console.log('prev slide');
       this.prevSlide();
@@ -150,6 +152,7 @@ export default class PDF extends Component {
 
     for (let i=1; i<10; ++i) {
       this.props.mousetrap(i.toFixed(0), e => {
+        if (!this.state.pdfFile) return;
         if (e) {e.preventDefault();}
         console.log('slide', i);
         this.setState({selectedPage: i});

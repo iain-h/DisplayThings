@@ -51,6 +51,7 @@ export default class SongEnter extends Component {
   componentDidMount() {
     console.log('mount song enter');
     this.props.mousetrap('down', e => {
+      if (!this.state.songData) return;
       if (e) {
         e.preventDefault();
         if (e.repeat) return;
@@ -80,6 +81,7 @@ export default class SongEnter extends Component {
     });
 
     this.props.mousetrap('up', e => {
+      if (!this.state.songData) return;
       if (e) {
         e.preventDefault();
         if (e.repeat) return;
