@@ -98,6 +98,11 @@ class App extends Component {
         this.setState({pdf: file});
       }
     };
+
+    window.loadSongs = songDatabase => {
+      this.songDatabase = songDatabase;
+      this.indexSongs();
+    };
     
   }
 

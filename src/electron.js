@@ -1,7 +1,93 @@
 const fs = require('fs');
 
 if (typeof fs.existsSync === 'function') {
-    const {app, BrowserWindow, screen, dialog, session} = require('electron');
+    const {app, BrowserWindow, Menu, screen, dialog, session, shell} = require('electron');
+
+    const isMac = process.platform === 'darwin'
+
+    const template = [
+    // { role: 'appMenu' }
+    ...(isMac ? [{
+        label: app.name,
+        submenu: [
+        { role: 'about' },
+        { type: 'separator' },
+        { role: 'services' },
+        { type: 'separator' },
+        { role: 'hide' },
+        { role: 'hideothers' },
+        { role: 'unhide' },
+        { type: 'separator' },
+        { role: 'quit' }
+        ]
+    }] : []),
+    // { role: 'fileMenu' }
+    {
+        label: 'File',
+        submenu: [
+        {
+            label: 'Import Songs...',
+            click: async () => {
+                const res = await dialog.showOpenDialog(mainWindow, {
+                    properties: ['openDirectory']
+                });
+                if (!res.canceled) {
+                    importSongs(res.filePaths[0]);
+                }
+            }
+        },
+        { type: 'separator' },
+        isMac ? { role: 'close' } : { role: 'quit' }
+        ]
+    },
+    // { role: 'editMenu' }
+    {
+        label: 'Edit',
+        submenu: [
+        { role: 'undo' },
+        { role: 'redo' },
+        { type: 'separator' },
+        { role: 'cut' },
+        { role: 'copy' },
+        { role: 'paste' },
+        ...(isMac ? [
+            { role: 'pasteAndMatchStyle' },
+            { role: 'delete' },
+            { role: 'selectAll' },
+            { type: 'separator' },
+            {
+            label: 'Speech',
+            submenu: [
+                { role: 'startspeaking' },
+                { role: 'stopspeaking' }
+            ]
+            }
+        ] : [
+            { role: 'delete' },
+            { type: 'separator' },
+            { role: 'selectAll' }
+        ])
+        ]
+    },
+    // { role: 'viewMenu' }
+    {
+        label: 'View',
+        submenu: [
+        { role: 'reload' },
+        { role: 'forcereload' },
+        { role: 'toggledevtools' },
+        { type: 'separator' },
+        { role: 'resetzoom' },
+        { role: 'zoomin' },
+        { role: 'zoomout' },
+        { type: 'separator' },
+        { role: 'togglefullscreen' }
+        ]
+    }
+    ];
+
+    const menu = Menu.buildFromTemplate(template);
+    Menu.setApplicationMenu(menu);
 
     const util = require('util');
     const path = require('path');
@@ -266,9 +352,9 @@ if (typeof fs.existsSync === 'function') {
 
     exports.createSong = createSong;
 
-    const readSong = async (songName, callback) => {
+    const readSong = async (songName, dir, callback) => {
 
-        const fp = path.join(basePath, 'Songs', `${songName}.txt`);
+        const fp = path.join(dir, `${songName}.txt`);
 
         const songData = createSong(songName);
 
@@ -315,38 +401,26 @@ if (typeof fs.existsSync === 'function') {
         
     };
 
-    exports.getSongs = async songFunc => {
-
-        loadSongDatabase(() => {
-
-            if (Object.keys(songDatabase).length === 0) {
-
-                const walker = walk.walk(path.join(basePath, 'Songs'));
-                walker.on("file", function (root, fileStats, next) {
-                    const name = fileStats.name.replace('.txt', '');
-                    fs.readFile(path.join(basePath, 'Songs', fileStats.name), 'utf8', (err, data) => {
-
-                        readSong(name, songData => {
-                            if (songData) {
-                                songDatabase[name] = songData;
-                            }
-                            next();
-                        });
-                        
-                    });
-                });
-
-                walker.on("end", function () {
-                    saveSongDatabase();
-                    songFunc(songDatabase);
-                });
-
-            } else {
-                songFunc(songDatabase);
-            }
-
+    const importSongs = importDir => {
+        const walker = walk.walk(importDir);
+        walker.on("file", function (root, fileStats, next) {
+            if (!fileStats.name.endsWith('txt')) return;
+            const name = fileStats.name.replace('.txt', '');
+            readSong(name, importDir, songData => {
+                if (songData) {
+                    songDatabase[name] = songData;
+                }
+                next();
+            });
         });
-        
+        walker.on("end", function () {
+            saveSongDatabase();
+            mainWindow.webContents.send('loadSongs', JSON.stringify(songDatabase));
+        });
+    };
+
+    exports.getSongs = async songFunc => {
+        loadSongDatabase(() => songFunc(songDatabase));
     };
 
     const saveSongDatabase = () => {
