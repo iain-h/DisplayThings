@@ -14,9 +14,9 @@ import Mousetrap from 'mousetrap';
 import FlexSearch from 'flexsearch';
 
 const keyCodeMap = {
-  down: [40], up: [38], 
+  down: [40, 34], up: [38, 33], 
   1: [49,97], 2: [50,98], 3: [51,99], 4: [52,100], 
-  5: [53,101], 6: [54,102], 7: [55,103], c: [67],
+  5: [53,101], 6: [54,102], 7: [55,103], c: [67], b: [66],
   escape: [27]};
 
 class App extends Component {
@@ -104,6 +104,14 @@ class App extends Component {
       this.indexSongs();
     };
     
+    window.addEventListener("keydown", e => {
+      if (this.editing) return;
+      if (e.defaultPrevented) return;
+      const callback = this.keyMap[e.which];
+      if (callback) {
+        callback(e);
+      }
+    }, false);
   }
 
   mousetrap(key, callback) {

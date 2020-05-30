@@ -170,9 +170,6 @@ export default class PDF extends Component {
       nextProps.pptFile !== this.props.pptFile) {
       console.log('prop change');
       this.setState({pdfFile: nextProps.pdfFile, pptFile: nextProps.pptFile, selectedPage: 1});
-
-      // Prevent key capture in app parent
-      this.props.handleEditing(nextProps.pdfFile !== undefined);
     }
 
     if (nextState.pdfFile != this.state.pdfFile ||
