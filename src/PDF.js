@@ -89,10 +89,14 @@ function PDFDocument(props) {
 
   const loadFile = async file => {
     if (numPages !== 0) return;
-    const pdfDoc = await pdfjs.getDocument(file);
-    setPDFDoc(pdfDoc);
-    setNumPages(pdfDoc.numPages);
-    props.onDocumentLoadSuccess(pdfDoc.numPages);
+    try {
+      const pdfDoc = await pdfjs.getDocument(file);
+      setPDFDoc(pdfDoc);
+      setNumPages(pdfDoc.numPages);
+      props.onDocumentLoadSuccess(pdfDoc.numPages);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   React.useEffect(() => {
