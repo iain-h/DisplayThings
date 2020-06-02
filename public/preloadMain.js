@@ -58,6 +58,10 @@ ipcRenderer.on('loadSongs', (event, songDatabase) => {
     window.loadSongs(JSON.parse(songDatabase));
 });
 
+ipcRenderer.on('hideDisplay', event => {
+    window.hideDisplay();
+});
+
 window.openFile = async () => {
     const result = await electron.remote.dialog.showOpenDialog({ 
         properties: ['openFile', 'multiSelections'],

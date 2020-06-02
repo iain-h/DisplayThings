@@ -123,7 +123,7 @@ class App extends Component {
 
     const func = e => {
       this.callbacks[key].forEach(f => {
-        if (e.defaultPrevented) return;
+        if (e && e.defaultPrevented) return;
         f(e);
       }
       )};

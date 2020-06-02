@@ -17,6 +17,10 @@ export default class Controls extends Component {
     
   }
 
+  componentDidMount() {
+    window.hideDisplay = () => {this.setState({show: false})};
+  }
+
   render() {
     return (
       <main>

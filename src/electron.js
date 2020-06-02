@@ -177,21 +177,7 @@ if (typeof fs.existsSync === 'function') {
         });
 
         // Create the display window.
-        displayWindow = new BrowserWindow({
-            frame: false,
-            show: false,
-            paintWhenInitiallyHidden: true,
-            backgroundColor: '#000000',
-            backgroundThrottling: false,
-            webPreferences: {
-                preload: path.join(__dirname, '../public/preload.js'),
-                webSecurity: false
-            }
-        });
-
-        console.log('display');
-        displayWindow.loadURL(`http://localhost:${port}/display.html`);
-        displayWindow.webContents.once('dom-ready', () => {});
+        createDisplayWindow();
 
     /*    browserWindow = new BrowserWindow({
             frame: false,
@@ -215,6 +201,30 @@ if (typeof fs.existsSync === 'function') {
 
       });
     }
+
+    const createDisplayWindow = () => {
+        displayWindow = new BrowserWindow({
+            frame: false,
+            show: false,
+            paintWhenInitiallyHidden: true,
+            backgroundColor: '#000000',
+            backgroundThrottling: false,
+            webPreferences: {
+                preload: path.join(__dirname, '../public/preload.js'),
+                webSecurity: false
+            }
+        });
+        console.log('display');
+        displayWindow.loadURL(`http://localhost:${port}/display.html`);
+        displayWindow.webContents.once('dom-ready', () => {});
+        displayWindow.loadURL(`http://localhost:${port}/display.html`);
+        displayWindow.on('closed', () => {
+            if (mainWindow) {
+                mainWindow.webContents.send('hideDisplay');
+                createDisplayWindow();
+            }
+        });
+    };
 
     // This method will be called when Electron has finished
     // initialization and is ready to create browser windows.
