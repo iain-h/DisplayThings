@@ -624,14 +624,26 @@ if (typeof fs.existsSync === 'function') {
             return;
         }
 
-        const fileName = file.replace('file://', '').replace(/\//g, '\\');
-        const tempDir = "C:\\TEMP";
-        const outDir = `--outdir "${tempDir}"`;
-        const convertTo = `--convert-to pdf`;
-        const headless = "--headless --invisible";
-        const execPath = `"C:\\Program Files\\LibreOffice\\program\\simpress.exe"`;
-        const command = `${execPath} ${headless} ${convertTo} ${outDir} "${fileName}"`;
-        console.log(command);
+        let fileName, tempDir, outDir, convertTo, headless, execPath, command;
+        if (process.platform === 'win32') {
+            fileName = file.replace('file://', '').replace(/\//g, '\\');
+            tempDir = "C:\\TEMP";
+            outDir = `--outdir "${tempDir}"`;
+            convertTo = `--convert-to pdf`;
+            headless = "--headless --invisible";
+            execPath = `"C:\\Program Files\\LibreOffice\\program\\simpress.exe"`;
+            command = `${execPath} ${headless} ${convertTo} ${outDir} "${fileName}"`;
+            console.log(command);
+        } else if (process.platform === 'linux') {
+            fileName = file.replace('file://', '');
+            tempDir = "/tmp";
+            outDir = `--outdir "${tempDir}"`;
+            convertTo = `--convert-to pdf`;
+            headless = "--headless --invisible";
+            execPath = `"libreoffice"`;
+            command = `${execPath} ${headless} ${convertTo} ${outDir} "${fileName}"`;
+            console.log(command);
+        }
 
         let baseName = path.basename(fileName);
         baseName = baseName.replace('pptx', 'pdf').replace('ppt', 'pdf');
