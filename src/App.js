@@ -262,14 +262,10 @@ class App extends Component {
           setPPT={
             file => {
               console.log('setPPT', file);
-              if (typeof file === 'string' && !file.endsWith('pdf')) {
+              if (typeof file === 'string') {
                 window.convertPPTtoPDF(file, true, false);
               }
-              if (typeof file === 'string' && file.endsWith('pdf')) {
-                this.setState({ppt: undefined, pdf: file});
-              } else {
-                this.setState({ppt: file, pdf: undefined});
-              }
+              this.setState({ppt: file, pdf: undefined});
               if (file === undefined) {
                 window.showPDF();
               }

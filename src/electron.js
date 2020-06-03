@@ -619,6 +619,11 @@ if (typeof fs.existsSync === 'function') {
 
         console.log('platform', process.platform);
 
+        if (file.endsWith('.pdf')){
+            mainWindow.webContents.send('loadPDF', file);
+            return;
+        }
+
         if (pdfConverting[file] && pdfConverting[file].converting) {
             pdfConverting[file].load = load;
             return;
