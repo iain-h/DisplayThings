@@ -68,7 +68,7 @@ window.displayKeyPressed = displayKeyPressed;
 const setBackdrop = file => {
   console.log('backdrop', file);
   const displayDiv1 = document.getElementById('back_fade1');
-  displayDiv1.style.backgroundImage = `url(${file})`;
+  displayDiv1.style.backgroundImage = `url(${file.replace('rootDir/', rootDir)})`;
 };
 
 ipcRenderer.on('backdrop', (event, file) => {

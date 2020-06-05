@@ -93,8 +93,9 @@ const useStyles = makeStyles(theme => ({
   },
   pictures: {
     height: '200px',
-    width: '100%',
-    overflowY: 'auto'
+    width: '80%',
+    overflowY: 'auto',
+    margin: '5px'
   },
   contents: {
     padding: '10px'
@@ -375,11 +376,12 @@ export default function(props) {
             <div style={{
               width:'100px', height:'60px',
               border: '2px solid',
-              borderColor: selected ? '#66f' : '#fff',
-              opacity: selected ? 1 : 0.5,
-              backgroundImage: `url(${file})`,
+              borderColor: selected ? '#f44' : '#fff',
+              opacity: selected ? 1 : 0.7,
+              backgroundImage: `url(${file.replace('rootDir/', window.rootDir)})`,
               backgroundSize: 'cover',
-              backgroundRepeat: 'no-repeat'
+              backgroundRepeat: 'no-repeat',
+              margin: '0px'
               }}>
             </div>
             </Button>

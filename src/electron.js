@@ -514,19 +514,48 @@ if (typeof fs.existsSync === 'function') {
 
     exports.rootDir = rootDir;
 
-    exports.getBackdrops = async callback => {
-        const files = [];
-        const walker = walk.walk(path.join(__dirname, '../public/Backdrops'));
-        walker.on("file", function (root, fileStats, next) {
-            files.push(rootDir + 'Backdrops/' + fileStats.name);
-            console.log('backdrop:', fileStats.name);
-            next();
-        });
-        walker.on("end", function () {
-            callback(files);
+
+    const getLocalBackdrops = () => {
+        return new Promise((resolve, reject) => {
+            const files = [];
+            const walker = walk.walk(path.join(__dirname, '../public/Backdrops'));
+            walker.on("file", function (root, fileStats, next) {
+                files.push('rootDir/Backdrops/' + fileStats.name);
+                console.log('backdrop:', fileStats.name);
+                next();
+            });
+            walker.on("end", function () {
+                resolve(files);
+            });
         });
     };
 
+    const getUserBackdrops = () => {
+
+        const homeUrl = `file://${path.join(homedir, 'Backdrops')}/`.replace(/\\/g ,'/');
+
+        return new Promise((resolve, reject) => {
+            const files = [];
+            const walker = walk.walk(path.join(homedir, 'Backdrops'));
+            walker.on("file", function (root, fileStats, next) {
+                const lowerName = fileStats.name.toLowerCase();
+                if (lowerName.endsWith('.jpg') || lowerName.endsWith('.png')){
+                    files.push(homeUrl + fileStats.name);
+                    console.log('backdrop:', fileStats.name);
+                }
+                next();
+            });
+            walker.on("end", function () {
+                resolve(files);
+            });
+        });
+    };
+
+    exports.getBackdrops = async callback => {
+        let files = await getLocalBackdrops();
+        let homeFiles = await getUserBackdrops();
+        callback(files.concat(homeFiles));
+    };
 
     exports.setWordsStyle = style => {
         console.log(JSON.stringify(style));

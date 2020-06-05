@@ -22,7 +22,8 @@ const {
     showBrowser,
     setYouTube,
     playYouTube,
-    setWordsStyle
+    setWordsStyle,
+    rootDir
 } = electron.remote.require('./electron.js');
 
 window.setWords = setWords;
@@ -48,6 +49,7 @@ window.setPicture = setPicture;
 window.showBrowser = showBrowser;
 window.playYouTube = playYouTube;
 window.setYouTube = setYouTube;
+window.rootDir = rootDir;
 
 const ipcRenderer = electron.ipcRenderer;
 ipcRenderer.on('loadPDF', (event, file) => {
