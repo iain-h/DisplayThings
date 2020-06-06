@@ -15,6 +15,7 @@ import PanoramaWideAngleIcon from '@material-ui/icons/PanoramaWideAngle';
 import DesktopWindowsIcon from '@material-ui/icons/DesktopWindows';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import DeleteIcon from '@material-ui/icons/Delete';
+import GraphicEqIcon from '@material-ui/icons/GraphicEq';
 import YouTubeIcon from '@material-ui/icons/YouTube';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
@@ -562,16 +563,19 @@ export default class Plan extends Component {
                           <div style={{paddingRight:'10px'}}>
                           {isVideo(item) ? 
                           <Tooltip title="Video">
-                            <TheatersIcon/></Tooltip> : 
+                              <TheatersIcon/></Tooltip> : 
+                            isAudio(item) ?
+                            <Tooltip title="Sound">
+                              <GraphicEqIcon/></Tooltip> : 
                             isYouTube(item) ? 
                             <Tooltip title="YouTube">
                               <YouTubeIcon/></Tooltip> : 
                             isPDF(item) ? 
                             <Tooltip title="Presentation">
-                            <PictureInPictureIcon/></Tooltip> :
+                              <PictureInPictureIcon/></Tooltip> :
                             isPicture(item) ? 
                             <Tooltip title="Picture"><ImageIcon/></Tooltip> :
-                            <Tooltip title="Song"><QueueMusicIcon /></Tooltip>}</div>
+                            <Tooltip title="Song Words"><QueueMusicIcon /></Tooltip>}</div>
                           <Tooltip title={item}>
                         <ListItemText
                            primary={
