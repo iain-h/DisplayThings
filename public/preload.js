@@ -414,3 +414,4 @@ ipcRenderer.on('playYouTube', async (event, controlStr) => {
   console.log('Play YouTube');
   playYouTube(JSON.parse(controlStr));
 });
+

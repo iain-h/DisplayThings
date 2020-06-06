@@ -49,7 +49,14 @@ function ValueLabelComponent(props) {
 
 export default class VideoControls extends Component {
 
-  state = {playing: false, status: {}, youtube: this.props.youtube, time: 0};
+  state = {
+    playing: false,
+    status: {},
+    youtube: this.props.youtube,
+    time: 0,
+    video: undefined,
+    audio: undefined
+  };
 
   progressDiv;
   progressBarDiv;
@@ -58,8 +65,39 @@ export default class VideoControls extends Component {
   title='';
   timer;
 
+  playAudio(control) {
+    const audioElement = document.getElementById('audio');
+    if (audioElement) {
+      if (control.action === 'play') {
+        audioElement.play();
+        audioElement.ontimeupdate = () => {
+          let time = audioElement.currentTime;
+          let duration = audioElement.duration;
+          let paused = audioElement.paused;
+          const status = {time: isNaN(time) ? 0 : time, duration: isNaN(duration) ? 0 : duration, paused};
+          console.log(status);
+          this.stateFromStatus(status);
+        };
+      } else if (control.action === 'pause') {
+        console.log('Pause');
+        audioElement.pause();
+      } else if (control.action === 'skip') {
+        audioElement.currentTime = control.time;
+      }
+    }
+  }
+  stopAudio() {
+    const audioElement = document.getElementById('audio');
+    if (audioElement) {
+      console.log('Stop');
+      audioElement.src = '';
+    }
+  }
+
   playVideo(control) {
-    if (this.state.youtube) {
+    if (this.state.audio) {
+      this.playAudio(control);
+    } else if (this.state.youtube) {
       window.playYouTube(control);
     } else {
       window.playVideo(control);
@@ -88,8 +126,13 @@ export default class VideoControls extends Component {
     if (this.suspendProgress) {
       return;
     }
+    if (this.state.audio) return;
 
     const status = JSON.parse(window.getVideoStatus());
+    this.stateFromStatus(status);
+  }
+
+  stateFromStatus(status) {
     this.setState({
       status: status,
       time: status.time
@@ -119,10 +162,25 @@ export default class VideoControls extends Component {
 
   componentWillUpdate(nextProps, nextState) {
     if (nextProps.video !== this.props.video) {
+      if (!this.timer) this.getStatusTimer();
       this.setState({video: nextProps.video});
     }
     if (nextProps.youtube !== this.props.youtube) {
+      if (!this.timer) this.getStatusTimer();
       this.setState({youtube: nextProps.youtube});
+    }
+    if (nextProps.audio !== this.props.audio) {
+      this.setState({audio: nextProps.audio});
+      if (nextProps.audio) {
+        const audioElement = document.getElementById('audio');
+        if (audioElement){
+          console.log('Set audio src');
+          audioElement.src = nextProps.audio;
+        }
+        this.playAudio({action: 'play'});
+      } else {
+        this.stopAudio();
+      }
     }
   }
 
@@ -139,12 +197,11 @@ export default class VideoControls extends Component {
   }
 
   render() {
-    if (!this.state.video && !this.state.youtube) return null;
+    if (!this.state.video && !this.state.youtube && !this.state.audio) return null;
 
     return (
 
         <Paper className={styles.paper}>
-
           <div style={{display: 'grid', paddingTop: '50px', paddingBottom: '50px', gridTemplateColumns: '50px 50px auto'}}>
             <Tooltip title="Skip to start">
             <IconButton aria-label="skip to start" onClick={this.handleSkipStart.bind(this)}>

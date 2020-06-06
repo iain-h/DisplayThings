@@ -249,6 +249,11 @@ const isVideo = name => {
   return lower.endsWith('.mp4');
 };
 
+const isAudio = name => {
+  const lower = name.toLowerCase();
+  return lower.endsWith('.mp3');
+};
+
 const isYouTube = name => {
   return name.includes('youtube://');
 };
@@ -321,6 +326,18 @@ export default class Plan extends Component {
     if (isVideo(name)) {
       this.props.updateSong(undefined);
       this.props.setVideo(name);
+      this.props.setAudio(undefined);
+      this.props.setYouTube(undefined);
+      this.props.setPPT(undefined);
+      this.props.setPicture(undefined);
+      this.setState({selected: name});
+      return;
+    }
+
+    if (isAudio(name)) {
+      this.props.updateSong(undefined);
+      this.props.setVideo(undefined);
+      this.props.setAudio(name);
       this.props.setYouTube(undefined);
       this.props.setPPT(undefined);
       this.props.setPicture(undefined);
@@ -331,6 +348,7 @@ export default class Plan extends Component {
     if (isYouTube(name)) {
       this.props.updateSong(undefined);
       this.props.setVideo(undefined);
+      this.props.setAudio(undefined);
       this.props.setYouTube(name);
       this.props.setPPT(undefined);
       this.props.setPicture(undefined);
@@ -342,6 +360,7 @@ export default class Plan extends Component {
      if (isPDF(name)) {
       this.props.updateSong(undefined);
       this.props.setVideo(undefined);
+      this.props.setAudio(undefined);
       this.props.setYouTube(undefined);
       this.props.setPPT(name);
       this.props.setPicture(undefined);
@@ -353,6 +372,7 @@ export default class Plan extends Component {
     if (isPicture(name)) {
       this.props.updateSong(undefined);
       this.props.setVideo(undefined);
+      this.props.setAudio(undefined);
       this.props.setYouTube(undefined);
       this.props.setPPT(undefined);
       this.props.setPicture(name);
@@ -373,6 +393,7 @@ export default class Plan extends Component {
   deselect() {
     this.setState({selected: ''});
     this.props.setVideo(undefined);
+    this.props.setAudio(undefined);
     this.props.setYouTube(undefined);
     this.props.setPPT(undefined);
     this.props.setPicture(undefined);
