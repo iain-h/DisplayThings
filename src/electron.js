@@ -2,6 +2,7 @@ const fs = require('fs');
 
 if (typeof fs.existsSync === 'function') {
     const {app, BrowserWindow, Menu, screen, dialog, session, shell} = require('electron');
+    let serverInstance = undefined;
 
     const isMac = process.platform === 'darwin'
 
@@ -123,7 +124,7 @@ if (typeof fs.existsSync === 'function') {
 
     function createWindow() {
 
-      server.listen(port, () => {
+      serverInstance = server.listen(port, () => {
 
         let prefs = {x: 20, y:20, width: 800, height: 800};
 
@@ -166,14 +167,13 @@ if (typeof fs.existsSync === 'function') {
             // Dereference the window object, usually you would store windows
             // in an array if your app supports multi windows, this is the time
             // when you should delete the corresponding element.
-            mainWindow = null;
+            mainWindow = undefined;
         });
 
         mainWindow.on('close', () => {
             fs.writeFileSync(path.join(basePath, "prefs.json"), JSON.stringify(mainWindow.getContentBounds()));
-            if (process.platform !== 'darwin') {
-                app.quit()
-            }
+            serverInstance.close();
+            app.exit(0);
         });
 
         // Create the display window.
@@ -233,11 +233,7 @@ if (typeof fs.existsSync === 'function') {
 
     // Quit when all windows are closed.
     app.on('window-all-closed', function () {
-        // On OS X it is common for applications and their menu bar
-        // to stay active until the user quits explicitly with Cmd + Q
-        if (process.platform !== 'darwin') {
-            app.quit()
-        }
+        app.quit();
     });
 
     app.on('activate', function () {
