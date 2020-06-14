@@ -177,7 +177,7 @@ if (typeof fs.existsSync === 'function') {
         });
 
         // Create the display window.
-        createDisplayWindow();
+        //createDisplayWindow();
 
     /*    browserWindow = new BrowserWindow({
             frame: false,
@@ -196,16 +196,15 @@ if (typeof fs.existsSync === 'function') {
         // Open the DevTools.
         if (dev) {
             mainWindow.webContents.openDevTools();
-            displayWindow.webContents.openDevTools();
         }
 
       });
     }
 
-    const createDisplayWindow = () => {
+    const createDisplayWindow = fullscreen => {
         displayWindow = new BrowserWindow({
-            frame: false,
-            show: false,
+            frame: !fullscreen,
+            show: true,
             paintWhenInitiallyHidden: true,
             backgroundColor: '#000000',
             backgroundThrottling: false,
@@ -218,12 +217,15 @@ if (typeof fs.existsSync === 'function') {
         displayWindow.loadURL(`http://localhost:${port}/display.html`);
         displayWindow.webContents.once('dom-ready', () => {});
         displayWindow.loadURL(`http://localhost:${port}/display.html`);
-        displayWindow.on('closed', () => {
+        displayWindow.on('close', () => {
             if (mainWindow) {
+                console.log('Hide Display');
                 mainWindow.webContents.send('hideDisplay');
-                createDisplayWindow();
             }
         });
+        if (dev) {
+            displayWindow.webContents.openDevTools();
+        }
     };
 
     // This method will be called when Electron has finished
@@ -252,6 +254,7 @@ if (typeof fs.existsSync === 'function') {
     exports.setWords = words => {
         if (message === words) return;
         console.log('setWords', words);
+        if (!displayWindow) return;
         displayWindow.webContents.send('words', words);
         message = words;
     };
@@ -271,28 +274,34 @@ if (typeof fs.existsSync === 'function') {
                     return;
                 }
 
+                createDisplayWindow(true);
                 displayWindow.setBounds(disp.bounds);
                 displayWindow.webContents.send('show');
                 displayWindow.setFullScreen(true);
-
+                mainWindow.focus();
             });
 
-            if (!displayWindow.isVisible()) {
+            if (!displayWindow) {
                 const disp = screen.getPrimaryDisplay();
+                createDisplayWindow(false);
                 displayWindow.setBounds({
                     x: disp.bounds.x,
                     y: disp.bounds.y,
                     width: Math.floor(disp.bounds.width * 0.5),
                     height: Math.floor(disp.bounds.height * 0.5)
                 });
-
                 displayWindow.webContents.send('show');
-                displayWindow.show();
+                mainWindow.focus();
             }
 
         } else {
-            displayWindow.webContents.send('hide');
-            setTimeout(() => displayWindow.hide(), 500);
+            if (displayWindow) {
+                displayWindow.webContents.send('hide');
+                setTimeout(() => {
+                    displayWindow.close();
+                    displayWindow = undefined;
+                }, 500);
+            }
         }
         
     };
@@ -555,6 +564,7 @@ if (typeof fs.existsSync === 'function') {
 
     exports.setWordsStyle = style => {
         console.log(JSON.stringify(style));
+        if (!displayWindow) return;
         Object.keys(style).forEach(s => {
             if (typeof style[s] === 'object' ) {
                 displayWindow.webContents.send(s, JSON.stringify(style[s]));
@@ -599,22 +609,26 @@ if (typeof fs.existsSync === 'function') {
 
     exports.setPicture = file => {
         console.log('setPicture', file);
+        if (!displayWindow) return;
         displayWindow.webContents.send('setPicture', file || '');
     };
 
 
     exports.setVideo = file => {
         console.log('setVideo', file);
+        if (!displayWindow) return;
         displayWindow.webContents.send('setVideo', file || '');
     };
 
     exports.playVideo = control => {
         console.log('playVideo', JSON.stringify(control));
+        if (!displayWindow) return;
         displayWindow.webContents.send('playVideo', JSON.stringify(control));
     };
 
     exports.setYouTube = name => {
         console.log('setYouTube', name);
+        if (!displayWindow) return;
         let id = undefined;
         if (name) {
             id = name.split('youtube://')[1];
@@ -625,6 +639,7 @@ if (typeof fs.existsSync === 'function') {
 
     exports.playYouTube = control => {
         console.log('playYouTube', JSON.stringify(control));
+        if (!displayWindow) return;
         displayWindow.webContents.send('playYouTube', JSON.stringify(control));
     };
 
@@ -714,6 +729,7 @@ if (typeof fs.existsSync === 'function') {
     };
 
     exports.showPDF = control => {
+        if (!displayWindow) return;
         if (!control) {
             displayWindow.webContents.send('showPDF', JSON.stringify({}));
             return;

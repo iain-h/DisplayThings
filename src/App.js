@@ -3,7 +3,6 @@ import logo from './logo.svg';
 import './App.css';
 import SongEnter from './SongEnter';
 
-import Controls from './Controls';
 import Plan from './Plan';
 import Style from './Style';
 import VideoControls from './VideoControls';
@@ -230,7 +229,6 @@ class App extends Component {
      
       <div style={{position: 'absolute', top: '0px', paddingTop: '10px', width: '400px', paddingRight: '20px', right: '0px', bottom: '0px', overflowY: 'auto'}}>
 
-        <Controls/>
         <Plan 
           mousetrap={this.mousetrap.bind(this)}
           plan={this.state.plan}

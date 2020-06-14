@@ -8,16 +8,23 @@ export default class Controls extends Component {
 
   state = {show: false};
 
-  handleChange(event) {
-    this.setState({show: event.target.checked});
+  handleChange(e) {
+    if (e) {
+      console.log('checkbox change', e.target.checked);
+      this.setState({show: e.target.checked});
+      if (!e.target.checked) {this.props.deselectPlan();}
+    }
   }
 
   componentWillUpdate(nextProps, nextState) {
-    window.setShow(nextState.show);
-    
+    if (nextState.show != this.state.show) {
+        console.log('setShow', nextState.show);
+        window.setShow(nextState.show);
+      }
   }
 
   componentDidMount() {
+    console.log('hide display');
     window.hideDisplay = () => {this.setState({show: false})};
   }
 
@@ -31,7 +38,7 @@ export default class Controls extends Component {
               control={
                 <Checkbox
                 checked={this.state.show}
-                onChange={this.handleChange.bind(this)}
+                onChange={e => this.handleChange(e)}
                 value="show"
                 color="primary"
               />

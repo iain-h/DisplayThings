@@ -37,6 +37,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
+import Controls from './Controls';
 
 let player;
 
@@ -499,6 +500,8 @@ export default class Plan extends Component {
     return (
 
       <div>
+      <Controls deselectPlan={() => this.deselect()}/>
+
       <DragDropContext className="plan" onDragEnd={this.onDragEnd}>
 
       <Paper className="paper">
