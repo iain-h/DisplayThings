@@ -280,11 +280,19 @@ export default class Plan extends Component {
       youtubeOpen: false
     };
     this.onDragEnd = this.onDragEnd.bind(this);
+    this.reselect = undefined;
   }
 
   componentWillUpdate(nextProps, nextState) {
     if (nextProps.plan !== this.state.items) {
       this.setState({items: nextProps.plan});
+    }
+  }
+
+  componentDidUpdate(nextProps, nextState) {
+    if (this.reselect && nextState.selected === '') {
+      this.handlePlay(this.reselect);
+      this.reselect = undefined;
     }
   }
 
@@ -320,9 +328,11 @@ export default class Plan extends Component {
     this.props.setPlan(items);
   }
 
-  handlePlay(name, index, e) {
+  handlePlay(name, e) {
     if (this.state.selected === name) return this.deselect();
-    e.preventDefault();
+    if (e) {
+      e.preventDefault();
+    }
 
     // Check for video
     if (isVideo(name)) {
@@ -500,7 +510,12 @@ export default class Plan extends Component {
     return (
 
       <div>
-      <Controls deselectPlan={() => this.deselect()}/>
+      <Controls 
+        deselectPlan={() => this.deselect()}
+        setDisplay={() => {
+          this.reselect = this.state.selected;
+          this.deselect();
+        }}/>
 
       <DragDropContext className="plan" onDragEnd={this.onDragEnd}>
 
@@ -554,10 +569,10 @@ export default class Plan extends Component {
                         <ListItemIcon>
                         <Tooltip title="Show this">
                           {this.state.selected !== item ?
-                        <Button onClick={this.handlePlay.bind(this,item, index)}>
+                        <Button onClick={this.handlePlay.bind(this,item)}>
                          <PlayArrowIcon/><span style={{width: '20px'}}>{index + 1}</span>
                          </Button> : 
-                          <Button onClick={this.handlePlay.bind(this,item, index)}>
+                          <Button onClick={this.handlePlay.bind(this,item)}>
                           <DesktopWindowsIcon /><span style={{width: '20px'}}>{index + 1}</span>
                           </Button> 
                         }

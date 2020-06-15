@@ -218,6 +218,7 @@ if (typeof fs.existsSync === 'function') {
         displayWindow.webContents.once('dom-ready', () => {});
         displayWindow.loadURL(`http://localhost:${port}/display.html`);
         displayWindow.on('close', () => {
+            displayWindow = undefined;
             if (mainWindow) {
                 console.log('Hide Display');
                 mainWindow.webContents.send('hideDisplay');
@@ -686,6 +687,15 @@ if (typeof fs.existsSync === 'function') {
             convertTo = `--convert-to pdf`;
             headless = "--headless --invisible";
             execPath = `"libreoffice"`;
+            command = `${execPath} ${headless} ${convertTo} ${outDir} "${fileName}"`;
+            console.log(command);
+        } else if (process.platform === 'darwin') {
+            fileName = file.replace('file://', '');
+            tempDir = "/tmp";
+            outDir = `--outdir "${tempDir}"`;
+            convertTo = `--convert-to pdf`;
+            headless = "--headless --invisible";
+            execPath = `"/Applications/LibreOffice.app/Contents/MacOS/soffice"`;
             command = `${execPath} ${headless} ${convertTo} ${outDir} "${fileName}"`;
             console.log(command);
         }

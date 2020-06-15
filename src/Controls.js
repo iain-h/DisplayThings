@@ -13,6 +13,7 @@ export default class Controls extends Component {
       console.log('checkbox change', e.target.checked);
       this.setState({show: e.target.checked});
       if (!e.target.checked) {this.props.deselectPlan();}
+      else {this.props.setDisplay();}
     }
   }
 
