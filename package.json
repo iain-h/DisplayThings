@@ -29,6 +29,7 @@
   },
   "build": {
     "appId": "display-things",
+    "productName": "DisplayThings",
     "mac": {
       "category": "display-things.app.category.type"
     },
