@@ -141,6 +141,7 @@ class App extends Component {
       const newSongData = Object.assign({}, this.state.songData);
       newSongData.style = style;
       this.setState({songData: newSongData});
+      this.songDatabase[newSongData.name] = newSongData;
       window.updateSongDatabase(JSON.stringify(newSongData), '');
     }
   }
@@ -189,6 +190,7 @@ class App extends Component {
               }
               songData.name = title;
               this.songDatabase[songData.name] = songData;
+              this.setState({songData});
               this.indexSongs();
               window.updateSongDatabase(JSON.stringify(songData), deleteName);
             }
