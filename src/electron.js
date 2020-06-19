@@ -213,6 +213,7 @@ if (typeof fs.existsSync === 'function') {
                 webSecurity: false
             }
         });
+        displayWindow.removeMenu();
         console.log('display');
         displayWindow.loadURL(`http://localhost:${port}/display.html`);
         displayWindow.webContents.once('dom-ready', () => {});
