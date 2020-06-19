@@ -177,15 +177,18 @@ class App extends Component {
           saveSongChanges={
             songData => {
               const title = songData.fields[songData.ids.indexOf('#T')];
+              if (!title) return;
+              let newPlan = Array.from(this.state.plan);
               let deleteName;
               if (title != songData.name) {
                 deleteName = songData.name;
                 this.songDatabase[songData.name] = undefined;
                 const idx = this.state.plan.indexOf(deleteName);
                 if (idx != -1) {
-                  const newPlan = Array.from(this.state.plan);
                   newPlan.splice(idx, 1, title);
+                  window.savePlan(newPlan);
                   this.setState({plan: newPlan});
+                  window.selectItem(title);
                 }
               }
               songData.name = title;
@@ -194,12 +197,10 @@ class App extends Component {
               this.indexSongs();
               window.updateSongDatabase(JSON.stringify(songData), deleteName);
 
-              
-              if (this.state.plan.indexOf(songData.name) === -1) {
-                const plan2 = Array.from(this.state.plan);
-                plan2.push(songData.name);
-                this.setState({plan: plan2});
-                window.savePlan(plan2);
+              if (newPlan.indexOf(songData.name) === -1) {
+                newPlan.push(songData.name);
+                this.setState({plan: newPlan});
+                window.savePlan(newPlan);
                 window.selectItem(songData.name);
               }
             }

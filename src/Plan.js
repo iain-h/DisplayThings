@@ -286,6 +286,9 @@ export default class Plan extends Component {
   componentWillUpdate(nextProps, nextState) {
     if (nextProps.plan !== this.state.items) {
       this.setState({items: nextProps.plan});
+      if (this.state.selected) {
+        this.playItem(this.state.selected);
+      }
     }
   }
 
@@ -328,12 +331,7 @@ export default class Plan extends Component {
     this.props.setPlan(items);
   }
 
-  handlePlay(name, e) {
-    if (this.state.selected === name) return this.deselect();
-    if (e) {
-      e.preventDefault();
-    }
-
+  playItem(name) {
     // Check for video
     if (isVideo(name)) {
       this.props.updateSong(undefined);
@@ -342,7 +340,6 @@ export default class Plan extends Component {
       this.props.setYouTube(undefined);
       this.props.setPPT(undefined);
       this.props.setPicture(undefined);
-      this.setState({selected: name});
       return;
     }
 
@@ -353,7 +350,6 @@ export default class Plan extends Component {
       this.props.setYouTube(undefined);
       this.props.setPPT(undefined);
       this.props.setPicture(undefined);
-      this.setState({selected: name});
       return;
     }
 
@@ -364,19 +360,17 @@ export default class Plan extends Component {
       this.props.setYouTube(name);
       this.props.setPPT(undefined);
       this.props.setPicture(undefined);
-      this.setState({selected: name});
       return;
     }
 
-     // Check for ppt
-     if (isPDF(name)) {
+    // Check for ppt
+    if (isPDF(name)) {
       this.props.updateSong(undefined);
       this.props.setVideo(undefined);
       this.props.setAudio(undefined);
       this.props.setYouTube(undefined);
       this.props.setPPT(name);
       this.props.setPicture(undefined);
-      this.setState({selected: name});
       return;
     }
 
@@ -388,19 +382,28 @@ export default class Plan extends Component {
       this.props.setYouTube(undefined);
       this.props.setPPT(undefined);
       this.props.setPicture(name);
-      this.setState({selected: name});
       return;
     }
 
+    // Song words
     const songData = this.props.setSong(name);
     this.props.updateSong(songData);
-    this.setState({selected: name});
     this.props.setVideo(undefined);
     this.props.setAudio(undefined);
     this.props.setYouTube(undefined);
     this.props.setPPT(undefined);
     this.props.setPicture(undefined);
-    return true;
+  }
+
+  handlePlay(name, e) {
+    if (!name) return;
+    if (this.state.selected === name) return this.deselect();
+    if (e) {
+      e.preventDefault();
+    }
+
+    this.playItem(name);
+    this.setState({selected: name});
   }
 
   deselect() {
@@ -496,6 +499,7 @@ export default class Plan extends Component {
     dropZone.addEventListener('drop', handleDrop);
 
     window.selectItem = item => {
+      if (this.state.selected === item) return;
       this.handlePlay(item);
     };
   }
@@ -556,7 +560,9 @@ export default class Plan extends Component {
               <List style={getListStyle(snapshot.isDraggingOver)}>
 
                 {this.state.items.length === 0 ? <div className="dragHint">Drag items here...</div> :
-                 this.state.items.map((item, index) => (
+                 this.state.items
+                 .filter(item => (item !== null))
+                 .map((item, index) => (
                   <Draggable key={item} draggableId={item} index={index}>
                     {(provided, snapshot) => (
                       <ListItem
@@ -584,7 +590,8 @@ export default class Plan extends Component {
                          </Tooltip>
                           </ListItemIcon>
                           <div style={{paddingRight:'10px'}}>
-                          {isVideo(item) ? 
+                          {!item ? null :
+                            isVideo(item) ? 
                           <Tooltip title="Video">
                               <TheatersIcon/></Tooltip> : 
                             isAudio(item) ?
@@ -603,6 +610,7 @@ export default class Plan extends Component {
                         <ListItemText
                            primary={
                             (() => {
+                              if (!item) return "Empty";
                               let displayName = item;
                               if (displayName.startsWith('file://') ||
                                   displayName.startsWith('youtube://')) {
