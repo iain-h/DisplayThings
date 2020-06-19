@@ -385,6 +385,7 @@ export default class Plan extends Component {
     this.props.updateSong(songData);
     this.setState({selected: name});
     this.props.setVideo(undefined);
+    this.props.setAudio(undefined);
     this.props.setYouTube(undefined);
     this.props.setPPT(undefined);
     this.props.setPicture(undefined);

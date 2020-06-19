@@ -670,7 +670,7 @@ if (typeof fs.existsSync === 'function') {
             console.log(command);
         } else if (process.platform === 'linux') {
             fileName = file.replace('file://', '');
-            tempDir = "/tmp";
+            tempDir = path.join(homedir, 'Documents', 'DisplayThings');
             outDir = `--outdir "${tempDir}"`;
             convertTo = `--convert-to pdf`;
             headless = "--headless --invisible";
