@@ -494,6 +494,10 @@ export default class Plan extends Component {
       hideDropZone();
     });
     dropZone.addEventListener('drop', handleDrop);
+
+    window.selectItem = item => {
+      this.handlePlay(item);
+    };
   }
 
   handleRemove(name) {
