@@ -23,7 +23,11 @@ const {
     setYouTube,
     playYouTube,
     setWordsStyle,
-    rootDir
+    rootDir,
+    setURL,
+    goBack,
+    goForward,
+    getURL
 } = electron.remote.require('./electron.js');
 
 window.setWords = setWords;
@@ -50,6 +54,10 @@ window.showBrowser = showBrowser;
 window.playYouTube = playYouTube;
 window.setYouTube = setYouTube;
 window.rootDir = rootDir;
+window.setURL = setURL;
+window.goBack = goBack;
+window.goForward = goForward;
+window.getURL = getURL;
 
 const ipcRenderer = electron.ipcRenderer;
 ipcRenderer.on('loadPDF', (event, file) => {
@@ -78,3 +86,7 @@ window.openFile = async () => {
 
     return result.filePaths;
 };
+
+ipcRenderer.on('updateTitle', (event, title) => {
+    window.updateTitle(title);
+});

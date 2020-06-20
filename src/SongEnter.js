@@ -45,18 +45,18 @@ export default class SongEnter extends Component {
     this.fieldId = -1;
     this.started = false;
     this.resetting = 'begin';
-    console.log('reset');
+    //console.log('reset');
   }
 
   componentDidMount() {
-    console.log('mount song enter');
+    //console.log('mount song enter');
     this.props.mousetrap('down', e => {
       if (!this.state.songData) return;
       if (e) {
         e.preventDefault();
         if (e.repeat) return;
       }
-      console.log('down');
+      //console.log('down');
       this.started = true;
       this.nextLines();
     });
@@ -68,13 +68,13 @@ export default class SongEnter extends Component {
         if (this.editing) return;
         if(!this.state.songData) return;
         if (e) {e.preventDefault();}
-        console.log('pressed', id);
+        //console.log('pressed', id);
         this.line = 0;
         this.fieldId = `#${id.toUpperCase()}`;
         this.field = this.state.songData.ids.indexOf(this.fieldId);
         this.orderIdx = this.getOrderField().indexOf(id.toUpperCase());
         this.started = true;
-        console.log(this.field,  this.orderIdx);
+        //console.log(this.field,  this.orderIdx);
         this.highlightLines();
       });
 
@@ -86,7 +86,7 @@ export default class SongEnter extends Component {
         e.preventDefault();
         if (e.repeat) return;
       }
-      console.log('up');
+      //console.log('up');
       if (this.started) {
         this.prevLines();
       } else {
@@ -109,9 +109,9 @@ export default class SongEnter extends Component {
   setOrderIndex(orderIdx) {
     if (!this.state.songData) return;
     const orderField = this.getOrderField();
-    console.log(orderField, orderIdx);
+    //console.log(orderField, orderIdx);
     if (orderIdx < orderField.length) {
-      console.log('orderIdx', orderIdx);
+      //console.log('orderIdx', orderIdx);
       const id = '#' + orderField.charAt(orderIdx).toUpperCase();
       this.line = 0;
       this.orderIdx = orderIdx;
@@ -125,7 +125,7 @@ export default class SongEnter extends Component {
   }
 
   nextField() {
-    console.log('next field');
+    //console.log('next field');
     const orderField = this.getOrderField();
     let nextIdx = this.orderIdx += 1;
     if (nextIdx >= orderField.length) {
@@ -135,7 +135,7 @@ export default class SongEnter extends Component {
   }
 
   prevField() {
-    console.log('prev field');
+    //console.log('prev field');
     const orderField = this.getOrderField();
     let prevIdx = this.orderIdx -= 1;
     if (prevIdx < 0) {
@@ -152,7 +152,7 @@ export default class SongEnter extends Component {
       fieldLines = this.getField(this.state.songData).split('\n');
     }
 
-    console.log('field', this.field, 'line', this.line, 'orderidx', this.orderIdx);
+    //console.log('field', this.field, 'line', this.line, 'orderidx', this.orderIdx);
 
     this.highlightLines(fieldLines);
   }
@@ -188,7 +188,7 @@ export default class SongEnter extends Component {
   }
 
   highlightLines(fieldLines) {
-    console.log('highlightLines');
+    //console.log('highlightLines');
 
     if (!this.state.songData) {
       window.setWords('');
@@ -250,10 +250,10 @@ export default class SongEnter extends Component {
   }
 
   componentWillUpdate(nextProps, nextState) {
-    console.log('component update')
+    //console.log('component update')
 
     if (nextProps.songData !== this.props.songData) {
-      console.log('prop change');
+      //console.log('prop change');
       this.setState({songData: nextProps.songData});
     }
     if (nextState.songData !== this.state.songData) {
@@ -264,7 +264,7 @@ export default class SongEnter extends Component {
   componentDidUpdate() {
     if (this.editing) return;
     if (this.resetting === 'done') {
-      console.log('update - highlight');
+      //console.log('update - highlight');
       this.highlightLines();
     }
     if (this.resetting === 'updating') {

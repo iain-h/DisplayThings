@@ -13,6 +13,7 @@ let wordsTimer1, wordsTimer2;
 const q = async.queue(function(task, callback) {
   const displayDiv1 = document.getElementById(toggleFade1);
   const displayDiv2 = document.getElementById(toggleFade2);
+  if (!displayDiv1 || !displayDiv2) return;
   displayDiv2.innerHTML = '';
   const lines = task.message.split('\n');
   currentWords = task.message;
@@ -54,6 +55,7 @@ ipcRenderer.on('words', (event, message) => {
 
   if (message !== '') {
     const videoElement = document.getElementById('video');
+    if (!videoElement) return;
     videoElement.style.display = 'none';
     videoElement.src = '';
   }
@@ -68,6 +70,7 @@ window.displayKeyPressed = displayKeyPressed;
 const setBackdrop = file => {
   console.log('backdrop', file);
   const displayDiv1 = document.getElementById('back_fade1');
+  if (!displayDiv1) return;
   displayDiv1.style.backgroundImage = `url(${file.replace('rootDir/', rootDir)})`;
 };
 
@@ -81,6 +84,7 @@ ipcRenderer.on('color', (event, newColor) => {
   const rgb = JSON.parse(newColor);
   const displayDiv1 = document.getElementById(toggleFade1);
   const displayDiv2 = document.getElementById(toggleFade2);
+  if (!displayDiv1 || !displayDiv2) return;
   color = `rgb(${rgb.r},${rgb.g},${rgb.b})`;
   displayDiv1.style.color = color;
   displayDiv2.style.color = color;
@@ -94,6 +98,7 @@ ipcRenderer.on('shadow', (event, newShadow) => {
   shadow = newShadow;
   const displayDiv1 = document.getElementById(toggleFade1);
   const displayDiv2 = document.getElementById(toggleFade2);
+  if (!displayDiv1 || !displayDiv2) return;
   if (newShadow) {
     displayDiv1.style.textShadow = `2px 2px ${shadowRad}px #000000`;
     displayDiv2.style.textShadow = `2px 2px ${shadowRad}px #000000`;
@@ -108,6 +113,7 @@ ipcRenderer.on('shadowRad', (event, newShadowRad) => {
   shadowRad = newShadowRad || 0;
   const displayDiv1 = document.getElementById(toggleFade1);
   const displayDiv2 = document.getElementById(toggleFade2);
+  if (!displayDiv1 || !displayDiv2) return;
   if (displayDiv1.style.textShadow) {
     displayDiv1.style.textShadow = `1px 1px ${shadowRad}px #000000`;
     displayDiv2.style.textShadow = `1px 1px ${shadowRad}px #000000`;
@@ -129,12 +135,14 @@ ipcRenderer.on('border', (event, newBorder) => {
   console.log('border', newBorder);
   border = newBorder;
   const displayDiv1 = document.getElementById(toggleFade1);
+  if (!displayDiv1) return;
   doBorder(displayDiv1);
 });
 
 ipcRenderer.on('size', (event, size) => {
   const displayDiv1 = document.getElementById(toggleFade1);
   const displayDiv2 = document.getElementById(toggleFade2);
+  if (!displayDiv1 || !displayDiv2) return;
   displayDiv1.style.fontSize = `${size}vw`;
   displayDiv2.style.fontSize = `${size}vw`;
 });
@@ -142,12 +150,14 @@ ipcRenderer.on('size', (event, size) => {
 ipcRenderer.on('font', (event, font) => {
   const displayDiv1 = document.getElementById(toggleFade1);
   const displayDiv2 = document.getElementById(toggleFade2);
+  if (!displayDiv1 || !displayDiv2) return;
   displayDiv1.style.fontFamily = font;
   displayDiv2.style.fontFamily = font;
 });
 
 const setupVideoUpdate = () => {
   const videoElement = document.getElementById('video');
+  if (!videoElement) return;
   videoElement.ontimeupdate = () => {
     let time = videoElement.currentTime;
     let duration = videoElement.duration;
@@ -159,6 +169,7 @@ const setupVideoUpdate = () => {
 
 ipcRenderer.on('setVideo', (event, file) => {
   const videoElement = document.getElementById('video');
+  if (!videoElement) return;
 
   if (file === '') {
     console.log('hide video');
@@ -179,6 +190,7 @@ ipcRenderer.on('setVideo', (event, file) => {
 
 ipcRenderer.on('setPicture', (event, file) => {
   const pictureElement = document.getElementById('picture');
+  if (!pictureElement) return;
 
   if (pictureElement.src !== '') {
     pictureElement.className = 'picture fadeout';
@@ -202,6 +214,7 @@ ipcRenderer.on('setPicture', (event, file) => {
 
 ipcRenderer.on('playVideo', (event, controlStr) => {
   const videoElement = document.getElementById('video');
+  if (!videoElement) return;
 
   setupVideoUpdate();
 
@@ -236,6 +249,7 @@ const pdfQ = async.queue(async function(task, callback) {
   console.log('showPDF', control.file);
   var canvas = document.getElementById(togglePDF1);
   var canvas2 = document.getElementById(togglePDF2);
+  if (!canvas || !canvas2) return;
   canvas.style.visibility = 'hidden';
 
   if (!control.file) {
@@ -387,6 +401,7 @@ const playYouTube = control => {
       player.loadVideoById(control.videoId);
       player.playVideo();
       var element = document.getElementById("youtube");
+      if (!element) return;
       element.style.visibility = 'visible';
     } else if (control.action === 'pause') {
       player.pauseVideo();
@@ -399,6 +414,7 @@ const playYouTube = control => {
 ipcRenderer.on('setYouTube', async (event, name) => {
   console.log('Set YouTube');
   var element = document.getElementById("youtube");
+  if (!element) return;
   if (name === '') {
     element.style.visibility = 'hidden';
     playYouTube({action: 'pause'});
@@ -414,4 +430,3 @@ ipcRenderer.on('playYouTube', async (event, controlStr) => {
   console.log('Play YouTube');
   playYouTube(JSON.parse(controlStr));
 });
-

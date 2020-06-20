@@ -168,7 +168,7 @@ export default class PDF extends Component {
   }
 
   componentWillUpdate(nextProps, nextState) {
-    console.log('component update')
+   // console.log('component update')
 
     if (nextProps.pdfFile !== this.props.pdfFile ||
       nextProps.pptFile !== this.props.pptFile) {

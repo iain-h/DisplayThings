@@ -370,7 +370,7 @@ export default function(props) {
       <div className={classes.pictures}>
         {props.backdrops.map((file, i) => {
           const selected = backdrop === file;
-          console.log(`url(${file})`);
+          //console.log(`url(${file})`);
           return (
             <Button key={i} onClick={handleBackdrop.bind(null, file, true)}>
             <div style={{

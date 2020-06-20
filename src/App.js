@@ -7,7 +7,7 @@ import Style from './Style';
 import VideoControls from './VideoControls';
 import PDF from './PDF';
 import Picture from './Picture';
-import Grid from '@material-ui/core/Grid';
+import WebPage from './WebPage';
 import Mousetrap from 'mousetrap';
 import FlexSearch from 'flexsearch';
 
@@ -28,6 +28,7 @@ class App extends Component {
     ppt: undefined,
     pdf: undefined,
     picture: undefined,
+    url: undefined,
     plan: [],
     backdrops: [],
     styles: {}
@@ -44,7 +45,7 @@ class App extends Component {
   callbacks = {};
 
   updateSong(songData) {
-    console.log('app update song');
+    //console.log('app update song');
     window.setWords('');
     setTimeout(() => {
       this.setState({songData});
@@ -92,7 +93,7 @@ class App extends Component {
     });
 
     window.loadPDF = file => {
-      console.log('loadPDF', file);
+      //console.log('loadPDF', file);
       if (this.state.ppt !== undefined) {
         this.setState({pdf: file});
       }
@@ -137,7 +138,7 @@ class App extends Component {
 
   setSongStyle(style) {
     if (this.state.songData && this.state.songData.style !== style) {
-      console.log('Update current song style', style);
+      //console.log('Update current song style', style);
       const newSongData = Object.assign({}, this.state.songData);
       newSongData.style = style;
       this.setState({songData: newSongData});
@@ -235,6 +236,22 @@ class App extends Component {
             mousetrap={this.mousetrap.bind(this)}/>
 
           <Picture file={this.state.picture}/>
+          <WebPage 
+            url={this.state.url}
+            updateURL={url => {
+              if (url === this.state.url) return;
+              this.setState({url});
+              if (!url) return;
+              const idx = this.state.plan.indexOf(this.state.url);
+              if (idx != -1) {
+                let newPlan = Array.from(this.state.plan);
+                newPlan.splice(idx, 1, url);
+                window.savePlan(newPlan);
+                this.setState({plan: newPlan});
+                window.selectItem(url);
+              }
+            }}
+            handleEditing={editing => { this.editing = editing;}}/>
         
       </div>
      
@@ -276,9 +293,14 @@ class App extends Component {
             this.setState({picture: file});
             window.setPicture(file);
           }}
+          setURL={(url, callback) => {
+            console.log('SetURL', url);
+            this.setState({url});
+            window.setURL(url, callback);
+          }}
           setPPT={
             file => {
-              console.log('setPPT', file);
+              //console.log('setPPT', file);
               if (typeof file === 'string') {
                 window.convertPPTtoPDF(file, true, false);
               }
@@ -292,7 +314,7 @@ class App extends Component {
             styles={this.state.styles}
             backdrops={this.state.backdrops}
             addStyle={(name, style) => {
-                console.log('Add style', name);
+                //console.log('Add style', name);
                 const newStyles = Object.assign({}, this.state.styles);
                 newStyles[name] = style;
                 newStyles[name].title = name;

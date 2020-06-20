@@ -176,23 +176,6 @@ if (typeof fs.existsSync === 'function') {
             app.exit(0);
         });
 
-        // Create the display window.
-        //createDisplayWindow();
-
-    /*    browserWindow = new BrowserWindow({
-            frame: false,
-            show: false,
-            paintWhenInitiallyHidden: true,
-            backgroundColor: '#ffffff',
-            backgroundThrottling: true,
-            webPreferences: {
-                preload: "https://www.youtube.com/iframe_api",
-                webSecurity: true
-            }
-        });
-        browserWindow.loadURL('https://www.youtube.com/watch?v=ULT4HDDsVHQ');
-*/
-        //displayWindow.show();
         // Open the DevTools.
         if (dev) {
             mainWindow.webContents.openDevTools();
@@ -215,7 +198,6 @@ if (typeof fs.existsSync === 'function') {
         });
         displayWindow.removeMenu();
         console.log('display');
-        displayWindow.loadURL(`http://localhost:${port}/display.html`);
         displayWindow.webContents.once('dom-ready', () => {});
         displayWindow.loadURL(`http://localhost:${port}/display.html`);
         displayWindow.on('close', () => {
@@ -224,6 +206,9 @@ if (typeof fs.existsSync === 'function') {
                 console.log('Hide Display');
                 mainWindow.webContents.send('hideDisplay');
             }
+        });
+        displayWindow.webContents.on('page-title-updated', (e, title) => {
+            mainWindow.webContents.send('updateTitle', title);
         });
         if (dev) {
             displayWindow.webContents.openDevTools();
@@ -750,5 +735,52 @@ if (typeof fs.existsSync === 'function') {
             displayWindow.webContents.send('showPDF', JSON.stringify(control));
         }
         
+    };
+
+    exports.setURL = (url, callback) => {
+        console.log('setURL', url);
+        if (displayWindow) {
+            if (url) {
+                if (url !== displayWindow.getURL()) {
+                    displayWindow.loadURL(url);
+                    displayWindow.webContents.once('dom-ready', () => {
+                        callback();
+                    });
+                } else {
+                    callback();
+                }
+            } else if (`http://localhost:${port}/display.html` !== displayWindow.getURL()) {
+                displayWindow.loadURL(`http://localhost:${port}/display.html`);
+                displayWindow.webContents.once('dom-ready', () => {
+                    callback();
+                });
+            } else {
+                callback();
+            }
+        } else {
+            callback();
+        }
+    };
+
+    exports.goBack = () => {
+        if (displayWindow && displayWindow.webContents.canGoBack()) {
+            displayWindow.webContents.goBack();
+        }
+    };
+
+    exports.goForward = () => {
+        if (displayWindow && displayWindow.webContents.canGoForward()) {
+            displayWindow.webContents.goForward();
+        }
+    };
+
+    exports.getURL = () => {
+        if (displayWindow) {
+            const url = displayWindow.getURL();
+            if (url !== `http://localhost:${port}/display.html`){
+                return url;
+            }
+        }
+        return '';
     };
 }

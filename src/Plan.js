@@ -37,6 +37,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
+import PublicIcon from '@material-ui/icons/Public';
 import Controls from './Controls';
 
 let player;
@@ -175,8 +176,9 @@ function AddToPlanMenu(props) {
     setAnchorEl(null);
     props.addYouTube();
   };
-  const addWebpage = () => {
+  const addWebPage = () => {
     setAnchorEl(null);
+    props.addWebPage();
   };
 
   return (
@@ -194,6 +196,7 @@ function AddToPlanMenu(props) {
       onClose={() => setAnchorEl(null)}
       >
       <MenuItem onClick={addFile}><InsertDriveFileIcon/> <span style={{width: '5px'}}/>Add File</MenuItem>
+      <MenuItem onClick={addWebPage}><PublicIcon/> <span style={{width: '5px'}}/>Add Web Page</MenuItem>
       <MenuItem onClick={addYouTube}><YouTubeIcon/> <span style={{width: '5px'}}/>Add YouTube</MenuItem>
       </Menu>
     </div>
@@ -260,6 +263,10 @@ const isYouTube = name => {
   return name.includes('youtube://');
 };
 
+const isURL = name => {
+  return name.includes('http://') || name.includes('https://');
+};
+
 const isPDF = name => {
   const lower = name.toLowerCase();
   return lower.endsWith('.pptx') || lower.endsWith('.ppt') || lower.endsWith('.pdf');
@@ -268,6 +275,15 @@ const isPDF = name => {
 const isPicture = name => {
   const lower = name.toLowerCase();
   return lower.endsWith('.jpg') || lower.endsWith('.png') || lower.endsWith('.jpeg');
+};
+
+const isSong = name => {
+  return !isVideo(name) &&
+         !isAudio(name) &&
+         !isYouTube(name) &&
+         !isURL(name) &&
+         !isPDF(name) &&
+         !isPicture(name);
 };
 
 export default class Plan extends Component {
@@ -286,7 +302,8 @@ export default class Plan extends Component {
   componentWillUpdate(nextProps, nextState) {
     if (nextProps.plan !== this.state.items) {
       this.setState({items: nextProps.plan});
-      if (this.state.selected) {
+      if (this.state.selected &&
+         nextProps.plan.indexOf(this.state.selected) !== -1) {
         this.playItem(this.state.selected);
       }
     }
@@ -332,67 +349,20 @@ export default class Plan extends Component {
   }
 
   playItem(name) {
-    // Check for video
-    if (isVideo(name)) {
-      this.props.updateSong(undefined);
-      this.props.setVideo(name);
-      this.props.setAudio(undefined);
-      this.props.setYouTube(undefined);
-      this.props.setPPT(undefined);
-      this.props.setPicture(undefined);
-      return;
-    }
 
-    if (isAudio(name)) {
-      this.props.updateSong(undefined);
-      this.props.setVideo(undefined);
-      this.props.setAudio(name);
-      this.props.setYouTube(undefined);
-      this.props.setPPT(undefined);
-      this.props.setPicture(undefined);
-      return;
-    }
-
-    if (isYouTube(name)) {
-      this.props.updateSong(undefined);
-      this.props.setVideo(undefined);
-      this.props.setAudio(undefined);
-      this.props.setYouTube(name);
-      this.props.setPPT(undefined);
-      this.props.setPicture(undefined);
-      return;
-    }
-
-    // Check for ppt
-    if (isPDF(name)) {
-      this.props.updateSong(undefined);
-      this.props.setVideo(undefined);
-      this.props.setAudio(undefined);
-      this.props.setYouTube(undefined);
-      this.props.setPPT(name);
-      this.props.setPicture(undefined);
-      return;
-    }
-
-    // Check for picture
-    if (isPicture(name)) {
-      this.props.updateSong(undefined);
-      this.props.setVideo(undefined);
-      this.props.setAudio(undefined);
-      this.props.setYouTube(undefined);
-      this.props.setPPT(undefined);
-      this.props.setPicture(name);
-      return;
-    }
-
-    // Song words
-    const songData = this.props.setSong(name);
-    this.props.updateSong(songData);
-    this.props.setVideo(undefined);
-    this.props.setAudio(undefined);
-    this.props.setYouTube(undefined);
-    this.props.setPPT(undefined);
-    this.props.setPicture(undefined);
+      this.props.setURL(isURL(name) ? name : undefined, () => {
+        if (isSong(name)) {
+          const songData = this.props.setSong(name);
+          this.props.updateSong(songData);
+        } else {
+          this.props.updateSong(undefined);
+        }
+        this.props.setVideo(isVideo(name) ? name : undefined);
+        this.props.setAudio(isAudio(name) ? name : undefined);
+        this.props.setYouTube(isYouTube(name) ? name : undefined);
+        this.props.setPPT(isPDF(name) ? name : undefined);
+        this.props.setPicture(isPicture(name) ? name : undefined);
+      });
   }
 
   handlePlay(name, e) {
@@ -408,6 +378,7 @@ export default class Plan extends Component {
 
   deselect() {
     this.setState({selected: ''});
+    this.props.setURL(undefined, ()=>{});
     this.props.setVideo(undefined);
     this.props.setAudio(undefined);
     this.props.setYouTube(undefined);
@@ -500,6 +471,7 @@ export default class Plan extends Component {
 
     window.selectItem = item => {
       if (this.state.selected === item) return;
+      console.log('SelectItem', item);
       this.handlePlay(item);
     };
   }
@@ -543,6 +515,14 @@ export default class Plan extends Component {
         addYouTube={() => {
           this.setState({youtubeOpen: true});
         }}
+        addWebPage={() => {
+          const item = `https://www.google.com`;
+          const result = Array.from(this.state.items);
+          if (result.indexOf(item) === -1) {
+            result.push(item);
+          }
+          this.props.setPlan(result);
+        }}
       />
       <Tooltip title="Show nothing">
       <IconButton onClick={this.deselect.bind(this)}>
@@ -561,7 +541,7 @@ export default class Plan extends Component {
 
                 {this.state.items.length === 0 ? <div className="dragHint">Drag items here...</div> :
                  this.state.items
-                 .filter(item => (item !== null))
+                 .filter(item => (item!=='' && item !== null))
                  .map((item, index) => (
                   <Draggable key={item} draggableId={item} index={index}>
                     {(provided, snapshot) => (
@@ -603,6 +583,9 @@ export default class Plan extends Component {
                             isPDF(item) ? 
                             <Tooltip title="Presentation">
                               <PictureInPictureIcon/></Tooltip> :
+                            isURL(item) ? 
+                            <Tooltip title="Web Page">
+                              <PublicIcon/></Tooltip> :
                             isPicture(item) ? 
                             <Tooltip title="Picture"><ImageIcon/></Tooltip> :
                             <Tooltip title="Song Words"><QueueMusicIcon /></Tooltip>}</div>
