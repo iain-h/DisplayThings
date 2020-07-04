@@ -103,6 +103,10 @@ class App extends Component {
       this.songDatabase = songDatabase;
       this.indexSongs();
     };
+
+    window.loadBackdrops = files => {
+      this.setState({backdrops: files});
+    };
     
     window.addEventListener("keydown", e => {
       if (this.editing) return;

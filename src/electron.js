@@ -37,6 +37,17 @@ if (typeof fs.existsSync === 'function') {
                 }
             }
         },
+        {
+            label: 'Choose backdrops folder...',
+            click: async () => {
+                const res = await dialog.showOpenDialog(mainWindow, {
+                    properties: ['openDirectory']
+                });
+                if (!res.canceled) {
+                    importBackdrops(res.filePaths[0]);
+                }
+            }
+        },
         { type: 'separator' },
         isMac ? { role: 'close' } : { role: 'quit' }
         ]
@@ -522,17 +533,42 @@ if (typeof fs.existsSync === 'function') {
         });
     };
 
+    const importBackdrops = async importDir => {
+        console.log('Importing backdrops', importDir);
+        fs.writeFileSync(path.join(basePath, "backdrops.json"), JSON.stringify({importDir}));
+        let files = await getLocalBackdrops();
+        let homeFiles = await getUserBackdrops();
+        mainWindow.webContents.send('loadBackdrops', JSON.stringify(files.concat(homeFiles)));
+    };
+
     const getUserBackdrops = () => {
 
-        const homeUrl = `file://${path.join(homedir, 'Backdrops')}/`.replace(/\\/g ,'/');
+        let backdrops;
+        if (fs.existsSync(path.join(basePath, "backdrops.json"))) {
+            try {
+                backdrops = JSON.parse(fs.readFileSync(path.join(basePath, "backdrops.json")));
+            } catch (err) {
+                // Not json
+                console.log('Not json');
+            }
+        }
+        else {
+            console.log('No backdrops.json');
+        }
+
+        if (!backdrops || !backdrops.importDir){
+            return [];
+        }
+
+        const url = `file://${backdrops.importDir}/`.replace(/\\/g ,'/');
 
         return new Promise((resolve, reject) => {
             const files = [];
-            const walker = walk.walk(path.join(homedir, 'Backdrops'));
+            const walker = walk.walk(backdrops.importDir);
             walker.on("file", function (root, fileStats, next) {
                 const lowerName = fileStats.name.toLowerCase();
                 if (lowerName.endsWith('.jpg') || lowerName.endsWith('.png')){
-                    files.push(homeUrl + fileStats.name);
+                    files.push(url + fileStats.name);
                     console.log('backdrop:', fileStats.name);
                 }
                 next();

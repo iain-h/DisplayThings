@@ -72,6 +72,10 @@ ipcRenderer.on('hideDisplay', event => {
     window.hideDisplay();
 });
 
+ipcRenderer.on('loadBackdrops', (event, files) => {
+    window.loadBackdrops(JSON.parse(files));
+});
+
 window.openFile = async () => {
     const result = await electron.remote.dialog.showOpenDialog({ 
         properties: ['openFile', 'multiSelections'],
