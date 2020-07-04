@@ -1,5 +1,0 @@
-entries:
-  - title: Download
-    url: /downloads.md
-    output: web, pdf
-    type: homepage
