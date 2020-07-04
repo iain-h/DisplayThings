@@ -753,6 +753,15 @@ if (typeof fs.existsSync === 'function') {
             if (code === 0 && pdfConverting[file].load === true) {
                 console.log('loadPDF', outName);
                 mainWindow.webContents.send('loadPDF', outName);
+            } else {
+                dialog.showMessageBoxSync({
+                    type: 'error',
+                    buttons: ['OK'],
+                    title: 'Reading file failed',
+                    message: 'Could not load file, make sure you have installed LibreOffice.',
+                    defaultId: 1,
+                    cancelId: 0
+                });
             }
             if (pdfConverting[file]) {
                 pdfConverting[file].converting = false;
