@@ -1,6 +1,6 @@
 {
   "name": "display-things",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "devDependencies": {
     "electron": "8.0.3",
