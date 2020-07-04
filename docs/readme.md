@@ -1,6 +1,6 @@
 # DisplayThings
 
-Display Song words, Videos, PowerPoints, PDFs, YouTube, Pictures, MP4 Videos, MP3 sounds on a second screen while controlling the display on the first screen. Set up a plan by dragging a dropping items. 
+Display Song words, Videos, PowerPoints, PDFs, YouTube, Pictures, MP4 Videos, MP3 sounds on a second screen while controlling the display on the first screen. Set up a plan by dragging and dropping items. 
 
 ## Show song words
 ![alt text](screenshot1.png "Display things screen shot 1")
