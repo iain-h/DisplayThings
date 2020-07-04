@@ -1,17 +1,20 @@
 body {
-  margin: 10;
+  margin: 0;
   padding: 0;
   font-family: sans-serif;
-  overflow-x: hidden;
 }
 
 .field {
-  width: 100%;
+  width: 100%
 }
 
 .plan {
   overflow-y: scroll;
-  overflow-x: hidden;
   max-height: 300px;
   width: 100%;
+}
+
+.paper {
+  margin-bottom: 20px;
+  padding-bottom: 16px;
 }

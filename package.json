@@ -9,18 +9,27 @@
     "react-scripts": "3.4.0"
   },
   "dependencies": {
-    "@material-ui/core": "^4.6.0",
+    "@material-ui/core": "^4.9.10",
     "@material-ui/icons": "^4.5.1",
+    "@material-ui/lab": "^4.0.0-alpha.49",
+    "async": "^3.2.0",
+    "express": "^4.17.1",
+    "flexsearch": "^0.6.32",
     "mousetrap": "^1.6.5",
     "node-dir": "^0.1.17",
     "node-sass": "^4.13.1",
     "react": "^16.1.1",
     "react-beautiful-dnd": "11.0.5",
+    "react-color": "^2.18.0",
     "react-dom": "^16.1.1",
+    "react-hotkeys": "^2.0.0",
+    "react-pdf": "^4.1.0",
+    "textarea-caret": "^3.1.0",
     "walk": "^2.3.14"
   },
   "build": {
     "appId": "display-things",
+    "productName": "DisplayThings",
     "mac": {
       "category": "display-things.app.category.type"
     },
@@ -35,7 +44,7 @@
   "homepage": "./",
   "main": "src/electron.js",
   "scripts": {
-    "start": "export BROWSER=none && nf start -p 3000",
+    "start": "nf start -p 8000",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
@@ -43,7 +52,7 @@
     "electron-start": "node src/electron-wait-react",
     "react-start": "react-scripts start",
     "dist": "electron-builder",
-    "predist": "yarn build && cp src/electron.js build/electron.js && sed -i 's/public/build/' build/electron.js"
+    "predist": "yarn build && cp 'src/electron.js' 'build/electron.js' && sed -i.bak 's/public/build/' build/electron.js"
   },
   "browserslist": {
     "production": [

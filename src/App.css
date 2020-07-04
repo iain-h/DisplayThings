@@ -1,25 +1,26 @@
 .App {
-  text-align: center;
-  flex-grow: 1;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  background-color: rgb(185, 181, 165);
 }
 
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
+.dragHint {
   height: 80px;
-}
-
-.App-header {
-  background-color: #222;
-  height: 150px;
   padding: 20px;
-  color: white;
+  -webkit-transition: background-color 0.5s linear;
+  transition: background-color 0.5s linear;
+  -webkit-transition: color 0.5s linear;
+  transition: color 0.5s linear;
+  text-align: center;
+  color: #aaa;
 }
 
-.App-intro {
-  font-size: large;
-}
-
-@keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.dragHint:hover {
+  color: rgb(217, 240, 255);
+  background-color: rgb(217, 240, 255);
+  -webkit-transition: background-color 0.5s linear;
+  transition: background-color 0.5s linear;
 }
