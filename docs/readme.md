@@ -1,7 +1,5 @@
 # DisplayThings
 
-Control your display and organise your service plan on one screen while presenting on the other.
-
 Display Song words, Videos, PowerPoints, PDFs, YouTube, Pictures, MP4 Videos, MP3 sounds on a second screen while controlling the display on the first screen. Set up a plan by dragging a dropping items. 
 
 ## Show song words
