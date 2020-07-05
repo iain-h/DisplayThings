@@ -6,9 +6,17 @@ Display Song words, Videos, PowerPoints, PDFs, YouTube, Pictures, MP4 Videos, MP
 
 
 ## Prerequisites
-- Node.js
-- yarn
+- Node.js from https://nodejs.org/en/download/
+- yarn from https://yarnpkg.com/getting-started/install
 
-## To Run Dev:
-- yarn install
-- yarn start
+## To run in development mode:
+- open a terminal
+- clone this repository:
+`git clone https://github.com/iain-h/DisplayThings.git`
+- cd to the folder `cd DisplayThings`
+- `yarn install`
+- `yarn start`
+
+## To build the program:
+- `yarn dist`
+- Go to the dist folder to find the installer

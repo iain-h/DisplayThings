@@ -30,6 +30,8 @@ Available for Windows, Mac and Linux.
 
 Download here:
 
+Note: These are not digitally signed so may not run on your computer. You can build from source to get around this by following the instructions in the github project.
+
 [![alt text](windows-icon-png-8.png "Download for Windows" )](https://github.com/iain-h/DisplayThings/releases/download/1.0.0/DisplayThings.Setup.1.0.0.exe)
 
 [![alt text](apple.png "Download for Mac")](https://github.com/iain-h/DisplayThings/releases/download/1.0.0/DisplayThings-1.0.0.dmg)
