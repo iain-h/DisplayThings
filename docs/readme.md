@@ -1,6 +1,6 @@
 # DisplayThings
 
-Display Song words, Videos, PowerPoints, PDFs, YouTube, Pictures, MP4 Videos, MP3 sounds on a second screen while controlling the display on the first screen. Set up a plan by dragging and dropping items. 
+Display Song words, Videos, PowerPoints*, PDFs, YouTube, Pictures, MP4 Videos, MP3 sounds on a second screen while controlling the display on the first screen. Set up a plan by dragging and dropping items. 
 
 ## Show song words
 ![alt text](screenshot1.png "Display things screen shot 1")
@@ -12,6 +12,20 @@ Display Song words, Videos, PowerPoints, PDFs, YouTube, Pictures, MP4 Videos, MP
 ## Show YouTube videos, mp4s, pictures.
 ![alt text](screenshot5.png "Display things screen shot 5")
 
+You can import song files exported from SongPro. These have the form:
+
+MySong.txt
+```
+#1
+...
+#2
+...
+#C
+...
+#B
+...
+```
+
 Available for Windows, Mac and Linux.
 
 Download here:
@@ -22,4 +36,4 @@ Download here:
 
 [![alt text](linux.png "Download for Linux")](https://github.com/iain-h/DisplayThings/releases/download/1.0.0/DisplayThings-1.0.0.AppImage)
 
-Displaying PowerPoint presentations requires you to install the free [LibreOffice](https://www.libreoffice.org/) software.
+*Displaying PowerPoint presentations requires you to install the free [LibreOffice](https://www.libreoffice.org/) software.
