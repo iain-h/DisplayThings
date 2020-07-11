@@ -6,6 +6,7 @@ Display Song words, Videos, PowerPoints, PDFs, YouTube, Pictures, MP4 Videos, MP
 
 
 ## Prerequisites
+- git
 - Node.js from https://nodejs.org/en/download/
 - yarn from https://yarnpkg.com/getting-started/install
 
