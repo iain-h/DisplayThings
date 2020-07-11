@@ -30,12 +30,16 @@ Available for Windows, Mac and Linux.
 
 Download here:
 
-Note: These are not digitally signed so may not run on your computer. You can build from source to get around this by following the instructions in the github project.
-
-[![alt text](windows-icon-png-8.png "Download for Windows" )](https://github.com/iain-h/DisplayThings/releases/download/1.0.0/DisplayThings.Setup.1.0.0.exe)
+Mac version is signed and security checked by apple, so should run ok.
 
 [![alt text](apple.png "Download for Mac")](https://github.com/iain-h/DisplayThings/releases/download/1.0.0/DisplayThings-1.0.0.dmg)
 
+Linux version may need to be given execute permission to run.
+
 [![alt text](linux.png "Download for Linux")](https://github.com/iain-h/DisplayThings/releases/download/1.0.0/DisplayThings-1.0.0.AppImage)
+
+Windows version is not signed, so may be blocked by your computer.
+
+[![alt text](windows-icon-png-8.png "Download for Windows" )](https://github.com/iain-h/DisplayThings/releases/download/1.0.0/DisplayThings.Setup.1.0.0.exe)
 
 *Displaying PowerPoint presentations requires you to install the free [LibreOffice](https://www.libreoffice.org/) software.
