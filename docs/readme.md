@@ -28,7 +28,7 @@ MySong.txt
 
 Available for Windows, Mac and Linux.
 
-Download here:
+## Download here:
 
 Mac version is signed and security checked by apple, so should run ok.
 
