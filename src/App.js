@@ -154,7 +154,7 @@ class App extends Component {
   render() {
     return (
       <div onKeyDownCapture = {e => {
-        if (this.editing) return;
+        if (this.editing && ![40, 34, 38, 33].includes(e.which)) return;
         if (e.defaultPrevented) return;
         const callback = this.keyMap[e.which];
         if (callback) {
