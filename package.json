@@ -13,6 +13,7 @@
     "@material-ui/icons": "^4.5.1",
     "@material-ui/lab": "^4.0.0-alpha.49",
     "async": "^3.2.0",
+    "electron-notarize": "^1.0.0",
     "express": "^4.17.1",
     "flexsearch": "^0.6.32",
     "mousetrap": "^1.6.5",
@@ -28,11 +29,14 @@
     "walk": "^2.3.14"
   },
   "build": {
-    "appId": "display-things",
+    "appId": "com.saffron.displaythings",
     "productName": "DisplayThings",
     "mac": {
-      "category": "display-things.app.category.type"
+      "category": "display-things.app.category.type",
+      "hardenedRuntime": true,
+      "entitlements": "./build/entitlements.mac.inherit.plist"
     },
+    "afterSign": "./afterSignHook.js",
     "files": [
       "build/**/*",
       "node_modules/**/*"
