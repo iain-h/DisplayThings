@@ -236,7 +236,7 @@ ipcRenderer.on('hide', async event => {
 });
 ipcRenderer.on('show', async event => {
   //document.body.style.visibility = 'visible';
-  document.body.className = 'fadein';
+  //document.body.className = 'fadein';
 });
 
 let togglePDF1 = 'pdf1';
