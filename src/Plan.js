@@ -637,6 +637,8 @@ export default class Plan extends Component {
             return this.props.setSong(name);
           }}
           searchIndex={this.props.searchIndex}
+          searchIndex2={this.props.searchIndex2}
+          searchIndex3={this.props.searchIndex3}
           updateSong={this.props.updateSong}
           handleEditing={this.props.handleEditing}
           plan={this.props.plan}

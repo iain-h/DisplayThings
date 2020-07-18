@@ -37,6 +37,14 @@ class App extends Component {
     threshold: 7,
     depth: 3
   });
+  searchIndex2 = new FlexSearch({
+    threshold: 7,
+    depth: 3
+  });
+  searchIndex3 = new FlexSearch({
+    threshold: 7,
+    depth: 3
+  });
   editing=false;
   resetSong=undefined;
   songDatabase={};
@@ -63,7 +71,27 @@ class App extends Component {
     this.searchIndex.clear();
     const songList = Object.keys(this.songDatabase)
       .filter(key => this.songDatabase[key] !== undefined);
-    songList.forEach((song, i) => this.searchIndex.add(i, song));
+    songList.forEach((song, i) => {
+      // Index title
+      this.searchIndex.add(i, song);
+      // Index first lines
+      const songData = this.songDatabase[song];
+      const chorus = songData.fields[songData.ids.indexOf('#C')];
+      if (chorus) {
+        const lines = chorus.split('\n');
+        if (lines.length > 0) {
+          this.searchIndex2.add(i, lines[0]);
+        }
+      }
+      const verse1 = songData.fields[songData.ids.indexOf('#1')];
+      if (verse1) {
+        const lines = verse1.split('\n');
+        if (lines.length > 0) {
+          this.searchIndex3.add(i, lines[0]);
+        }
+      }
+    });
+
     this.setState({songList});
   }
 
@@ -267,6 +295,8 @@ class App extends Component {
           setPlan={plan => {this.setState({plan}); window.savePlan(plan);}}
           songList={this.state.songList}
           searchIndex={this.searchIndex}
+          searchIndex2={this.searchIndex2}
+          searchIndex3={this.searchIndex3}
           updateSong={this.updateSong.bind(this)}
           handleEditing={editing => { this.editing = editing;}}
           addToPlan={item =>{

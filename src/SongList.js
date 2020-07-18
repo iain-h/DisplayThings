@@ -30,6 +30,7 @@ import Paper from '@material-ui/core/Paper';
 import Checkbox from '@material-ui/core/Checkbox';
 import Tooltip from '@material-ui/core/Tooltip';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
+import CheckIcon from '@material-ui/icons/Check';
 import Switch from '@material-ui/core/Switch';
 import DeleteIcon from '@material-ui/icons/Delete';
 import SearchIcon from '@material-ui/icons/Search';
@@ -231,13 +232,24 @@ export default function EnhancedTable(props) {
     }
     //if (!props.searchIndex) return;
     props.searchIndex.search(value, {
-      limit: 20
+      limit: 10
     }, results => {
-      //if (results.length > 0) {
-        setSearchResults(results.map(idx => props.songList[idx]));
-        handleChangePage(null, 0);
-      //}
+      props.searchIndex2.search(value, {
+        limit: 10
+      }, results2 => {
+        props.searchIndex3.search(value, {
+          limit: 10
+        }, results3 => {
+          //if (results.length > 0) {
+            let res = results.concat(results2.filter(i => !results.includes(i)));
+            res = res.concat(results3.filter(i => !res.includes(i)));
+            setSearchResults(res.map(idx => props.songList[idx]));
+            handleChangePage(null, 0);
+          //}
+        });
+      });
     });
+
   };
 
   const handleSearch = e => {
@@ -263,6 +275,8 @@ export default function EnhancedTable(props) {
       <Paper className={classes.paper}>
         <EnhancedTableToolbar
            searchIndex={props.searchIndex}
+           searchIndex2={props.searchIndex2}
+           searchIndex3={props.searchIndex3}
            handleSearch={handleSearch}
            songList={props.songList}
            handleChangePage={handleChangePage}
@@ -275,9 +289,27 @@ export default function EnhancedTable(props) {
                 <List>
                   {rows
                         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage + props.plan.length)
-                        .filter((row, index) => props.plan.indexOf(row) == -1)
+                        //.filter((row, index) => props.plan.indexOf(row) == -1)
                         .map((row, index) => {
                           if (index >= rowsPerPage) return null;
+                          if (props.plan.indexOf(row) != -1) {
+                            return  (
+                              <ListItem style={{height: '30px'}}>
+                                <ListItemIcon>
+                                <Tooltip title="In Plan">
+                                <Button disabled={true}> <CheckIcon/> </Button>
+                                </Tooltip>
+                                </ListItemIcon>
+                                <Tooltip title="In Plan">
+                                <ListItemText style={{color: "#aaa"}}
+                                  primary={row.length > 28 ? row.substring(0, 25) + '...' :  row}
+                                />
+                                </Tooltip>
+                                <ListItemSecondaryAction>
+      
+                                </ListItemSecondaryAction>
+                              </ListItem>);
+                          }
                        return (
                     <Draggable key={row} draggableId={row} index={index}>
                        {(provided, snapshot) => (
