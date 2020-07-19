@@ -277,6 +277,9 @@ if (typeof fs.existsSync === 'function') {
                 displayWindow.webContents.send('show');
                 displayWindow.setFullScreen(true);
                 mainWindow.focus();
+                displayWindow.webContents.once('dom-ready', () => {
+                    mainWindow.webContents.send('displayReady');
+                });
             });
 
             if (!displayWindow) {
@@ -290,6 +293,9 @@ if (typeof fs.existsSync === 'function') {
                 });
                 displayWindow.webContents.send('show');
                 mainWindow.focus();
+                displayWindow.webContents.once('dom-ready', () => {
+                    mainWindow.webContents.send('displayReady');
+                });
             }
 
         } else {

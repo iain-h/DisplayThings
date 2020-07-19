@@ -310,10 +310,6 @@ export default class Plan extends Component {
   }
 
   componentDidUpdate(nextProps, nextState) {
-    if (this.reselect && nextState.selected === '') {
-      this.handlePlay(this.reselect);
-      this.reselect = undefined;
-    }
   }
 
   onDragEnd(result) {
@@ -473,6 +469,13 @@ export default class Plan extends Component {
       if (this.state.selected === item) return;
       console.log('SelectItem', item);
       this.handlePlay(item);
+    };
+
+    window.displayReady = () => {
+      if (this.reselect) {
+        this.handlePlay(this.reselect);
+        this.reselect = undefined;
+      }
     };
   }
 
