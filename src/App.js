@@ -67,31 +67,39 @@ class App extends Component {
     this.resetSong = callback;
   }
 
+  indexSong(i, songData) {
+    // Index title
+    this.searchIndex.add(i, songData.name);
+    // Index first lines
+    const chorus = songData.fields[songData.ids.indexOf('#C')];
+    if (chorus) {
+      const lines = chorus.split('\n');
+      if (lines.length > 0) {
+        this.searchIndex2.add(i, lines[0]);
+      }
+    }
+    const verse1 = songData.fields[songData.ids.indexOf('#1')];
+    if (verse1) {
+      const lines = verse1.split('\n');
+      if (lines.length > 0) {
+        this.searchIndex3.add(i, lines[0]);
+      }
+    }
+  }
+
+  removeSong(i) {
+    this.searchIndex.remove(i);
+    this.searchIndex2.remove(i);
+    this.searchIndex3.remove(i);
+  }
+
   indexSongs() {
     this.searchIndex.clear();
     const songList = Object.keys(this.songDatabase)
       .filter(key => this.songDatabase[key] !== undefined);
     songList.forEach((song, i) => {
-      // Index title
-      this.searchIndex.add(i, song);
-      // Index first lines
-      const songData = this.songDatabase[song];
-      const chorus = songData.fields[songData.ids.indexOf('#C')];
-      if (chorus) {
-        const lines = chorus.split('\n');
-        if (lines.length > 0) {
-          this.searchIndex2.add(i, lines[0]);
-        }
-      }
-      const verse1 = songData.fields[songData.ids.indexOf('#1')];
-      if (verse1) {
-        const lines = verse1.split('\n');
-        if (lines.length > 0) {
-          this.searchIndex3.add(i, lines[0]);
-        }
-      }
+      this.indexSong(i, this.songDatabase[song])
     });
-
     this.setState({songList});
   }
 
@@ -227,7 +235,14 @@ class App extends Component {
               songData.name = title;
               this.songDatabase[songData.name] = songData;
               this.setState({songData});
-              this.indexSongs();
+
+              const songList = Object.keys(this.songDatabase)
+                .filter(key => this.songDatabase[key] !== undefined);
+              const idx = songList.indexOf(title);
+              console.log(title, idx);
+              this.indexSong(idx, songData);
+              this.setState({songList});
+
               window.updateSongDatabase(JSON.stringify(songData), deleteName);
 
               if (newPlan.indexOf(songData.name) === -1) {
@@ -240,8 +255,12 @@ class App extends Component {
           }
           deleteSong={songData => {
             const deleteName = songData.name;
+            this.removeSong(this.state.songList.indexOf(deleteName));
             this.songDatabase[deleteName] = undefined;
-            this.indexSongs();
+            const songList = Object.keys(this.songDatabase)
+              .filter(key => this.songDatabase[key] !== undefined);
+            this.setState({songList});
+            
             window.updateSongDatabase('', deleteName);
             this.setState({songData: undefined});
             const idx = this.state.plan.indexOf(deleteName);
@@ -249,6 +268,7 @@ class App extends Component {
               const newPlan = Array.from(this.state.plan);
               newPlan.splice(idx, 1);
               this.setState({plan: newPlan});
+              window.savePlan(newPlan);
             }
           }}
           />

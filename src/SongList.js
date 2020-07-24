@@ -289,7 +289,7 @@ export default function EnhancedTable(props) {
                 <List>
                   {rows
                         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage + props.plan.length)
-                        //.filter((row, index) => props.plan.indexOf(row) == -1)
+                        .filter((row, index) => row !== undefined)
                         .map((row, index) => {
                           if (index >= rowsPerPage) return null;
                           if (props.plan.indexOf(row) != -1) {
