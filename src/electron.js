@@ -391,10 +391,11 @@ if (typeof fs.existsSync === 'function') {
             //if (err) return;
             let dest = undefined;
             let content = [];
+            const skipImport = ['#P', '#M', '#F', '#I'];
             const setContent = () => {
                 if (dest === undefined) return;
                 songData.ids.forEach((id, i) => {
-                    if (dest.startsWith(id) ) {
+                    if (dest === id && !skipImport.includes(id)) {
                         songData.fields[i] = content.join('\n');
                     }
                 });
