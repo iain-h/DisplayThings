@@ -61,7 +61,7 @@ export default class SongEnter extends Component {
       this.nextLines();
     });
 
-    const ids = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'c', 'b', 'f', 'i', 'p', 'm', 'd', ];
+    const ids = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'c', 'b', 'f', 'i', 'p', 'm', 'd', 'e'];
 
     ids.forEach( id => {
       this.props.mousetrap(id, e => {

@@ -354,7 +354,7 @@ if (typeof fs.existsSync === 'function') {
         const songData = {
             name: name,
             fields: [],
-            ids: ['#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8', '#9', '#C', '#B', '#A', '#O', '#T', '#P', '#M', '#F', '#I', '#D'],
+            ids: ['#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8', '#9', '#C', '#B', '#A', '#O', '#T', '#P', '#M', '#F', '#I', '#E'],
             names: ['Verse 1', 'Verse 2', 'Verse 3', 'Verse 4', 'Verse 5',
             'Verse 6', 'Verse 7', 'Verse 8', 'Verse 9', 'Chorus', 'Bridge', 'Author', 'Order', 'Title',
             'Pre-Chorus', 'Middle Section', '2nd Chrous', 'Intro', 'Ending'],
@@ -395,7 +395,9 @@ if (typeof fs.existsSync === 'function') {
             const setContent = () => {
                 if (dest === undefined) return;
                 songData.ids.forEach((id, i) => {
-                    if (dest === id && !skipImport.includes(id)) {
+                    let importID = id;
+                    if (importID === '#E') importID = '#D'; // Convert D to E (Ending!)
+                    if (dest === importID && !skipImport.includes(id)) {
                         songData.fields[i] = content.join('\n');
                     }
                 });
@@ -414,7 +416,11 @@ if (typeof fs.existsSync === 'function') {
             });
             setContent();
 
-            songData.fields[songData.ids.indexOf('#T')] = songName;
+            if (!songData.fields[songData.ids.indexOf('#T')]) {
+                songData.fields[songData.ids.indexOf('#T')] = songName;
+            } else {
+                songData.name = songData.fields[songData.ids.indexOf('#T')];
+            }
 
             callback(songData);
         });
@@ -428,7 +434,7 @@ if (typeof fs.existsSync === 'function') {
             const name = fileStats.name.replace('.txt', '');
             readSong(name, importDir, songData => {
                 if (songData) {
-                    songDatabase[name] = songData;
+                    songDatabase[songData.name] = songData;
                 }
                 next();
             });
