@@ -115,8 +115,21 @@ ipcRenderer.on('shadowRad', (event, newShadowRad) => {
   const displayDiv2 = document.getElementById(toggleFade2);
   if (!displayDiv1 || !displayDiv2) return;
   if (displayDiv1.style.textShadow) {
-    displayDiv1.style.textShadow = `1px 1px ${shadowRad}px #000000`;
-    displayDiv2.style.textShadow = `1px 1px ${shadowRad}px #000000`;
+    displayDiv1.style.textShadow = `1px 1px ${Math.abs(shadowRad)}px ${shadowRad < 0 ? '#fff' :  '#000'}`;
+    displayDiv2.style.textShadow = `1px 1px ${Math.abs(shadowRad)}px ${shadowRad < 0 ? '#fff' :  '#000'}`;
+  }
+});
+
+ipcRenderer.on('backCast', (event, newBackCast) => {
+  console.log('backCast', newBackCast);
+  backCast = newBackCast || 0;
+  const displayDiv = document.getElementById('backCast');
+  if (!displayDiv) return;
+  displayDiv.style.opacity = `${(Math.abs(newBackCast) / 30.0).toFixed(3)}`;
+  if (newBackCast < 0) {
+    displayDiv.style.backgroundColor = '#000';
+  } else {
+    displayDiv.style.backgroundColor = '#fff';
   }
 });
 

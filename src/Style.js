@@ -217,6 +217,7 @@ export default function(props) {
   const [shadow, setShadow] = React.useState(false);
   const [shadowRad, setShadowRad] = React.useState(3);
   const [border, setBorder] = React.useState(false);
+  const [backCast, setBackCast] = React.useState(0);
 
   const addStyle = (styleName, newStyle) => {
     const fullStyle = {
@@ -227,7 +228,8 @@ export default function(props) {
       allCaps,
       shadow,
       shadowRad,
-      border
+      border,
+      backCast
     };
     Object.keys(newStyle).forEach(s => {
       fullStyle[s] = newStyle[s];
@@ -300,6 +302,14 @@ export default function(props) {
     }
   };
 
+  const handleBackCast = (newBackCast, save) => {
+    window.setWordsStyle({'backCast': newBackCast});
+    setBackCast(newBackCast || false);
+    if (save) {
+      addStyle(currentStyle, {backCast: newBackCast});
+    }
+  };
+
   const handleBorder = (newBorder, save) => {
     window.setWordsStyle({'border': newBorder});
     setBorder(newBorder || false);
@@ -321,6 +331,7 @@ export default function(props) {
       handleShadow(vals.shadow, false);
       handleShadowRad(vals.shadowRad, false);
       handleBorder(vals.border, false);
+      handleBackCast(vals.backCast, false);
     }
   };
 
@@ -391,22 +402,63 @@ export default function(props) {
         
       </div>
 
-      
-        <SwatchButton  color={color} onChange={ color => handleColor(color, true) } />
 
-        
-        <div style={{display: 'inline-block', position: 'relative', top: '8px'}}>
-        <Tooltip title="Font Size">
-          <FormatSizeIcon/>
-        </Tooltip>
+        <div style={{display: 'block', padding: '10px'}}>
+        <div style={{display: 'inline'}}>
+         <FontSelect font={font} setFont={font => handleFont(font, true)}/>
         </div>
-        <div style={{
+        <SwatchButton color={color} onChange={ color => handleColor(color, true) } />
+        </div>
+        
+        <div style={{textAlign: 'center'}}>
+
+        <FormControlLabel
+              control={
+                <Checkbox
+                checked={allCaps}
+                onChange={e => handleAllCaps(e.target.checked, true)}
+                value="allCaps"
+                color="secondary"
+              />
+              }
+              label="All Caps"
+            />
+
+        <FormControlLabel
+              control={
+                <Checkbox
+                checked={border}
+                onChange={e => handleBorder(e.target.checked, true)}
+                value="border"
+                color="secondary"
+              />
+              }
+              label="Border"
+            />
+
+
+        <FormControlLabel
+              control={
+                <Checkbox
+                checked={shadow}
+                onChange={e => handleShadow(e.target.checked, true)}
+                value="shadow"
+                color="secondary"
+              />
+              }
+              label="Shadow"
+            />
+
+      </div>
+
+      <div style={{
           display: 'inline-block',
           position: 'relative',
           top: '10px',
-          width: '250px',
+          width: '300px',
           marginLeft: '10px'
           }}>
+          Font Size
           <Slider
             defaultValue={9}
             getAriaValueText={value => `${value}`}
@@ -423,39 +475,11 @@ export default function(props) {
         </div>
 
 
-        <div style={{display: 'block', padding: '10px'}}>
-        <FontSelect font={font} setFont={font => handleFont(font, true)}/>
-        </div>
-        
-        
-
-        <FormControlLabel
-              control={
-                <Checkbox
-                checked={allCaps}
-                onChange={e => handleAllCaps(e.target.checked, true)}
-                value="allCaps"
-                color="secondary"
-              />
-              }
-              label="All Caps"
-            />
-        <FormControlLabel
-              control={
-                <Checkbox
-                checked={shadow}
-                onChange={e => handleShadow(e.target.checked, true)}
-                value="shadow"
-                color="secondary"
-              />
-              }
-              label="Shadow"
-            />
          <div style={{
           display: 'block',
           position: 'relative',
           top: '10px',
-          width: '250px',
+          width: '300px',
           marginLeft: '10px'
           }}>
             Shadow Blur
@@ -465,7 +489,7 @@ export default function(props) {
             aria-labelledby="discrete-slider-small-steps"
             step={1}
             marks
-            min={0}
+            min={-15}
             max={15}
             valueLabelDisplay="auto"
             value={shadowRad}
@@ -477,17 +501,32 @@ export default function(props) {
           />
         </div>
 
-        <FormControlLabel
-              control={
-                <Checkbox
-                checked={border}
-                onChange={e => handleBorder(e.target.checked, true)}
-                value="border"
-                color="secondary"
-              />
-              }
-              label="Border"
-            />
+        <div style={{
+          display: 'block',
+          position: 'relative',
+          top: '10px',
+          width: '300px',
+          marginLeft: '10px'
+          }}>
+            Background Color Cast
+          <Slider
+            defaultValue={3}
+            getAriaValueText={value => `${value}`}
+            aria-labelledby="discrete-slider-small-steps"
+            step={1}
+            marks
+            min={-20}
+            max={20}
+            valueLabelDisplay="auto"
+            value={backCast}
+            onChange={(e, val) => {handleBackCast(val, false);}}
+            onChangeCommitted={e => {
+              handleBackCast(backCast, true);
+            }}
+          />
+        </div>
+
+
 
         {currentStyle === 'Default' ? null :
           <div style={{display: 'inline-block', float: 'right'}}>
