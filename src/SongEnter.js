@@ -19,6 +19,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 
 const getCaretCoordinates = require('textarea-caret');
 
+const selectables = ['#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8', '#9', '#C', '#E', '#D', '#F', '#I', '#P', '#M'];
 
 export default class SongEnter extends Component {
 
@@ -338,7 +339,7 @@ export default class SongEnter extends Component {
                   }}></div>) : null}
               <TextField className="field" id={id} 
                 inputRef={x => this.textInputs[id] = x}
-                label={name} multiline rows="1" rowsMax="20"
+                label={`${name} ${selectables.includes(id) ? `(${id.replace('#','')})` : ''}`} multiline rows="1" rowsMax="20"
                 variant="outlined" name={name}
                 value={f || ''}
                 onKeyDownCapture={e => {
