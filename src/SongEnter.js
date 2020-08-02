@@ -224,6 +224,7 @@ export default class SongEnter extends Component {
     if (id != -1 && this.textInputs[id]) {
       this.textInputs[id].setSelectionRange(count1, count2);
       this.textInputs[id].focus();
+      this.textInputs[id].scrollIntoView(false);
     }
 
     this.moveDot();
