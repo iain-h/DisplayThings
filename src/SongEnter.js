@@ -19,7 +19,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 
 const getCaretCoordinates = require('textarea-caret');
 
-const selectables = ['#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8', '#9', '#C', '#E', '#D', '#F', '#I', '#P', '#M'];
+const selectables = ['#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8', '#9', '#C', '#B', '#E', '#D', '#F', '#I', '#P', '#M'];
 
 export default class SongEnter extends Component {
 

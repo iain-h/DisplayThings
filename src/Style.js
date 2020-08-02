@@ -378,7 +378,7 @@ export default function(props) {
               border: '2px solid',
               borderColor: selected ? '#f44' : '#fff',
               opacity: selected ? 1 : 0.7,
-              backgroundImage: `url(${file.replace('rootDir/', window.rootDir)})`,
+              backgroundImage: `url("${file.replace('rootDir/', window.rootDir)}")`,
               backgroundSize: 'cover',
               backgroundRepeat: 'no-repeat',
               margin: '0px'

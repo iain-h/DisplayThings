@@ -573,15 +573,15 @@ if (typeof fs.existsSync === 'function') {
             return [];
         }
 
-        const url = `file://${backdrops.importDir}/`.replace(/\\/g ,'/');
+        const url = `file://`;
 
         return new Promise((resolve, reject) => {
             const files = [];
             const walker = walk.walk(backdrops.importDir);
             walker.on("file", function (root, fileStats, next) {
                 const lowerName = fileStats.name.toLowerCase();
-                if (lowerName.endsWith('.jpg') || lowerName.endsWith('.png')){
-                    files.push(url + fileStats.name);
+                if (lowerName.endsWith('.jpg') || lowerName.endsWith('.png') || lowerName.endsWith('.bmp')){
+                    files.push(url + root.replace(/\\/g ,'/') + '/' + fileStats.name);
                     console.log('backdrop:', fileStats.name);
                 }
                 next();
