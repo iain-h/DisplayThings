@@ -143,8 +143,8 @@ function YouTubeDialog(props) {
           onFocus={e => props.handleEditing(true)}
           onBlur={e => props.handleEditing(false)}
         />
-        
-        <div style={{width: '300px', height: '200px'}}>{title}<div id="player"></div></div>
+        <div style={{height: '50px', width:'300px'}}>{title ? title.substring(0, 80) : ''}</div>
+        <div style={{width: '300px', height: '200px'}}><div id="player"></div></div>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleCancel} color="primary">
