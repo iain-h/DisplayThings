@@ -46,6 +46,7 @@ export default class SongEnter extends Component {
     this.fieldId = -1;
     this.started = false;
     this.resetting = 'begin';
+    this.setOrderIndex(0);
     //console.log('reset');
   }
 
@@ -117,6 +118,7 @@ export default class SongEnter extends Component {
       this.line = 0;
       this.orderIdx = orderIdx;
       this.field = this.state.songData.ids.indexOf(id);
+      this.fieldId = id;
     }
   }
 
@@ -219,6 +221,7 @@ export default class SongEnter extends Component {
       const orderField = this.getOrderField();
  
       id = '#' + orderField.charAt(this.orderIdx).toUpperCase();
+      this.fieldId = id;
     }
 
     if (id != -1 && this.textInputs[id]) {
