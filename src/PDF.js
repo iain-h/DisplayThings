@@ -130,6 +130,16 @@ function PDFDocument(props) {
   </div>;
 }
 
+function scrollIntoViewIfNeeded(target) { 
+  if (target.getBoundingClientRect().bottom > window.innerHeight) {
+      target.scrollIntoView(false);
+  }
+
+  if (target.getBoundingClientRect().top < 0) {
+      target.scrollIntoView();
+  } 
+}
+
 
 export default class PDF extends Component {
 
@@ -190,6 +200,11 @@ export default class PDF extends Component {
     }
     console.log(next);
     this.setState({selectedPage: next});
+
+    const element = document.getElementById(`pdfPage${next}`);
+    if (element) {
+      scrollIntoViewIfNeeded(element);
+    }
   }
 
   prevSlide() {
@@ -199,6 +214,11 @@ export default class PDF extends Component {
     }
     this.setState({selectedPage: prev});
     console.log(prev);
+
+    const element = document.getElementById(`pdfPage${prev}`);
+    if (element) {
+      scrollIntoViewIfNeeded(element);
+    }
   }
 
   reload() {
