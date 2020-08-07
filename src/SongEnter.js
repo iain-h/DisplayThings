@@ -20,6 +20,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 const getCaretCoordinates = require('textarea-caret');
 
 const selectables = ['#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8', '#9', '#C', '#B', '#E', '#D', '#F', '#I', '#P', '#M'];
+const alwaysHas = ['#1', '#C', '#T', '#O', '#A'];
 
 export default class SongEnter extends Component {
 
@@ -47,7 +48,17 @@ export default class SongEnter extends Component {
     this.started = false;
     this.resetting = 'begin';
     this.setOrderIndex(0);
-    //console.log('reset');
+
+    // Remove empty fields
+    if (songData) {
+      songData.ids.forEach((id, i) => {
+        const f = songData.fields[i];
+        if (!f && !alwaysHas.includes(id)) {
+          songData.hasField[id] = false;
+        }
+      });
+    }
+
   }
 
   componentDidMount() {

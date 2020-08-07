@@ -100,8 +100,8 @@ ipcRenderer.on('shadow', (event, newShadow) => {
   const displayDiv2 = document.getElementById(toggleFade2);
   if (!displayDiv1 || !displayDiv2) return;
   if (newShadow) {
-    displayDiv1.style.textShadow = `2px 2px ${shadowRad}px #000000`;
-    displayDiv2.style.textShadow = `2px 2px ${shadowRad}px #000000`;
+    displayDiv1.style.textShadow = `2px 2px ${Math.abs(shadowRad)}px ${shadowRad < 0 ? '#fff' :  '#000'}`;
+    displayDiv2.style.textShadow = `2px 2px ${Math.abs(shadowRad)}px ${shadowRad < 0 ? '#fff' :  '#000'}`;
   } else {
     displayDiv1.style.textShadow = '';
     displayDiv2.style.textShadow = '';
@@ -125,7 +125,7 @@ ipcRenderer.on('backCast', (event, newBackCast) => {
   backCast = newBackCast || 0;
   const displayDiv = document.getElementById('backCast');
   if (!displayDiv) return;
-  displayDiv.style.opacity = `${(Math.abs(newBackCast) / 30.0).toFixed(3)}`;
+  displayDiv.style.opacity = `${(Math.abs(newBackCast) / 25.0).toFixed(3)}`;
   if (newBackCast < 0) {
     displayDiv.style.backgroundColor = '#000';
   } else {

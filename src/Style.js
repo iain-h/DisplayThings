@@ -529,7 +529,7 @@ export default function(props) {
 
 
         {currentStyle === 'Default' ? null :
-          <div style={{display: 'inline-block', float: 'right'}}>
+          <div style={{display: 'block'}}>
           <Tooltip title="Delete this style">
           <IconButton onClick={handleDelete}>
           <DeleteIcon disabled={true}/>
