@@ -766,7 +766,7 @@ if (typeof fs.existsSync === 'function') {
             if (code === 0 && pdfConverting[file].load === true) {
                 console.log('loadPDF', outName);
                 mainWindow.webContents.send('loadPDF', outName);
-            } else {
+            } else if (code !== 0) {
                 dialog.showMessageBoxSync({
                     type: 'error',
                     buttons: ['OK'],
