@@ -38,6 +38,21 @@ import AddIcon from '@material-ui/icons/Add';
 import Input from '@material-ui/core/Input';
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import RootRef from "@material-ui/core/RootRef";
+import { createMuiTheme, ThemeProvider  } from '@material-ui/core/styles';
+
+const darkTheme = createMuiTheme({
+  palette: {
+    type: 'dark',
+    background: '#000',
+  },
+});
+const lightTheme = createMuiTheme({
+  palette: {
+    type: 'light',
+    background: '#fff',
+  },
+});
+
 const headCells = [
   { id: 'name', numeric: false, disablePadding: true, label: 'Name' }
 ];
@@ -48,6 +63,18 @@ const getItemStyle = (isDragging, draggableStyle, selected) => ({
 
   ...(isDragging && {
     background: "rgb(235,235,235)"
+  }),
+    ...(selected && {
+      background: "rgb(256,256,0)"
+  })
+});
+
+const getItemStyleDark = (isDragging, draggableStyle, selected) => ({
+  // styles we need to apply on draggables
+  ...draggableStyle, height: '30px',
+
+  ...(isDragging && {
+    background: "rgb(40, 40, 40)"
   }),
     ...(selected && {
       background: "rgb(256,256,0)"
@@ -138,6 +165,7 @@ const EnhancedTableToolbar = props => {
   const { numSelected } = props;
 
   return (
+    <ThemeProvider theme={props.colorTheme === 'Dark' ? darkTheme : lightTheme}>
     <Toolbar
       className={clsx(classes.froot, {
         [classes.highlight]: numSelected > 0,
@@ -167,6 +195,7 @@ const EnhancedTableToolbar = props => {
        </div>
       )}
     </Toolbar>
+    </ThemeProvider>
   );
 };
 
@@ -272,8 +301,10 @@ export default function EnhancedTable(props) {
 
   return (
 
-      <Paper className={classes.paper}>
+      <ThemeProvider theme={props.colorTheme === 'Dark' ? darkTheme : lightTheme}>
+      <Paper className={classes.paper}  style={{background: props.colorTheme === 'Dark' ? '#000' : '#fff'}}>
         <EnhancedTableToolbar
+           colorTheme={props.colorTheme}
            searchIndex={props.searchIndex}
            searchIndex2={props.searchIndex2}
            searchIndex3={props.searchIndex3}
@@ -294,7 +325,9 @@ export default function EnhancedTable(props) {
                           if (index >= rowsPerPage) return null;
                           if (props.plan.indexOf(row) != -1) {
                             return  (
+                              
                               <ListItem style={{height: '30px'}}>
+                                <ThemeProvider theme={props.colorTheme === 'Dark' ? darkTheme : lightTheme}>
                                 <ListItemIcon>
                                 <Tooltip title="In Plan">
                                 <Button disabled={true}> <CheckIcon/> </Button>
@@ -308,17 +341,26 @@ export default function EnhancedTable(props) {
                                 <ListItemSecondaryAction>
       
                                 </ListItemSecondaryAction>
-                              </ListItem>);
+                                </ThemeProvider>
+                              </ListItem>
+                              );
                           }
                        return (
                     <Draggable key={row} draggableId={row} index={index}>
                        {(provided, snapshot) => (
+                         <ThemeProvider theme={props.colorTheme === 'Dark' && props.selected !== row ? darkTheme : lightTheme}>
                       <ListItem
                           ContainerComponent="li"
                           ContainerProps={{ ref: provided.innerRef }}
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
-                          style={getItemStyle(
+                          style={props.colorTheme === 'Dark' ? 
+                          getItemStyleDark(
+                            snapshot.isDragging,
+                            provided.draggableProps.style,
+                            props.selected === row
+                          ) :
+                          getItemStyle(
                             snapshot.isDragging,
                             provided.draggableProps.style,
                             props.selected === row
@@ -332,14 +374,15 @@ export default function EnhancedTable(props) {
                           </Tooltip>
                           </ListItemIcon>
                           <Tooltip title={row}>
-                          <ListItemText
+                          <ListItemText style={{color: props.colorTheme === 'Dark' && props.selected !== row ? '#fff' : '#000'}}
                             primary={row.length > 28 ? row.substring(0, 25) + '...' :  row}
                           />
                           </Tooltip>
                           <ListItemSecondaryAction>
 
                           </ListItemSecondaryAction>
-                        </ListItem>)}
+                        </ListItem>
+                        </ThemeProvider>)}
                     </Draggable>
                   );}
                   )}
@@ -360,6 +403,7 @@ export default function EnhancedTable(props) {
         />
 
       </Paper>
+      </ThemeProvider>
 
   );
 }

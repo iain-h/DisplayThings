@@ -16,11 +16,23 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import DeleteIcon from '@material-ui/icons/Delete';
+import { createMuiTheme, ThemeProvider  } from '@material-ui/core/styles';
 
 const getCaretCoordinates = require('textarea-caret');
 
 const selectables = ['#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8', '#9', '#C', '#B', '#E', '#D', '#F', '#I', '#P', '#M'];
 const alwaysHas = ['#1', '#C', '#T', '#O', '#A'];
+
+const darkTheme = createMuiTheme({
+  palette: {
+    type: 'dark',
+  },
+});
+const lightTheme = createMuiTheme({
+  palette: {
+    type: 'light',
+  },
+});
 
 export default class SongEnter extends Component {
 
@@ -320,7 +332,7 @@ export default class SongEnter extends Component {
 
     return (
       <main>
-       
+       <ThemeProvider theme={this.props.colorTheme === 'Dark' ? darkTheme : lightTheme}>
         <div id="songEnterRoot" className="root">
         <Grid container alignItems="stretch" direction="row" spacing={2} justify="flex-start"
         style={{
@@ -340,6 +352,7 @@ export default class SongEnter extends Component {
             const name = songData.names[idx];
 
             return (
+              
               <Grid item xs={6} flex-grow={1} key={id}>
                 <div>
                 {id === '#O' ?
@@ -349,8 +362,8 @@ export default class SongEnter extends Component {
                   left: '-10px',
                   width: '4px',
                   height: '2px',
-                  borderBottom: '2px solid black',
-                  backgroundColor: '#FF0'
+                  borderBottom: this.props.colorTheme === 'Dark' ? '2px solid white' : '2px solid black',
+                  backgroundColor: this.props.colorTheme === 'Dark' ? '#000' : '#FF0'
                   }}></div>) : null}
               <TextField className="field" id={id} 
                 inputRef={x => this.textInputs[id] = x}
@@ -418,6 +431,7 @@ export default class SongEnter extends Component {
         </Menu>
         
         </div>
+        </ThemeProvider>
       </main>
     );
   }

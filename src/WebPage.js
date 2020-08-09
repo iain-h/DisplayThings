@@ -10,6 +10,22 @@ import {
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import BookmarkIcon from '@material-ui/icons/Bookmark';
+import { createMuiTheme, ThemeProvider  } from '@material-ui/core/styles';
+
+const darkTheme = createMuiTheme({
+  palette: {
+    type: 'dark',
+    background: '#000',
+  },
+});
+const lightTheme = createMuiTheme({
+  palette: {
+    type: 'light',
+    background: '#fff',
+  },
+});
+
+
 
 const styles = {
     paper: {
@@ -45,7 +61,8 @@ export default class WebPage extends Component {
     if (!this.state.url) return null;
     return (
 
-        <Paper style={styles.paper}>
+      <ThemeProvider theme={this.props.colorTheme === 'Dark' ? darkTheme : lightTheme}>
+        <Paper style={styles.paper}  style={{background: this.props.colorTheme === 'Dark' ? '#000' : '#fff'}}>
           <div style={{paddingTop: '50px', paddingBottom: '50px', padding: '20px'}}>
 
             <Tooltip title="Bookmarked Address">
@@ -106,6 +123,7 @@ export default class WebPage extends Component {
             {this.state.title ? this.state.title : null}
             </div>
         </Paper>
+        </ThemeProvider>
 
     );
   }

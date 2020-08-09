@@ -4,102 +4,124 @@ if (typeof fs.existsSync === 'function') {
     const {app, BrowserWindow, Menu, screen, dialog, session, shell} = require('electron');
     let serverInstance = undefined;
 
-    const isMac = process.platform === 'darwin'
+    const isMac = process.platform === 'darwin';
 
-    const template = [
-    // { role: 'appMenu' }
-    ...(isMac ? [{
-        label: app.name,
-        submenu: [
-        { role: 'about' },
-        { type: 'separator' },
-        { role: 'services' },
-        { type: 'separator' },
-        { role: 'hide' },
-        { role: 'hideothers' },
-        { role: 'unhide' },
-        { type: 'separator' },
-        { role: 'quit' }
-        ]
-    }] : []),
-    // { role: 'fileMenu' }
-    {
-        label: 'File',
-        submenu: [
+    let colorTheme = 'Light';
+
+    const createMenu = () => {
+        const template = [
+        // { role: 'appMenu' }
+        ...(isMac ? [{
+            label: app.name,
+            submenu: [
+            { role: 'about' },
+            { type: 'separator' },
+            { role: 'services' },
+            { type: 'separator' },
+            { role: 'hide' },
+            { role: 'hideothers' },
+            { role: 'unhide' },
+            { type: 'separator' },
+            { role: 'quit' }
+            ]
+        }] : []),
+        // { role: 'fileMenu' }
         {
-            label: 'Import Songs...',
-            click: async () => {
-                const res = await dialog.showOpenDialog(mainWindow, {
-                    properties: ['openDirectory']
-                });
-                if (!res.canceled) {
-                    importSongs(res.filePaths[0]);
+            label: 'File',
+            submenu: [
+            {
+                label: 'Import Songs...',
+                click: async () => {
+                    const res = await dialog.showOpenDialog(mainWindow, {
+                        properties: ['openDirectory']
+                    });
+                    if (!res.canceled) {
+                        importSongs(res.filePaths[0]);
+                    }
                 }
-            }
+            },
+            {
+                label: 'Choose backdrops folder...',
+                click: async () => {
+                    const res = await dialog.showOpenDialog(mainWindow, {
+                        properties: ['openDirectory']
+                    });
+                    if (!res.canceled) {
+                        importBackdrops(res.filePaths[0]);
+                    }
+                }
+            },
+            { type: 'separator' },
+            isMac ? { role: 'close' } : { role: 'quit' }
+            ]
         },
+        // { role: 'editMenu' }
         {
-            label: 'Choose backdrops folder...',
-            click: async () => {
-                const res = await dialog.showOpenDialog(mainWindow, {
-                    properties: ['openDirectory']
-                });
-                if (!res.canceled) {
-                    importBackdrops(res.filePaths[0]);
+            label: 'Edit',
+            submenu: [
+            { role: 'undo' },
+            { role: 'redo' },
+            { type: 'separator' },
+            { role: 'cut' },
+            { role: 'copy' },
+            { role: 'paste' },
+            ...(isMac ? [
+                { role: 'pasteAndMatchStyle' },
+                { role: 'delete' },
+                { role: 'selectAll' },
+                { type: 'separator' },
+                {
+                label: 'Speech',
+                submenu: [
+                    { role: 'startspeaking' },
+                    { role: 'stopspeaking' }
+                ]
                 }
-            }
+            ] : [
+                { role: 'delete' },
+                { type: 'separator' },
+                { role: 'selectAll' }
+            ])
+            ]
         },
-        { type: 'separator' },
-        isMac ? { role: 'close' } : { role: 'quit' }
-        ]
-    },
-    // { role: 'editMenu' }
-    {
-        label: 'Edit',
-        submenu: [
-        { role: 'undo' },
-        { role: 'redo' },
-        { type: 'separator' },
-        { role: 'cut' },
-        { role: 'copy' },
-        { role: 'paste' },
-        ...(isMac ? [
-            { role: 'pasteAndMatchStyle' },
-            { role: 'delete' },
-            { role: 'selectAll' },
+        // { role: 'viewMenu' }
+        {
+            label: 'View',
+            submenu: [
+            { role: 'reload' },
+            { role: 'forcereload' },
+            { role: 'toggledevtools' },
+            { type: 'separator' },
+            { role: 'resetzoom' },
+            { role: 'zoomin' },
+            { role: 'zoomout' },
+            { type: 'separator' },
+            { role: 'togglefullscreen' },
             { type: 'separator' },
             {
-            label: 'Speech',
-            submenu: [
-                { role: 'startspeaking' },
-                { role: 'stopspeaking' }
-            ]
-            }
-        ] : [
-            { role: 'delete' },
-            { type: 'separator' },
-            { role: 'selectAll' }
-        ])
-        ]
-    },
-    // { role: 'viewMenu' }
-    {
-        label: 'View',
-        submenu: [
-        { role: 'reload' },
-        { role: 'forcereload' },
-        { role: 'toggledevtools' },
-        { type: 'separator' },
-        { role: 'resetzoom' },
-        { role: 'zoomin' },
-        { role: 'zoomout' },
-        { type: 'separator' },
-        { role: 'togglefullscreen' }
-        ]
-    }
-    ];
+                label: colorTheme === 'Light' ? 'Dark Theme' : 'Light Theme',
+                click: async menuItem => {
+                    if (colorTheme === 'Light') {
+                        colorTheme = 'Dark';
+                        createMenu();
+                    } else {
+                        colorTheme = 'Light';
+                        createMenu();
+                    }
 
-    const menu = Menu.buildFromTemplate(template);
-    Menu.setApplicationMenu(menu);
+                    mainWindow.webContents.send('colorTheme');
+                    fs.writeFileSync(path.join(basePath, "colorTheme.json"), JSON.stringify(colorTheme));
+                }
+            }
+            ]
+        }
+        ];
+
+        const menu = Menu.buildFromTemplate(template);
+        Menu.setApplicationMenu(menu);
+    }
+
+    createMenu();
 
     const util = require('util');
     const path = require('path');
@@ -131,6 +153,15 @@ if (typeof fs.existsSync === 'function') {
             } 
             console.log('Directory created successfully!'); 
         }); 
+    }
+
+    if (fs.existsSync(path.join(basePath, "colorTheme.json"))) {
+        try {
+            colorTheme = JSON.parse(fs.readFileSync(path.join(basePath, "colorTheme.json")));
+            createMenu();
+        } catch (err) {
+            // Not json
+        }
     }
 
     function createWindow() {
@@ -185,6 +216,9 @@ if (typeof fs.existsSync === 'function') {
             fs.writeFileSync(path.join(basePath, "prefs.json"), JSON.stringify(mainWindow.getContentBounds()));
             serverInstance.close();
             app.exit(0);
+        });
+
+        mainWindow.webContents.once('dom-ready', () => { 
         });
 
         // Open the DevTools.
@@ -841,4 +875,6 @@ if (typeof fs.existsSync === 'function') {
         }
         return '';
     };
+
+    exports.getColorTheme = () => colorTheme;
 }

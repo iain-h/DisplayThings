@@ -27,7 +27,8 @@ const {
     setURL,
     goBack,
     goForward,
-    getURL
+    getURL,
+    getColorTheme
 } = electron.remote.require('./electron.js');
 
 window.setWords = setWords;
@@ -58,6 +59,7 @@ window.setURL = setURL;
 window.goBack = goBack;
 window.goForward = goForward;
 window.getURL = getURL;
+window.getColorTheme = getColorTheme;
 
 const ipcRenderer = electron.ipcRenderer;
 ipcRenderer.on('loadPDF', (event, file) => {
@@ -78,6 +80,10 @@ ipcRenderer.on('loadBackdrops', (event, files) => {
 
 ipcRenderer.on('displayReady', (event, files) => {
     window.displayReady();
+});
+
+ipcRenderer.on('colorTheme', (event, colorTheme) => {
+    window.setColorTheme(colorTheme);
 });
 
 window.openFile = async () => {

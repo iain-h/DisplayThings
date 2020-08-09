@@ -18,3 +18,11 @@ body {
   margin-bottom: 20px;
   padding-bottom: 16px;
 }
+
+.paperDark {
+  background: #000;
+}
+
+.paperLight {
+  background: #fff;
+}

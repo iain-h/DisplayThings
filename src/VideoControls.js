@@ -11,6 +11,21 @@ import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
 import Slider from '@material-ui/core/Slider';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
+import { createMuiTheme, ThemeProvider  } from '@material-ui/core/styles';
+
+const darkTheme = createMuiTheme({
+  palette: {
+    type: 'dark',
+    background: '#000',
+  },
+});
+const lightTheme = createMuiTheme({
+  palette: {
+    type: 'light',
+    background: '#fff',
+  },
+});
+
 
 const LightTooltip = withStyles((theme) => ({
   tooltip: {
@@ -201,7 +216,8 @@ export default class VideoControls extends Component {
 
     return (
 
-        <Paper className={styles.paper}>
+      <ThemeProvider theme={this.props.colorTheme === 'Dark' ? darkTheme : lightTheme}>
+        <Paper className={styles.paper} style={{background: this.props.colorTheme === 'Dark' ? '#000' : '#fff'}}>
           <div style={{display: 'grid', paddingTop: '50px', paddingBottom: '50px', gridTemplateColumns: '50px 50px auto'}}>
             <Tooltip title="Skip to start">
             <IconButton aria-label="skip to start" onClick={this.handleSkipStart.bind(this)}>
@@ -259,6 +275,7 @@ export default class VideoControls extends Component {
             {this.state.status.title ? this.state.status.title : null}
             </div>
         </Paper>
+        </ThemeProvider>
 
     );
   }

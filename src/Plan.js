@@ -39,6 +39,20 @@ import Button from '@material-ui/core/Button';
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import PublicIcon from '@material-ui/icons/Public';
 import Controls from './Controls';
+import { createMuiTheme, ThemeProvider  } from '@material-ui/core/styles';
+
+const darkTheme = createMuiTheme({
+  palette: {
+    type: 'dark',
+    background: '#000',
+  },
+});
+const lightTheme = createMuiTheme({
+  palette: {
+    type: 'light',
+    background: '#fff',
+  },
+});
 
 let player;
 
@@ -125,7 +139,7 @@ function YouTubeDialog(props) {
 
   return (
     <Dialog open={open} onClose={handleCancel} aria-labelledby="form-dialog-title">
-      <DialogTitle id="form-dialog-title">Add YouTube to plan</DialogTitle>
+      <DialogTitle style={{color: '#000'}} id="form-dialog-title">Add YouTube to plan</DialogTitle>
       <DialogContent>
         <TextField
           autoFocus
@@ -143,7 +157,7 @@ function YouTubeDialog(props) {
           onFocus={e => props.handleEditing(true)}
           onBlur={e => props.handleEditing(false)}
         />
-        <div style={{height: '50px', width:'300px'}}>{title ? title.substring(0, 80) : ''}</div>
+        <div style={{height: '50px', width:'300px', color: '#000'}}>{title ? title.substring(0, 80) : ''}</div>
         <div style={{width: '300px', height: '200px'}}><div id="player"></div></div>
       </DialogContent>
       <DialogActions>
@@ -194,10 +208,11 @@ function AddToPlanMenu(props) {
       anchorEl={anchorEl}
       open={Boolean(anchorEl)}
       onClose={() => setAnchorEl(null)}
+      
       >
-      <MenuItem onClick={addFile}><InsertDriveFileIcon/> <span style={{width: '5px'}}/>Add File</MenuItem>
-      <MenuItem onClick={addWebPage}><PublicIcon/> <span style={{width: '5px'}}/>Add Web Page</MenuItem>
-      <MenuItem onClick={addYouTube}><YouTubeIcon/> <span style={{width: '5px'}}/>Add YouTube</MenuItem>
+      <MenuItem style={{color: '#000'}} onClick={addFile}><InsertDriveFileIcon/> <span style={{width: '5px'}}/>Add File</MenuItem>
+      <MenuItem style={{color: '#000'}} onClick={addWebPage}><PublicIcon/> <span style={{width: '5px'}}/>Add Web Page</MenuItem>
+      <MenuItem style={{color: '#000'}} onClick={addYouTube}><YouTubeIcon/> <span style={{width: '5px'}}/>Add YouTube</MenuItem>
       </Menu>
     </div>
   );
@@ -238,6 +253,24 @@ const getItemStyle = (isDragging, draggableStyle, selected, index) => ({
   }),
   ...(index % 2 !== 0 && {
     background: "rgb(230,250,250)"
+  }),
+  ...(selected && {
+    background: "rgb(256,256,0)"
+  })
+});
+
+const getItemStyleDark = (isDragging, draggableStyle, selected, index) => ({
+  // styles we need to apply on draggables
+  ...draggableStyle, height: '30px',
+
+  ...(isDragging && {
+    background: "rgb(0, 0, 0)"
+  }),
+  ...(index % 2 === 0 && {
+    background: "rgb(40, 40, 40)"
+  }),
+  ...(index % 2 !== 0 && {
+    background: "rgb(10, 10, 10)"
   }),
   ...(selected && {
     background: "rgb(256,256,0)"
@@ -491,10 +524,13 @@ export default class Plan extends Component {
   // Normally you would want to split things out into separate components.
   // But in this example everything is just done in one place for simplicity
   render() {
+    
     return (
 
       <div>
+      
       <Controls 
+        colorTheme={this.props.colorTheme}
         deselectPlan={() => this.deselect()}
         setDisplay={() => {
           this.reselect = this.state.selected;
@@ -503,9 +539,10 @@ export default class Plan extends Component {
 
       <DragDropContext className="plan" onDragEnd={this.onDragEnd}>
 
-      <Paper className="paper">
+      <ThemeProvider theme={this.props.colorTheme === 'Dark' ? darkTheme : lightTheme}>
+      <Paper className={`paper`} style={{background: this.props.colorTheme === 'Dark' ? '#000' : '#fff'}}>
       <Toolbar>
-      <Typography >Plan</Typography>
+      <Typography>Plan</Typography>
       <div style={{position: 'absolute', right: '20px'}}>
       <Tooltip title="Clear the plan">
       <IconButton onClick={() => {this.setState({items: []}); this.props.setPlan([]);}}>
@@ -547,19 +584,30 @@ export default class Plan extends Component {
                  .filter(item => (item!=='' && item !== null))
                  .map((item, index) => (
                   <Draggable key={item} draggableId={item} index={index}>
-                    {(provided, snapshot) => (
+                    {(provided, snapshot) => {
+                      const iconColor = this.props.colorTheme === 'Dark' && this.state.selected !== item ? "#fff" : "#000";
+                      return (
+                      <ThemeProvider theme={this.props.colorTheme === 'Dark' && this.state.selected !== item ? darkTheme : lightTheme}>
                       <ListItem
                         ContainerComponent="li"
                         ContainerProps={{ ref: provided.innerRef }}
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
-                        style={getItemStyle(
+                        style={this.props.colorTheme === 'Dark' ? 
+                        getItemStyleDark(
+                          snapshot.isDragging,
+                          provided.draggableProps.style,
+                          this.state.selected === item,
+                          index+1
+                        ) : 
+                        getItemStyle(
                           snapshot.isDragging,
                           provided.draggableProps.style,
                           this.state.selected === item,
                           index+1
                         )}
                       >
+                        
                         <ListItemIcon>
                         <Tooltip title="Show this">
                           {this.state.selected !== item ?
@@ -572,28 +620,30 @@ export default class Plan extends Component {
                         }
                          </Tooltip>
                           </ListItemIcon>
+                          
                           <div style={{paddingRight:'10px'}}>
                           {!item ? null :
                             isVideo(item) ? 
                           <Tooltip title="Video">
-                              <TheatersIcon/></Tooltip> : 
+                              <TheatersIcon style={{color: iconColor}}/></Tooltip> : 
                             isAudio(item) ?
                             <Tooltip title="Sound">
-                              <GraphicEqIcon/></Tooltip> : 
+                              <GraphicEqIcon style={{color: iconColor}}/></Tooltip> : 
                             isYouTube(item) ? 
                             <Tooltip title="YouTube">
-                              <YouTubeIcon/></Tooltip> : 
+                              <YouTubeIcon style={{color: iconColor}}/></Tooltip> : 
                             isPDF(item) ? 
                             <Tooltip title="Presentation">
-                              <PictureInPictureIcon/></Tooltip> :
+                              <PictureInPictureIcon style={{color: iconColor}}/></Tooltip> :
                             isURL(item) ? 
                             <Tooltip title="Web Page">
-                              <PublicIcon/></Tooltip> :
+                              <PublicIcon style={{color: iconColor}}/></Tooltip> :
                             isPicture(item) ? 
-                            <Tooltip title="Picture"><ImageIcon/></Tooltip> :
-                            <Tooltip title="Song Words"><QueueMusicIcon /></Tooltip>}</div>
+                            <Tooltip title="Picture"><ImageIcon style={{color: iconColor}}/></Tooltip> :
+                            <Tooltip title="Song Words"><QueueMusicIcon style={{color: iconColor}} /></Tooltip>}
+                            </div>
                           <Tooltip title={item}>
-                        <ListItemText
+                        <ListItemText style={{color: iconColor}}
                            primary={
                             (() => {
                               if (!item) return "Empty";
@@ -609,6 +659,7 @@ export default class Plan extends Component {
                             })()}
                         />
                         </Tooltip>
+                        
 
                         <ListItemSecondaryAction>
                           <Tooltip title="Remove from plan">
@@ -618,7 +669,8 @@ export default class Plan extends Component {
                             </Tooltip>
                         </ListItemSecondaryAction>
                       </ListItem>
-                    )}
+                      </ThemeProvider>
+                    );}}
                   </Draggable>
                 ))}
                 {provided.placeholder}
@@ -628,8 +680,10 @@ export default class Plan extends Component {
         </Droppable>
       
      </Paper>
-
+     </ThemeProvider>
+     
      <SongList
+          colorTheme={this.props.colorTheme}
           songList={this.props.songList}
           setSong={name=> {
             this.setState({selected: name});
@@ -667,7 +721,6 @@ export default class Plan extends Component {
           }
         }}
       />
-
      </div>
     );
   }

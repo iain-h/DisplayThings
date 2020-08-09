@@ -24,6 +24,20 @@ import FormatSizeIcon from '@material-ui/icons/FormatSize';
 import Slider from '@material-ui/core/Slider';
 import fontList from './font_list.json';
 import {Checkbox, FormGroup, FormControlLabel} from '@material-ui/core';
+import { createMuiTheme, ThemeProvider  } from '@material-ui/core/styles';
+
+const darkTheme = createMuiTheme({
+  palette: {
+    type: 'dark',
+    background: '#000',
+  },
+});
+const lightTheme = createMuiTheme({
+  palette: {
+    type: 'light',
+    background: '#fff',
+  },
+});
 
 function SwatchButton(props) {
 
@@ -112,6 +126,7 @@ function FreeSoloCreateOption(props) {
  }, [props.currentStyle]);
 
   return (
+    <ThemeProvider theme={lightTheme}>
     <Autocomplete
       value={value ? value.title : null}
       onChange={(event, newValue) => {
@@ -169,9 +184,12 @@ function FreeSoloCreateOption(props) {
       freeSolo
       disableClearable
       renderInput={(params) => (
+        <ThemeProvider theme={props.colorTheme === 'Dark' ? darkTheme : lightTheme}>
         <TextField {...params} label="Style (type to add new)" />
+        </ThemeProvider>
       )}
     />
+    </ThemeProvider>
   );
 }
 
@@ -188,15 +206,19 @@ function FontSelect(props) {
   }, [props.font]);
 
   return (
+    
       <FormControl>
+
         <Select
           labelId="demo-simple-select-label"
           id="demo-simple-select"
           value={value}
           onChange={handleChange}
+          theme={lightTheme}
         >
           {fontList.map((item, key) => {
             return <MenuItem 
+              style={{color: '#000'}}
               key={key}
               value={item}><div style={{fontFamily: item}}>{item}</div></MenuItem>
           })}
@@ -356,10 +378,11 @@ export default function(props) {
 
   return (
 
-      <Paper className={classes.paper}>
+      <Paper className={classes.paper} style={{background: props.colorTheme === 'Dark' ? '#000' : '#fff'}}>
         <div className={classes.contents}>
 
       <FreeSoloCreateOption
+        colorTheme={props.colorTheme}
         styles={props.styles}
         currentStyle={currentStyle}
         changeStyle={name => {
@@ -378,6 +401,7 @@ export default function(props) {
         handleEditing={props.handleEditing}
       />
 
+<ThemeProvider theme={props.colorTheme === 'Dark' ? darkTheme : lightTheme}>
       <div className={classes.pictures}>
         {props.backdrops.map((file, i) => {
           const selected = backdrop === file;
@@ -405,7 +429,7 @@ export default function(props) {
 
         <div style={{display: 'block', padding: '10px'}}>
         <div style={{display: 'inline'}}>
-         <FontSelect font={font} setFont={font => handleFont(font, true)}/>
+         <FontSelect colorTheme={props.colorTheme} font={font} setFont={font => handleFont(font, true)}/>
         </div>
         <SwatchButton color={color} onChange={ color => handleColor(color, true) } />
         </div>
@@ -419,6 +443,7 @@ export default function(props) {
                 onChange={e => handleAllCaps(e.target.checked, true)}
                 value="allCaps"
                 color="secondary"
+                style={{color: props.colorTheme === 'Dark' ? '#fff' : '#000'}}
               />
               }
               label="All Caps"
@@ -431,6 +456,7 @@ export default function(props) {
                 onChange={e => handleBorder(e.target.checked, true)}
                 value="border"
                 color="secondary"
+                style={{color: props.colorTheme === 'Dark' ? '#fff' : '#000'}}
               />
               }
               label="Border"
@@ -444,6 +470,7 @@ export default function(props) {
                 onChange={e => handleShadow(e.target.checked, true)}
                 value="shadow"
                 color="secondary"
+                style={{color: props.colorTheme === 'Dark' ? '#fff' : '#000'}}
               />
               }
               label="Shadow"
@@ -537,7 +564,7 @@ export default function(props) {
           </Tooltip>
           </div>
         }
-     
+     </ThemeProvider>
       </div>
       </Paper>
 

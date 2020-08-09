@@ -31,7 +31,8 @@ class App extends Component {
     url: undefined,
     plan: [],
     backdrops: [],
-    styles: {}
+    styles: {},
+    colorTheme: window.getColorTheme()
   };
   searchIndex = new FlexSearch({
     threshold: 7,
@@ -143,6 +144,10 @@ class App extends Component {
     window.loadBackdrops = files => {
       this.setState({backdrops: files});
     };
+
+    window.setColorTheme = () => {
+      this.setState({colorTheme: window.getColorTheme()});
+    };
     
     window.addEventListener("keydown", e => {
       if (this.editing) return;
@@ -196,21 +201,12 @@ class App extends Component {
         if (callback) {
           callback(e);
         }
-      }} className="App">
+      }} className={`App App${this.state.colorTheme}`}>
 
-      <div style={{
-        position: 'absolute',
-        backgroundColor: 'rgb(247, 240, 218)',
-        top: '0px',
-        paddingTop: '10px',
-        paddingLeft: '10px',
-        paddingRight: '10px',
-        left: '0px',
-        right: '440px',
-        bottom: '0px',
-        overflowY: 'auto'}}>
+      <div className={`Editor Editor${this.state.colorTheme}`}>
 
         <SongEnter 
+          colorTheme={this.state.colorTheme}
           mousetrap={this.mousetrap.bind(this)}
           songData={this.state.songData}
           setResetCallback={this.setResetCallback.bind(this)}
@@ -274,10 +270,12 @@ class App extends Component {
           />
            <audio id="audio" src=""></audio>
           <VideoControls 
+            colorTheme={this.state.colorTheme}
             video={this.state.video}
             youtube={this.state.youtube}
             audio={this.state.audio}/>
           <PDF
+            colorTheme={this.state.colorTheme}
             pdfFile={this.state.pdf}
             pptFile={this.state.ppt}
             reload={() => {
@@ -289,6 +287,7 @@ class App extends Component {
 
           <Picture file={this.state.picture}/>
           <WebPage 
+            colorTheme={this.state.colorTheme}
             url={this.state.url}
             updateURL={url => {
               if (url === this.state.url) return;
@@ -310,6 +309,7 @@ class App extends Component {
       <div style={{position: 'absolute', top: '0px', paddingTop: '10px', width: '400px', paddingRight: '20px', right: '0px', bottom: '0px', overflowY: 'auto'}}>
 
         <Plan 
+          colorTheme={this.state.colorTheme}
           mousetrap={this.mousetrap.bind(this)}
           plan={this.state.plan}
           setPlan={plan => {this.setState({plan}); window.savePlan(plan);}}
@@ -365,6 +365,7 @@ class App extends Component {
           }}
           />
           <Style 
+            colorTheme={this.state.colorTheme}
             styles={this.state.styles}
             backdrops={this.state.backdrops}
             addStyle={(name, style) => {
