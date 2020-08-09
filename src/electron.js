@@ -8,6 +8,47 @@ if (typeof fs.existsSync === 'function') {
 
     let colorTheme = 'Light';
 
+    const util = require('util');
+    const path = require('path');
+    const url = require('url');
+    const walk = require('walk');
+    const { exec } = require('child_process');
+    const express = require('express')
+    const server = express();
+    const port = 3002;
+    server.use(express.static(path.join(__dirname, '../public')));
+
+    const dev = 'public'.startsWith('p');
+
+    // Keep a global reference of the window object, if you don't, the window will
+    // be closed automatically when the JavaScript object is garbage collected.
+    let mainWindow;
+    let displayWindow;
+    let browserWindow;
+
+    let songDatabase = {};
+
+    const homedir = require('os').homedir();
+    const basePath = path.join(homedir, '.displayThings');
+
+    if (!fs.existsSync(basePath)) {
+        fs.mkdir(basePath, (err) => { 
+            if (err) { 
+                return console.error(err); 
+            } 
+            console.log('Directory created successfully!'); 
+        }); 
+    }
+
+    if (fs.existsSync(path.join(basePath, "colorTheme.json"))) {
+        try {
+            colorTheme = JSON.parse(fs.readFileSync(path.join(basePath, "colorTheme.json")));
+            createMenu();
+        } catch (err) {
+            // Not json
+        }
+    }
+
     const createMenu = () => {
         const template = [
         // { role: 'appMenu' }
@@ -104,9 +145,11 @@ if (typeof fs.existsSync === 'function') {
                     if (colorTheme === 'Light') {
                         colorTheme = 'Dark';
                         createMenu();
+                        displayWindow.removeMenu();
                     } else {
                         colorTheme = 'Light';
                         createMenu();
+                        displayWindow.removeMenu();
                     }
 
                     mainWindow.webContents.send('colorTheme');
@@ -122,47 +165,6 @@ if (typeof fs.existsSync === 'function') {
     }
 
     createMenu();
-
-    const util = require('util');
-    const path = require('path');
-    const url = require('url');
-    const walk = require('walk');
-    const { exec } = require('child_process');
-    const express = require('express')
-    const server = express();
-    const port = 3002;
-    server.use(express.static(path.join(__dirname, '../public')));
-
-    const dev = 'public'.startsWith('p');
-
-    // Keep a global reference of the window object, if you don't, the window will
-    // be closed automatically when the JavaScript object is garbage collected.
-    let mainWindow;
-    let displayWindow;
-    let browserWindow;
-
-    let songDatabase = {};
-
-    const homedir = require('os').homedir();
-    const basePath = path.join(homedir, '.displayThings');
-
-    if (!fs.existsSync(basePath)) {
-        fs.mkdir(basePath, (err) => { 
-            if (err) { 
-                return console.error(err); 
-            } 
-            console.log('Directory created successfully!'); 
-        }); 
-    }
-
-    if (fs.existsSync(path.join(basePath, "colorTheme.json"))) {
-        try {
-            colorTheme = JSON.parse(fs.readFileSync(path.join(basePath, "colorTheme.json")));
-            createMenu();
-        } catch (err) {
-            // Not json
-        }
-    }
 
     function createWindow() {
 
