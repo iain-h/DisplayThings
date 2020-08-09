@@ -354,24 +354,26 @@ export default class Plan extends Component {
     if (!result.destination) {
       return;
     }
-    else if (result.destination.droppableId !== 'droppable') {
+    else if (result.destination.droppableId !== 'droppable' && result.source.droppableId === 'droppable') {
       items = removeItem(
         this.state.items,
         result.source.index
       );
     }
-    else if (result.source.droppableId === result.destination.droppableId) {
+    else if (result.source.droppableId === 'droppable' && result.destination.droppableId === 'droppable') {
       items = reorder(
         this.state.items,
         result.source.index,
         result.destination.index
       );
-    } else {
+    } else if (result.source.droppableId !== 'droppable' && result.destination.droppableId === 'droppable') {
       items = insertItem(
         this.state.items,
         result.destination.index,
         result.draggableId
       );
+    } else {
+      return;
     }
 
     this.props.setPlan(items);
