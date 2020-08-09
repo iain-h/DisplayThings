@@ -145,13 +145,13 @@ if (typeof fs.existsSync === 'function') {
                     if (colorTheme === 'Light') {
                         colorTheme = 'Dark';
                         createMenu();
-                        displayWindow.removeMenu();
                     } else {
                         colorTheme = 'Light';
                         createMenu();
+                    }
+                    if (displayWindow) {
                         displayWindow.removeMenu();
                     }
-
                     mainWindow.webContents.send('colorTheme');
                     fs.writeFileSync(path.join(basePath, "colorTheme.json"), JSON.stringify(colorTheme));
                 }
