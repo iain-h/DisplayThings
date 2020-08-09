@@ -12,6 +12,21 @@ import { Document, Page, pdfjs } from 'react-pdf';
 import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import RefreshIcon from '@material-ui/icons/Refresh';
+import { createMuiTheme, ThemeProvider  } from '@material-ui/core/styles';
+
+const darkTheme = createMuiTheme({
+  palette: {
+    type: 'dark',
+    background: '#000',
+  },
+});
+const lightTheme = createMuiTheme({
+  palette: {
+    type: 'light',
+    background: '#fff',
+  },
+});
+
 
 pdfjs.GlobalWorkerOptions.workerSrc = `./pdf.worker.js`;
 
@@ -69,15 +84,15 @@ function PDFPage(props) {
       <canvas id={id}  style={{
       display: 'inline-block',
       border: selected ? '2px solid' : '1px solid',
-      borderColor: selected ? '#f00' : '#000',
+      borderColor: selected ? '#f00' : props.colorTheme === 'Dark' ? '#fff' : '#000',
       padding: '0px',
-      boxShadow: '5px 10px 8px ' + (selected ? '#998888' : '#888888')}}/>
+      boxShadow: '5px 10px 8px ' + (props.colorTheme === 'Dark' ? '#000' : selected ? '#998888' :  '#888888')}}/>
 
       </Button>
       <span style={{
         display: 'block',
         textAlign: 'center',
-        color: selected ? '#f00' : '#000'
+        color: selected ? '#f00' : props.colorTheme === 'Dark' ? '#fff' : '#000'
         }}>{props.page}</span>
     </div>;
 }
@@ -119,6 +134,7 @@ function PDFDocument(props) {
       const pages = [];
       for (let i=0;i<numPages;++i) {
         pages.push(<PDFPage 
+          colorTheme={props.colorTheme}
           page={i+1}
           pdfDoc={pdfDoc}
           handleClick={props.handleClick}
@@ -237,6 +253,7 @@ export default class PDF extends Component {
     console.log('render');
     return (
         <div>
+           <ThemeProvider theme={this.props.colorTheme === 'Dark' ? darkTheme : lightTheme}>
         {
         this.state.pptFile ?
         <Tooltip title="Reload">
@@ -246,6 +263,7 @@ export default class PDF extends Component {
         </Tooltip> : null
         }
         <PDFDocument
+          colorTheme={this.props.colorTheme}
           file={this.state.pdfFile}
           selected={this.state.selectedPage}
           onDocumentLoadSuccess={numPages => {
@@ -254,6 +272,7 @@ export default class PDF extends Component {
           handleClick={page => {
             this.setState({selectedPage: page});
           }}/>
+          </ThemeProvider>
     </div>
     );
   }
