@@ -366,10 +366,18 @@ export default class SongEnter extends Component {
                   backgroundColor: this.props.colorTheme === 'Dark' ? '#000' : '#FF0'
                   }}></div>) : null}
               <TextField className="field" id={id} 
-                inputRef={x => this.textInputs[id] = x}
-                label={`${name} ${selectables.includes(id) ? `(${id.replace('#','')})` : ''}`} multiline rows="1" rowsMax="20"
+                inputRef={x => {
+                  if (!x) return;
+                  this.textInputs[id] = x;
+                }}
+                InputProps={{style: {
+                  fontFamily: 'OpenSans-Regular',
+                  fontSize: '15px',
+                  lineHeight: '140%'
+                }}}
+                label={`${name} ${selectables.includes(id) ? `(${id.replace('#','')})` : ''}`} multiline margin="normal" rows="1" rowsMax="20"
                 variant="outlined" name={name}
-                value={f || ''}
+                value={(f  || '')}
                 onKeyDownCapture={e => {
                   if (!this.editing) {
                     e.preventDefault();
