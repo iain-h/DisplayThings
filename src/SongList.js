@@ -77,7 +77,7 @@ const getItemStyleDark = (isDragging, draggableStyle, selected) => ({
     background: "rgb(40, 40, 40)"
   }),
     ...(selected && {
-      background: "rgb(256,256,0)"
+      background: "rgb(50,50,150)"
   })
 });
 
@@ -348,7 +348,7 @@ export default function EnhancedTable(props) {
                        return (
                     <Draggable key={row} draggableId={row} index={index}>
                        {(provided, snapshot) => (
-                         <ThemeProvider theme={props.colorTheme === 'Dark' && props.selected !== row ? darkTheme : lightTheme}>
+                         <ThemeProvider theme={props.colorTheme === 'Dark' ? darkTheme : lightTheme}>
                       <ListItem
                           ContainerComponent="li"
                           ContainerProps={{ ref: provided.innerRef }}
@@ -374,7 +374,7 @@ export default function EnhancedTable(props) {
                           </Tooltip>
                           </ListItemIcon>
                           <Tooltip title={row}>
-                          <ListItemText style={{color: props.colorTheme === 'Dark' && props.selected !== row ? '#fff' : '#000'}}
+                          <ListItemText style={{color: props.colorTheme === 'Dark' ? '#fff' : '#000'}}
                             primary={row.length > 28 ? row.substring(0, 25) + '...' :  row}
                           />
                           </Tooltip>

@@ -273,7 +273,7 @@ const getItemStyleDark = (isDragging, draggableStyle, selected, index) => ({
     background: "rgb(10, 10, 10)"
   }),
   ...(selected && {
-    background: "rgb(256,256,0)"
+    background: "rgb(50,50,150)"
   })
 });
 
@@ -587,9 +587,9 @@ export default class Plan extends Component {
                  .map((item, index) => (
                   <Draggable key={item} draggableId={item} index={index}>
                     {(provided, snapshot) => {
-                      const iconColor = this.props.colorTheme === 'Dark' && this.state.selected !== item ? "#fff" : "#000";
+                      const iconColor = this.props.colorTheme === 'Dark' ? "#fff" : "#000";
                       return (
-                      <ThemeProvider theme={this.props.colorTheme === 'Dark' && this.state.selected !== item ? darkTheme : lightTheme}>
+                      <ThemeProvider theme={this.props.colorTheme === 'Dark' ? darkTheme : lightTheme}>
                       <ListItem
                         ContainerComponent="li"
                         ContainerProps={{ ref: provided.innerRef }}
