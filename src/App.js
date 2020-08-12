@@ -10,6 +10,7 @@ import Picture from './Picture';
 import WebPage from './WebPage';
 import Mousetrap from 'mousetrap';
 import FlexSearch from 'flexsearch';
+import './Scrollbar'; 
 
 const keyCodeMap = {
   down: [40, 34], up: [38, 33], 
