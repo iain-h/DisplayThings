@@ -12,7 +12,7 @@ function addCss(rule) {
     width: 8px;
  }
  ::-webkit-scrollbar-track-piece {
-    background: #555;
+    background: rbga(0, 0, 0, 0.2);
  }
  ::-webkit-scrollbar-thumb:vertical,
  ::-webkit-scrollbar-thumb:horizontal {
