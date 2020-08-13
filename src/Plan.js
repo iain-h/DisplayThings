@@ -335,10 +335,10 @@ export default class Plan extends Component {
   componentWillUpdate(nextProps, nextState) {
     if (nextProps.plan !== this.state.items) {
       this.setState({items: nextProps.plan});
-      if (this.state.selected &&
+      /*if (this.state.selected &&
          nextProps.plan.indexOf(this.state.selected) !== -1) {
         this.playItem(this.state.selected);
-      }
+      }*/
     }
   }
 
