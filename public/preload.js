@@ -1,5 +1,5 @@
 const electron = require('electron');
-const {displayKeyPressed, rootDir, setVideoStatus} = electron.remote.require('./electron.js');
+const {displayKeyPressed, rootDir, setVideoStatus, setYouTubeStatus} = electron.remote.require('./electron.js');
 const ipcRenderer = electron.ipcRenderer;
 const {pdfjs} = require('react-pdf');
 pdfjs.GlobalWorkerOptions.workerSrc = `./pdf.worker.js`;
@@ -377,7 +377,7 @@ const setupYouTubeUpdate = () => {
       title = data.title;
     }
     const status = {time, duration, paused, title};
-    setVideoStatus(JSON.stringify(status));
+    setYouTubeStatus(JSON.stringify(status));
     setupYouTubeUpdate();
   }, 1000);
 };

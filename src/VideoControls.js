@@ -143,8 +143,13 @@ export default class VideoControls extends Component {
     }
     if (this.state.audio) return;
 
-    const status = JSON.parse(window.getVideoStatus());
-    this.stateFromStatus(status);
+    if (this.state.youtube){
+      const status = JSON.parse(window.getYouTubeStatus());
+      this.stateFromStatus(status);
+    } else if (this.state.video) {
+      const status = JSON.parse(window.getVideoStatus());
+      this.stateFromStatus(status);
+    }
   }
 
   stateFromStatus(status) {

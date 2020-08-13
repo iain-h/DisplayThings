@@ -14,6 +14,7 @@ const {
     setVideo,
     playVideo,
     getVideoStatus,
+    getYouTubeStatus,
     convertPPTtoPDF,
     showPDF,
     loadStyles,
@@ -45,6 +46,7 @@ window.getBackdrops = getBackdrops;
 window.setVideo = setVideo;
 window.playVideo = playVideo;
 window.getVideoStatus = getVideoStatus;
+window.getYouTubeStatus = getYouTubeStatus;
 window.convertPPTtoPDF = convertPPTtoPDF;
 window.showPDF = showPDF;
 window.loadStyles = loadStyles;

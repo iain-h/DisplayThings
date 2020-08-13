@@ -716,13 +716,23 @@ if (typeof fs.existsSync === 'function') {
     };
 
     let videoStatus = '{}';
+    let youTubeStatus = '{}';
 
     exports.setVideoStatus = status => {
         videoStatus = status;
+        console.log(videoStatus);
     };
 
     exports.getVideoStatus = () => {
         return videoStatus;
+    };
+
+    exports.setYouTubeStatus = status => {
+        youTubeStatus = status;
+    };
+
+    exports.getYouTubeStatus = () => {
+        return youTubeStatus;
     };
 
     const pdfConverting = {};
