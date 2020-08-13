@@ -37,10 +37,8 @@
 .dragHint {
   height: 80px;
   padding: 20px;
-  -webkit-transition: background-color 0.5s linear;
-  transition: background-color 0.5s linear;
-  -webkit-transition: color 0.5s linear;
-  transition: color 0.5s linear;
+  -webkit-transition: 0.5s linear;
+  transition: 0.5s linear;
   text-align: center;
   color: #aaa;
 }
@@ -48,6 +46,4 @@
 .dragHint:hover {
   color: rgb(217, 240, 255);
   background-color: rgb(217, 240, 255);
-  -webkit-transition: background-color 0.5s linear;
-  transition: background-color 0.5s linear;
 }
