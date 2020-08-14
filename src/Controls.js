@@ -20,7 +20,7 @@ const lightTheme = createMuiTheme({
 
 export default class Controls extends Component {
 
-  state = {show: false};
+  state = {show: true};
 
   handleChange(e) {
     if (e) {
@@ -41,6 +41,7 @@ export default class Controls extends Component {
   componentDidMount() {
     console.log('hide display');
     window.hideDisplay = () => {this.setState({show: false})};
+    window.setShow(true);
   }
 
   render() {
