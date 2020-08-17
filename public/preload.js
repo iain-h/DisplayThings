@@ -67,11 +67,18 @@ ipcRenderer.on('words', (event, message) => {
 
 window.displayKeyPressed = displayKeyPressed;
 
-const setBackdrop = file => {
-  console.log('backdrop', file);
+
+const backdropQ = async.queue(function(task, callback) {
+  console.log('backdrop', task.file);
   const displayDiv1 = document.getElementById('back_fade1');
   if (!displayDiv1) return;
-  displayDiv1.style.backgroundImage = `url("${file.replace('rootDir/', rootDir)}")`;
+  displayDiv1.style.backgroundImage = `url("${task.file.replace('rootDir/', rootDir)}")`;
+  setTimeout(callback, 1600);
+}, 1);
+
+const setBackdrop = file => {
+  backdropQ.remove(() => true);
+  backdropQ.push({file});
 };
 
 ipcRenderer.on('backdrop', (event, file) => {
@@ -195,7 +202,7 @@ ipcRenderer.on('setVideo', (event, file) => {
   console.log('show video');
   setTimeout(() =>{
     videoElement.style.display = 'inline-block';
-    videoElement.src = file;
+    videoElement.src = encodeURI(file);
     videoElement.play();
     setupVideoUpdate();
     }, 300);
@@ -219,7 +226,7 @@ ipcRenderer.on('setPicture', (event, file) => {
 
       setBackdrop('Backdrops/black.png');
       console.log('show picture');
-      pictureElement.src = file;
+      pictureElement.src = encodeURI(file);
       pictureElement.className = 'picture fadein';
       pictureElement.style.display = 'inline';
     }, 500);
