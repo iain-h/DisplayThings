@@ -381,22 +381,31 @@ export default class Plan extends Component {
 
   playItem(name) {
 
-      this.props.setURL(isURL(name) ? name : undefined, () => {
-        if (isSong(name)) {
-          const songData = this.props.setSong(name);
-          this.props.updateSong(songData);
-        } else {
-          this.props.updateSong(undefined);
-        }
-        this.props.setVideo(isVideo(name) ? name : undefined);
-        this.props.setAudio(isAudio(name) ? name : undefined);
-        this.props.setYouTube(isYouTube(name) ? name : undefined);
-        this.props.setPPT(isPDF(name) ? name : undefined);
-        this.props.setPicture(isPicture(name) ? name : undefined);
-      });
+    this.props.setURL(isURL(name) ? name : undefined, () => {
+      if (isSong(name)) {
+        const songData = this.props.setSong(name);
+        this.props.updateSong(songData);
+      } else {
+        this.props.updateSong(undefined);
+      }
+      this.props.setVideo(isVideo(name) ? name : undefined);
+      this.props.setAudio(isAudio(name) ? name : undefined);
+      this.props.setYouTube(isYouTube(name) ? name : undefined);
+      this.props.setPPT(isPDF(name) ? name : undefined);
+      this.props.setPicture(isPicture(name) ? name : undefined);
+      
+    });
+      
   }
 
   handlePlay(name, e) {
+
+    if (!window.getShow()) {
+      this.reselect = name; 
+      window.showDisplay();
+      return;
+    }
+
     if (!name) return;
     if (this.state.selected === name) return this.deselect();
     if (e) {

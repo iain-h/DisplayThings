@@ -232,6 +232,7 @@ if (typeof fs.existsSync === 'function') {
     }
 
     const createDisplayWindow = fullscreen => {
+        if (displayWindow) return;
         displayWindow = new BrowserWindow({
             frame: !fullscreen,
             show: true,
@@ -261,6 +262,22 @@ if (typeof fs.existsSync === 'function') {
             displayWindow.webContents.openDevTools();
         }
     };
+
+    // Check display every 2 seconds.
+    const checkDisplay = () => {
+        if (displayWindow && mainWindow && displayWindow.isFullScreen()) {
+            const mainBounds = mainWindow.getContentBounds();
+            const displayBounds = displayWindow.getContentBounds();
+            if (mainBounds.x >= displayBounds.x && mainBounds.x <= displayBounds.x + displayBounds.width &&
+                mainBounds.y >= displayBounds.y && mainBounds.y <= displayBounds.y + displayBounds.height) {
+                displayWindow.close();
+                displayWindow = undefined;
+            }
+        }
+        setTimeout(checkDisplay, 2000);
+    };
+
+    setTimeout(checkDisplay, 2000);
 
     // This method will be called when Electron has finished
     // initialization and is ready to create browser windows.
@@ -292,6 +309,11 @@ if (typeof fs.existsSync === 'function') {
         displayWindow.webContents.send('words', words);
         message = words;
     };
+
+    exports.getShow = () => {
+        return displayWindow != undefined;
+    };
+
 
     exports.setShow = show => {
 

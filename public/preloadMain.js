@@ -5,6 +5,7 @@ const {
     setSong, 
     createSong, 
     setShow, 
+    getShow,
     savePlan, 
     loadPlan, 
     updateSongDatabase, 
@@ -36,6 +37,7 @@ window.setWords = setWords;
 window.getSongs = getSongs;
 window.setSong = setSong;
 window.setShow = setShow;
+window.getShow = getShow;
 window.savePlan = savePlan;
 window.loadPlan = loadPlan;
 window.createSong = createSong;
