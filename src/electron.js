@@ -259,10 +259,6 @@ if (typeof fs.existsSync === 'function') {
             if (mainWindow) {
                 console.log('Hide Display');
                 mainWindow.webContents.send('hideDisplay', redisplay);
-
-                if (redisplay) {
-                    setTimeout(mainWindow.focus.bind(mainWindow), 2000);
-                }
                 redisplay = false;
             }
         });
@@ -298,7 +294,7 @@ if (typeof fs.existsSync === 'function') {
                     return;
                 }
 
-                const result = dialog.showMessageBoxSync({
+              /*  const result = dialog.showMessageBoxSync({
                     type: 'warning',
                     buttons: ['Cancel', 'OK'],
                     title: 'Second screen detected',
@@ -307,12 +303,12 @@ if (typeof fs.existsSync === 'function') {
                     cancelId: 0
                 });
 
-                if (result) {
+                if (result) {*/
                     redisplay = true;
                     displayWindow.close();
-                } else {
+              /*  } else {
                     askFullScreen = false;
-                }
+                }*/
 
             });
         }
@@ -378,6 +374,7 @@ if (typeof fs.existsSync === 'function') {
                 displayWindow.webContents.send('show');
                 displayWindow.setFullScreen(true);
                 mainWindow.focus();
+                setTimeout(mainWindow.focus.bind(mainWindow), 2000);
                 displayWindow.webContents.once('dom-ready', () => {
                     mainWindow.webContents.send('displayReady');
                 });
@@ -385,7 +382,7 @@ if (typeof fs.existsSync === 'function') {
 
             if (!displayWindow) {
 
-                const result = dialog.showMessageBoxSync({
+            /*    const result = dialog.showMessageBoxSync({
                         type: 'warning',
                         buttons: ['Cancel', 'OK'],
                         title: 'No second screen detected',
@@ -394,7 +391,7 @@ if (typeof fs.existsSync === 'function') {
                         cancelId: 0
                     });
 
-                if (result) {
+                if (result) {*/
                     const disp = screen.getPrimaryDisplay();
                     createDisplayWindow(false);
                     displayWindow.setBounds({
@@ -408,7 +405,7 @@ if (typeof fs.existsSync === 'function') {
                     displayWindow.webContents.once('dom-ready', () => {
                         mainWindow.webContents.send('displayReady');
                     });
-                }
+               // }
             }
 
         } else {
