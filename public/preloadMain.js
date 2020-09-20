@@ -74,8 +74,12 @@ ipcRenderer.on('loadSongs', (event, songDatabase) => {
     window.loadSongs(JSON.parse(songDatabase));
 });
 
-ipcRenderer.on('hideDisplay', event => {
-    window.hideDisplay();
+ipcRenderer.on('hideDisplay', (event, redisplay) => {
+    window.hideDisplay(redisplay);
+});
+
+ipcRenderer.on('reshowFullscreen', event => {
+    window.reshowFullscreen();
 });
 
 ipcRenderer.on('loadBackdrops', (event, files) => {

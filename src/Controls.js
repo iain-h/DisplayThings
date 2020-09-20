@@ -40,7 +40,14 @@ export default class Controls extends Component {
 
   componentDidMount() {
     console.log('hide display');
-    window.hideDisplay = () => {this.setState({show: false}); this.props.deselectPlan();};
+    window.hideDisplay = redisplay => {
+      this.setState({show: false});
+      this.props.deselectPlan(redisplay);
+      if (redisplay) {
+        window.setShow(true);
+        this.setState({show: true});
+      }
+    };
     window.showDisplay = () => {window.setShow(true); this.setState({show: true});};
     window.setShow(true);
   }

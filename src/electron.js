@@ -231,8 +231,14 @@ if (typeof fs.existsSync === 'function') {
       });
     }
 
+    // Should we ask to display full screen when second screen found.
+    let askFullScreen = true;
+    let redisplay = false;
+
     const createDisplayWindow = fullscreen => {
         if (displayWindow) return;
+
+        askFullScreen = true;
         displayWindow = new BrowserWindow({
             frame: !fullscreen,
             show: true,
@@ -252,7 +258,12 @@ if (typeof fs.existsSync === 'function') {
             displayWindow = undefined;
             if (mainWindow) {
                 console.log('Hide Display');
-                mainWindow.webContents.send('hideDisplay');
+                mainWindow.webContents.send('hideDisplay', redisplay);
+
+                if (redisplay) {
+                    setTimeout(mainWindow.focus.bind(mainWindow), 2000);
+                }
+                redisplay = false;
             }
         });
         displayWindow.webContents.on('page-title-updated', (e, title) => {
@@ -274,6 +285,38 @@ if (typeof fs.existsSync === 'function') {
                 displayWindow = undefined;
             }
         }
+
+        if (askFullScreen && displayWindow && mainWindow && !displayWindow.isFullScreen()) {
+            const mainBounds = mainWindow.getContentBounds();
+    
+            let displays = screen.getAllDisplays();
+            displays.forEach(disp => {
+
+                // Check for main display.
+                if (mainBounds.x >= disp.bounds.x && mainBounds.x <= disp.bounds.x + disp.bounds.width &&
+                    mainBounds.y >= disp.bounds.y && mainBounds.y <= disp.bounds.y + disp.bounds.height) {
+                    return;
+                }
+
+                const result = dialog.showMessageBoxSync({
+                    type: 'warning',
+                    buttons: ['Cancel', 'OK'],
+                    title: 'Second screen detected',
+                    message: 'Do you want to switch display to the second screen?',
+                    defaultId: 1,
+                    cancelId: 0
+                });
+
+                if (result) {
+                    redisplay = true;
+                    displayWindow.close();
+                } else {
+                    askFullScreen = false;
+                }
+
+            });
+        }
+
         setTimeout(checkDisplay, 2000);
     };
 
@@ -315,7 +358,7 @@ if (typeof fs.existsSync === 'function') {
     };
 
 
-    exports.setShow = show => {
+    const setShow = show => {
 
         if (show) {
 
@@ -341,19 +384,31 @@ if (typeof fs.existsSync === 'function') {
             });
 
             if (!displayWindow) {
-                const disp = screen.getPrimaryDisplay();
-                createDisplayWindow(false);
-                displayWindow.setBounds({
-                    x: disp.bounds.x,
-                    y: disp.bounds.y,
-                    width: Math.floor(disp.bounds.width * 0.5),
-                    height: Math.floor(disp.bounds.height * 0.5)
-                });
-                displayWindow.webContents.send('show');
-                mainWindow.focus();
-                displayWindow.webContents.once('dom-ready', () => {
-                    mainWindow.webContents.send('displayReady');
-                });
+
+                const result = dialog.showMessageBoxSync({
+                        type: 'warning',
+                        buttons: ['Cancel', 'OK'],
+                        title: 'No second screen detected',
+                        message: 'There is no second screen available. Do you want to display in a window?',
+                        defaultId: 1,
+                        cancelId: 0
+                    });
+
+                if (result) {
+                    const disp = screen.getPrimaryDisplay();
+                    createDisplayWindow(false);
+                    displayWindow.setBounds({
+                        x: disp.bounds.x,
+                        y: disp.bounds.y,
+                        width: Math.floor(disp.bounds.width * 0.5),
+                        height: Math.floor(disp.bounds.height * 0.5)
+                    });
+                    displayWindow.webContents.send('show');
+                    //mainWindow.focus();
+                    displayWindow.webContents.once('dom-ready', () => {
+                        mainWindow.webContents.send('displayReady');
+                    });
+                }
             }
 
         } else {
@@ -367,6 +422,8 @@ if (typeof fs.existsSync === 'function') {
         }
         
     };
+
+    exports.setShow = setShow;
 
     exports.showBrowser = show => {
 

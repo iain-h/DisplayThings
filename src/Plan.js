@@ -521,6 +521,10 @@ export default class Plan extends Component {
         this.reselect = undefined;
       }
     };
+
+    window.reshowFullscreen = () => {
+      this.reselect = this.state.selected; 
+    };
   }
 
   handleRemove(name) {
@@ -542,7 +546,12 @@ export default class Plan extends Component {
       
       <Controls 
         colorTheme={this.props.colorTheme}
-        deselectPlan={() => this.deselect()}
+        deselectPlan={redisplay => {
+          if (redisplay) {
+            this.reselect = this.state.selected;
+          }
+          this.deselect();
+        }}
         setDisplay={() => {
           this.reselect = this.state.selected;
           this.deselect();
