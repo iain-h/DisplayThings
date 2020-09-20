@@ -858,7 +858,7 @@ if (typeof fs.existsSync === 'function') {
         }
 
         let baseName = path.basename(fileName);
-        baseName = baseName.replace('pptx', 'pdf').replace('ppt', 'pdf');
+        baseName = baseName.replace('pptx', 'pdf').replace('ppt', 'pdf').replace('odp', 'pdf').replace('odt', 'pdf');
         const outName = `file://${tempDir.replace(/\\/g, '/')}/${baseName}`;
         const pdfFile = path.join(tempDir, baseName);
 

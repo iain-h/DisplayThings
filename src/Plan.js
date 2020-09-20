@@ -302,7 +302,7 @@ const isURL = name => {
 
 const isPDF = name => {
   const lower = name.toLowerCase();
-  return lower.endsWith('.pptx') || lower.endsWith('.ppt') || lower.endsWith('.pdf');
+  return lower.endsWith('.odt') || lower.endsWith('.odp') || lower.endsWith('.pptx') || lower.endsWith('.ppt') || lower.endsWith('.pdf');
 };
 
 const isPicture = name => {
@@ -437,7 +437,7 @@ export default class Plan extends Component {
         result.push(item);
       }
       this.props.setPlan(result);
-      if (item.endsWith('.ppt') || item.endsWith('.pptx')) {
+      if (item.endsWith('.odt') || item.endsWith('.odp') || item.endsWith('.ppt') || item.endsWith('.pptx')) {
         window.convertPPTtoPDF(item, false, true);
       }
     }
