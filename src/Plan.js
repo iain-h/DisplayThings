@@ -56,6 +56,7 @@ const lightTheme = createMuiTheme({
 });
 
 let player;
+let addOnTitle = false;
 
 function YouTubeDialog(props) {
   const [open, setOpen] = React.useState(false);
@@ -71,6 +72,11 @@ function YouTubeDialog(props) {
       if (data) {
         console.log(data.title);
         setTitle(data.title);
+        if (data.title && addOnTitle) {
+          props.onClose(getVideoId(data.video_id), data.title);
+          window.closeBrowser();
+          clearVideo();
+        } 
       } else {
         setTimeout(onPlayerStateChange, 1000);
       }
@@ -110,9 +116,11 @@ function YouTubeDialog(props) {
   };
 
   window.addYouTube = url => {
-    setValue(url);
+    const id = getVideoId(url);
+    addOnTitle = true;
+    setValue(id);
     if (player && typeof player.loadVideoById === 'function') {
-      player.loadVideoById(getVideoId(url));
+      player.loadVideoById(id);
     }
   };
 
@@ -127,6 +135,7 @@ function YouTubeDialog(props) {
 
     if (props.open) {
       clearVideo();
+      addOnTitle = false;
       window.YT = undefined;
       let tag = document.createElement('script');
       tag.src = "https://www.youtube.com/iframe_api";
