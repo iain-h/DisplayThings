@@ -153,20 +153,13 @@ function YouTubeDialog(props) {
           }
         });
       };
+      window.showBrowser(true);
     }
   }, [props.open]);
 
   return (
     <Dialog open={open} onClose={handleCancel} aria-labelledby="form-dialog-title">
       <DialogTitle style={{color: '#000'}} id="form-dialog-title">Add YouTube to plan</DialogTitle>
-
-      <Button onClick={()=> {
-          clearVideo();
-          window.showBrowser(true);
-        }} color="primary">
-         <SearchIcon />
-         Search
-       </Button>
 
       <DialogContent>
         <TextField
