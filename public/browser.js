@@ -44,7 +44,7 @@ ipcRenderer.on('showButton', event => {
   document.body.appendChild(div);
 
   const check = () => {
-    setTimeout(check, 1000);
+    setTimeout(check, 2000);
     //alert('hi');
     const res = window.location.search.match(/v=([^ &]*)/);
     if (res) {
@@ -58,7 +58,7 @@ ipcRenderer.on('showButton', event => {
       but.style.backgroundColor = '#FFA';
       but.style.color = '#000';
       but.style.cursor = '';
-      but.onclick = e => {alert('Choose a video then click the button to add to plan');};
+      but.onclick = e => {but.innerHTML = "Click a video first!";};
     }
   };
   
