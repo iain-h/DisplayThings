@@ -39,6 +39,7 @@ import Button from '@material-ui/core/Button';
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import PublicIcon from '@material-ui/icons/Public';
 import Controls from './Controls';
+import SearchIcon from '@material-ui/icons/Search';
 import { createMuiTheme, ThemeProvider  } from '@material-ui/core/styles';
 
 const darkTheme = createMuiTheme({
@@ -104,11 +105,20 @@ function YouTubeDialog(props) {
 
   const handleAdd = () => {
     props.onClose(getVideoId(value), title);
+    window.closeBrowser();
     clearVideo();
+  };
+
+  window.addYouTube = url => {
+    setValue(url);
+    if (player && typeof player.loadVideoById === 'function') {
+      player.loadVideoById(getVideoId(url));
+    }
   };
 
   const handleCancel = () => {
     clearVideo();
+    window.closeBrowser();
     props.onClose();
   };
 
@@ -140,12 +150,18 @@ function YouTubeDialog(props) {
   return (
     <Dialog open={open} onClose={handleCancel} aria-labelledby="form-dialog-title">
       <DialogTitle style={{color: '#000'}} id="form-dialog-title">Add YouTube to plan</DialogTitle>
+
+      <Button onClick={()=> window.showBrowser(true)} color="primary">
+         <SearchIcon />
+         Search
+       </Button>
+
       <DialogContent>
         <TextField
           autoFocus
           margin="dense"
           id="name"
-          label="YouTube video"
+          label="Video ID"
           fullWidth
           value={value}
           onChange={e => {
@@ -157,8 +173,14 @@ function YouTubeDialog(props) {
           onFocus={e => props.handleEditing(true)}
           onBlur={e => props.handleEditing(false)}
         />
-        <div style={{height: '50px', width:'300px', color: '#000'}}>{title ? title.substring(0, 80) : ''}</div>
-        <div style={{width: '300px', height: '200px'}}><div id="player"></div></div>
+        {
+        [1].map(()=>{
+          const disp = value ? 'block' : 'none';
+          return(<div>
+          <div style={{display: disp, height: '50px', width:'300px', color: '#000'}}>{title ? title.substring(0, 80) : ''}</div>
+          <div style={{display: disp, width: '300px', height: '200px'}}><div id="player"></div></div></div>);
+        })
+        }
       </DialogContent>
       <DialogActions>
         <Button onClick={handleCancel} color="primary">

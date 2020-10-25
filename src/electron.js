@@ -422,44 +422,47 @@ if (typeof fs.existsSync === 'function') {
 
     exports.setShow = setShow;
 
+    exports.addYouTube = () => {
+        if (browserWindow) {
+            const url = browserWindow.getURL();
+            console.log('Add youtube', url);
+            mainWindow.webContents.send('addYouTube', url);
+            browserWindow.close();
+            browserWindow = undefined;
+        }
+    };
+
+    exports.closeBrowser = () => {
+        if (browserWindow) {
+            browserWindow.close();
+            browserWindow = undefined;
+        }
+    };
+
     exports.showBrowser = show => {
 
-        if (show) {
-
+        if (show && !browserWindow) {
             const mainBounds = mainWindow.getContentBounds();
-    
-            let displays = screen.getAllDisplays();
-            displays.forEach(disp => {
-
-                // Check for main display.
-                if (mainBounds.x >= disp.bounds.x && mainBounds.x <= disp.bounds.x + disp.bounds.width &&
-                    mainBounds.y >= disp.bounds.y && mainBounds.y <= disp.bounds.y + disp.bounds.height) {
-                    return;
+            browserWindow = new BrowserWindow({
+                x: mainBounds.x,
+                y: mainBounds.y,
+                width: mainBounds.width,
+                height: mainBounds.height,
+                webPreferences: {
+                    preload: path.join(__dirname, '../public/browser.js')
                 }
-
-                browserWindow.setBounds(disp.bounds);
-                browserWindow.webContents.send('show');
-                browserWindow.setFullScreen(true);
-
             });
+            browserWindow.removeMenu();
+            browserWindow.loadURL(`https://www.youtube.com`);
 
-            if (!browserWindow.isVisible()) {
-                const disp = screen.getPrimaryDisplay();
-                browserWindow.setBounds({
-                    x: disp.bounds.x,
-                    y: disp.bounds.y,
-                    width: Math.floor(disp.bounds.width * 0.5),
-                    height: Math.floor(disp.bounds.height * 0.5)
-                });
-
-                browserWindow.webContents.send('show');
-                browserWindow.show();
-            }
-
-        } else {
-            browserWindow.webContents.send('hide');
-            setTimeout(() => browserWindow.hide(), 500);
+            browserWindow.webContents.once('dom-ready', () => {
+                browserWindow.webContents.send('showButton');
+            });
+            browserWindow.webContents.on('close', () => {
+                browserWindow = undefined;
+            });
         }
+
     };
 
     const createSong = name => {
