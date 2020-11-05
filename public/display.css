@@ -36,6 +36,14 @@ body {
   transform: translate(-50%, -50%);
 }
 
+#webcam {
+  display: block;
+  width: 50%;
+  position: absolute;
+  bottom: 0%;
+  right: 0%;
+}
+
 #picture {
   display: none;
   height: 90%;
@@ -58,6 +66,13 @@ body {
   z-index: 20;
 }
 
+#group {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+}
 
 .words {
     color: rgb(255, 231, 13);

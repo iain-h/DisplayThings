@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 if (typeof fs.existsSync === 'function') {
-    const {app, BrowserWindow, Menu, screen, dialog, session, shell} = require('electron');
+    const {app, protocol, BrowserWindow, Menu, screen, dialog, session, shell, systemPreferences} = require('electron');
     let serverInstance = undefined;
 
     const isMac = process.platform === 'darwin';
@@ -27,6 +27,8 @@ if (typeof fs.existsSync === 'function') {
     let browserWindow;
 
     let songDatabase = {};
+
+    console.log('Camera access', systemPreferences.getMediaAccessStatus('camera'));
 
     const homedir = require('os').homedir();
     const basePath = path.join(homedir, '.displayThings');
@@ -190,7 +192,8 @@ if (typeof fs.existsSync === 'function') {
             
             webPreferences: {
              preload: path.join(__dirname, '../public/preloadMain.js'),
-                webSecurity: false
+                webSecurity: false,
+                enableRemoteModule: true
             }
         });
 
@@ -247,12 +250,12 @@ if (typeof fs.existsSync === 'function') {
             backgroundThrottling: false,
             webPreferences: {
                 preload: path.join(__dirname, '../public/preload.js'),
-                webSecurity: false
+                webSecurity: false,
+                enableRemoteModule: true
             }
         });
         displayWindow.removeMenu();
         console.log('display');
-        displayWindow.webContents.once('dom-ready', () => {});
         displayWindow.loadURL(`http://localhost:${port}/display.html`);
         displayWindow.on('close', () => {
             displayWindow = undefined;
@@ -335,6 +338,13 @@ if (typeof fs.existsSync === 'function') {
             createWindow()
         }
     });
+
+    app.whenReady().then(() => {
+        protocol.registerFileProtocol('file', (request, callback) => {
+          const pathname = decodeURI(request.url.replace('file:///', ''));
+          callback(pathname);
+        });
+      });
 
     // In this file you can include the rest of your app's specific main process
     // code. You can also put them in separate files and require them here.
@@ -968,4 +978,6 @@ if (typeof fs.existsSync === 'function') {
     };
 
     exports.getColorTheme = () => colorTheme;
+
+    exports.setWebcam = val => {displayWindow.webContents.send('playWebcam', val);};
 }

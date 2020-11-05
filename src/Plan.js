@@ -547,6 +547,7 @@ export default class Plan extends Component {
         this.handlePlay(this.reselect);
         this.reselect = undefined;
       }
+      window.setControls();
     };
 
     window.reshowFullscreen = () => {

@@ -450,3 +450,48 @@ ipcRenderer.on('playYouTube', async (event, controlStr) => {
   console.log('Play YouTube');
   playYouTube(JSON.parse(controlStr));
 });
+
+
+
+ipcRenderer.on('playWebcam', async (event, val) => {
+  console.log('Play Webcam');
+  // Webcam
+  // Grab elements, create settings, etc.
+  const webcam = document.getElementById('webcam');
+  const ids = ['fade1', 'fade2', 'pdf1', 'pdf2', 'picture'];
+
+  if (val && !webcam.srcObject) {
+
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (id.indexOf('fade') != -1) {
+        el.style.transform = "translate(-50%, -50%) scale(0.8) translate(0%, -20%)";
+      }
+      else {
+        el.style.transform = "translate(-50%, -50%) scale(0.7) translate(-20%, -20%)";
+      }
+    });
+
+    // Get access to the camera!
+    if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        // Not adding `{ audio: true }` since we only want video now
+        navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+            //video.src = window.URL.createObjectURL(stream);
+            console.log('Webcam stream');
+            webcam.style.display = 'block';
+            webcam.srcObject = stream;
+            webcam.play();
+        });
+    }
+  } else if (!val) {
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      el.style.transform = "translate(-50%, -50%)";
+    });
+
+    webcam.srcObject = undefined;
+    webcam.style.display = 'none';
+  }
+});
+
+

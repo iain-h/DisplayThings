@@ -6,6 +6,7 @@ const {
     createSong, 
     setShow, 
     getShow,
+    setWebcam,
     savePlan, 
     loadPlan, 
     updateSongDatabase, 
@@ -39,6 +40,7 @@ window.getSongs = getSongs;
 window.setSong = setSong;
 window.setShow = setShow;
 window.getShow = getShow;
+window.setWebcam = setWebcam;
 window.savePlan = savePlan;
 window.loadPlan = loadPlan;
 window.createSong = createSong;

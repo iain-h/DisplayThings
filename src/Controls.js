@@ -20,7 +20,7 @@ const lightTheme = createMuiTheme({
 
 export default class Controls extends Component {
 
-  state = {show: true};
+  state = {show: true, webcam: true};
 
   handleChange(e) {
     if (e) {
@@ -31,10 +31,21 @@ export default class Controls extends Component {
     }
   }
 
+  handleWebcam(e) {
+    if (e) {
+      console.log('webcam change', e.target.checked);
+      this.setState({webcam: e.target.checked});
+    }
+  }
+
   componentWillUpdate(nextProps, nextState) {
     if (nextState.show != this.state.show) {
         console.log('setShow', nextState.show);
         window.setShow(nextState.show);
+      }
+   if (nextState.webcam != this.state.webcam) {
+        console.log('webcam', nextState.webcam);
+        window.setWebcam(nextState.webcam);
       }
   }
 
@@ -48,8 +59,14 @@ export default class Controls extends Component {
         this.setState({show: true});
       }
     };
-    window.showDisplay = () => {window.setShow(true); this.setState({show: true});};
-    window.setShow(true);
+    window.showDisplay = () => {
+      window.setShow(true);
+      this.setState({show: true});
+    };
+    window.setControls = () => {
+      window.setWebcam(this.state.webcam);
+    };
+    window.setShow(this.state.show);
   }
 
   render() {
@@ -76,6 +93,20 @@ export default class Controls extends Component {
               }
               style={{color: this.props.colorTheme === 'Dark' ? '#fff' : '#000'}}
               label="Show"
+            />
+
+            <FormControlLabel
+              control={
+                <Checkbox
+                checked={this.state.webcam}
+                onChange={e => this.handleWebcam(e)}
+                value="show"
+                color="primary"
+                style={{color: this.props.colorTheme === 'Dark' ? '#fff' : '#000'}}
+              />
+              }
+              style={{color: this.props.colorTheme === 'Dark' ? '#fff' : '#000'}}
+              label="Webcam"
             />
          </ThemeProvider>
          </Tooltip>
