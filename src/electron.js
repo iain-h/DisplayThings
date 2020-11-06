@@ -979,5 +979,9 @@ if (typeof fs.existsSync === 'function') {
 
     exports.getColorTheme = () => colorTheme;
 
-    exports.setWebcam = val => {displayWindow.webContents.send('playWebcam', val);};
+    exports.setWebcam = val => {
+        if (displayWindow) {
+            displayWindow.webContents.send('playWebcam', val);
+        }
+    };
 }
