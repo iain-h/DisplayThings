@@ -481,7 +481,9 @@ ipcRenderer.on('playWebcam', async (event, val) => {
             webcam.style.display = 'block';
             webcam.srcObject = stream;
             webcam.play();
+            webcamSizer();
         });
+
     }
   } else if (!val) {
     ids.forEach(id => {
@@ -494,4 +496,24 @@ ipcRenderer.on('playWebcam', async (event, val) => {
   }
 });
 
+let webcamTimer;
+const webcamSizer = () => {
+  if (webcamTimer) clearTimeout(webcamTimer);
+  const webcam = document.getElementById('webcam');
+  webcamTimer = setTimeout(() => {
+    let large = true;
+    const pictureElement = document.getElementById('picture');
+    //const videoElement = document.getElementById('video');
+    
+    if (pictureElement.style.display && pictureElement.style.display != 'none') large = false;
+    else if (showingPDF) large = false;
 
+    if (large) {
+      webcam.style.width = "100%";
+    } else {
+      webcam.style.width = "50%";
+    }
+
+    webcamSizer();
+  }, 2000);
+};

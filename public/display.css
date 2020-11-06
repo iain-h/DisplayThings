@@ -24,7 +24,7 @@ body {
   top: 0px;
   left: 0px;
   background-color: #000;
-  opacity: 0.5;
+  opacity: 0.0;
 }
 
 #video {
@@ -38,10 +38,11 @@ body {
 
 #webcam {
   display: block;
-  width: 50%;
+  width: 100%;
   position: absolute;
   bottom: 0%;
   right: 0%;
+  transition: width 0.8s ease-out;
 }
 
 #picture {
