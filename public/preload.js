@@ -468,7 +468,7 @@ ipcRenderer.on('playWebcam', async (event, val) => {
         el.style.transform = "translate(-50%, -50%) scale(0.8) translate(0%, -20%)";
       }
       else {
-        el.style.transform = "translate(-50%, -50%) scale(0.7) translate(-20%, -20%)";
+        el.style.transform = "translate(-50%, -50%) scale(0.8) translate(-10%, -10%)";
       }
     });
 
@@ -476,7 +476,6 @@ ipcRenderer.on('playWebcam', async (event, val) => {
     if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         // Not adding `{ audio: true }` since we only want video now
         navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
-            //video.src = window.URL.createObjectURL(stream);
             console.log('Webcam stream');
             webcam.style.display = 'block';
             webcam.srcObject = stream;
@@ -502,16 +501,23 @@ const webcamSizer = () => {
   const webcam = document.getElementById('webcam');
   webcamTimer = setTimeout(() => {
     let large = true;
+    let noshow = false;
     const pictureElement = document.getElementById('picture');
-    //const videoElement = document.getElementById('video');
-    
-    if (pictureElement.style.display && pictureElement.style.display != 'none') large = false;
-    else if (showingPDF) large = false;
+    const videoElement = document.getElementById('video');
+    //const youtubeElement = document.getElementById("youtube");
 
-    if (large) {
+    if (pictureElement.style.display && pictureElement.style.display != 'none') large = false;
+    if (videoElement.style.display && videoElement.style.display != 'none') noshow = true;
+    if (showingPDF) large = false;
+
+    if (noshow) {
+      webcam.style.visibility = 'hidden';
+    } else if (large) {
+      webcam.style.visibility = 'visible';
       webcam.style.width = "100%";
     } else {
-      webcam.style.width = "50%";
+      webcam.style.visibility = 'visible';
+      webcam.style.width = "30%";
     }
 
     webcamSizer();
