@@ -28,7 +28,7 @@ if (typeof fs.existsSync === 'function') {
 
     let songDatabase = {};
 
-    console.log('Camera access', systemPreferences.getMediaAccessStatus('camera'));
+    //console.log('Camera access', systemPreferences.getMediaAccessStatus('camera'));
 
     const homedir = require('os').homedir();
     const basePath = path.join(homedir, '.displayThings');
