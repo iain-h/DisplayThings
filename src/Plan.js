@@ -420,7 +420,7 @@ export default class Plan extends Component {
       this.props.setYouTube(isYouTube(name) ? name : undefined);
       this.props.setPPT(isPDF(name) ? name : undefined);
       this.props.setPicture(isPicture(name) ? name : undefined);
-      
+      window.setControls();
     });
       
   }
@@ -452,6 +452,7 @@ export default class Plan extends Component {
     this.props.setPPT(undefined);
     this.props.setPicture(undefined);
     this.props.updateSong();
+    window.setControls();
   }
 
 
