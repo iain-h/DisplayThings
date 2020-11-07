@@ -20,7 +20,7 @@ const lightTheme = createMuiTheme({
 
 export default class Controls extends Component {
 
-  state = {show: true, webcam: false};
+  state = {show: true, webcam: true};
 
   handleChange(e) {
     if (e) {
