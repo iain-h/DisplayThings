@@ -459,7 +459,8 @@ if (typeof fs.existsSync === 'function') {
                 width: mainBounds.width,
                 height: mainBounds.height,
                 webPreferences: {
-                    preload: path.join(__dirname, '../public/browser.js')
+                    preload: path.join(__dirname, '../public/browser.js'),
+                    enableRemoteModule: true
                 }
             });
             browserWindow.removeMenu();
@@ -471,6 +472,8 @@ if (typeof fs.existsSync === 'function') {
             browserWindow.webContents.on('close', () => {
                 browserWindow = undefined;
             });
+
+            browserWindow.webContents.openDevTools();
         }
 
     };
