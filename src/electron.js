@@ -473,7 +473,7 @@ if (typeof fs.existsSync === 'function') {
                 browserWindow = undefined;
             });
 
-            browserWindow.webContents.openDevTools();
+           // browserWindow.webContents.openDevTools();
         }
 
     };
