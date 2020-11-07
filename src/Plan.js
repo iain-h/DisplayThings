@@ -408,7 +408,7 @@ export default class Plan extends Component {
 
   playItem(name) {
 
-    this.props.setURL(isURL(name) ? name : undefined, () => {
+    this.props.setURL(isURL(name) ? name : undefined, n => {
       if (isSong(name)) {
         const songData = this.props.setSong(name);
         this.props.updateSong(songData);

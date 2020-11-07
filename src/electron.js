@@ -933,28 +933,31 @@ if (typeof fs.existsSync === 'function') {
         
     };
 
-    exports.setURL = (url, callback) => {
+    exports.setURL = async (url, callback) => {
         console.log('setURL', url);
         if (displayWindow) {
+            console.log('displayWindow');
             if (url) {
+                console.log('url');
                 if (url !== displayWindow.getURL()) {
-                    displayWindow.loadURL(url);
-                    displayWindow.webContents.once('dom-ready', () => {
-                        callback();
-                    });
+                    console.log('loadURL');
+                    await displayWindow.loadURL(url);
+                    callback(url);
                 } else {
-                    callback();
+                    callback(url);
                 }
             } else if (`http://localhost:${port}/display.html` !== displayWindow.getURL()) {
-                displayWindow.loadURL(`http://localhost:${port}/display.html`);
+                console.log('loadURL');
                 displayWindow.webContents.once('dom-ready', () => {
-                    callback();
+                    callback(url);
+                    mainWindow.webContents.send('displayReady');
                 });
+                await displayWindow.loadURL(`http://localhost:${port}/display.html`);
             } else {
-                callback();
+                callback(url);
             }
         } else {
-            callback();
+            callback(url);
         }
     };
 

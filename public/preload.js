@@ -1,3 +1,9 @@
+
+if (window.location.href.endsWith('display.html')) {
+
+window.addEventListener('DOMContentLoaded', (event) => {
+
+
 const electron = require('electron');
 const {displayKeyPressed, rootDir, setVideoStatus, setYouTubeStatus} = electron.remote.require('./electron.js');
 const ipcRenderer = electron.ipcRenderer;
@@ -506,8 +512,8 @@ const webcamSizer = () => {
     const videoElement = document.getElementById('video');
     //const youtubeElement = document.getElementById("youtube");
 
-    if (pictureElement.style.display && pictureElement.style.display != 'none') large = false;
-    if (videoElement.style.display && videoElement.style.display != 'none') noshow = true;
+    if (pictureElement && pictureElement.style.display && pictureElement.style.display != 'none') large = false;
+    if (videoElement && videoElement.style.display && videoElement.style.display != 'none') noshow = true;
     if (showingPDF) large = false;
 
     if (noshow) {
@@ -523,3 +529,10 @@ const webcamSizer = () => {
     webcamSizer();
   }, 2000);
 };
+
+
+console.log('DOM fully loaded and parsed');
+ipcRenderer.send('display-ready', 'ping')
+});
+
+}
