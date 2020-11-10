@@ -520,10 +520,14 @@ const webcamSizer = () => {
       webcam.style.visibility = 'hidden';
     } else if (large) {
       webcam.style.visibility = 'visible';
-      webcam.style.width = "100%";
+      webcam.style.minWidth = "100%";
+      webcam.style.minHeight = "100%";
+      webcam.style.width = "";
     } else {
       webcam.style.visibility = 'visible';
       webcam.style.width = "30%";
+      webcam.style.minWidth = "";
+      webcam.style.minHeight = "";
     }
 
     webcamSizer();
