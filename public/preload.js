@@ -481,14 +481,18 @@ ipcRenderer.on('playWebcam', async (event, val) => {
     // Get access to the camera!
     if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         // Not adding `{ audio: true }` since we only want video now
-        navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+        navigator.mediaDevices.getUserMedia({ 
+          video: {
+            width: { min: 640, ideal: 1280, max: 1920 },
+            height: { min: 480, ideal: 720, max: 1080 }
+          }
+        }).then(function(stream) {
             console.log('Webcam stream');
             webcam.style.display = 'block';
             webcam.srcObject = stream;
             webcam.play();
             webcamSizer();
         });
-
     }
   } else if (!val) {
     ids.forEach(id => {
