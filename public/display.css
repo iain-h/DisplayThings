@@ -82,6 +82,7 @@ body {
     font-family: AbrilFatface-Regular;
     font-size: 4.5vw;
     position: absolute;
+    height: auto;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);

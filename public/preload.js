@@ -91,6 +91,39 @@ ipcRenderer.on('backdrop', (event, file) => {
   setBackdrop(file);
 });
 
+ipcRenderer.on('textAlign', (event, align) => {
+  console.log(align);
+  ['fade1', 'fade2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (align == 'top') {
+      el.style.top = '0%';
+      el.style.bottom = '';
+      el.style.height = 'auto';
+      el.style.transform = 'translate(-50%, 0%)';
+      el.style.alignItems = '';
+      el.style.display = 'block';
+      el.style.justifyContent = '';
+    } else if (align == 'middle') {
+      el.style.top = '50%';
+      el.style.height = 'auto';
+      el.style.bottom = '';
+      el.style.transform = 'translate(-50%, -50%)';
+      el.style.alignItems = '';
+      el.style.display = 'block';
+    } else if (align == 'bottom') {
+      el.style.top = '';
+      el.style.bottom = '0px';
+      el.style.height = '100%';
+      el.style.transform = '';
+      el.style.alignItems = 'flex-end';
+      el.style.display = 'flex';
+      el.style.justifyContent = 'center';
+    }
+  });
+  
+});
+
+
 let color =  `rgb(255, 255, 0)`;
 
 ipcRenderer.on('color', (event, newColor) => {
@@ -464,18 +497,13 @@ ipcRenderer.on('playWebcam', async (event, val) => {
   // Webcam
   // Grab elements, create settings, etc.
   const webcam = document.getElementById('webcam');
-  const ids = ['fade1', 'fade2', 'pdf1', 'pdf2', 'picture'];
+  const ids = ['pdf1', 'pdf2', 'picture'];
 
   if (val && !webcam.srcObject) {
 
     ids.forEach(id => {
       const el = document.getElementById(id);
-      if (id.indexOf('fade') != -1) {
-        el.style.transform = "translate(-50%, -50%) scale(0.8) translate(0%, -20%)";
-      }
-      else {
-        el.style.transform = "translate(-50%, -50%) scale(0.8) translate(-10%, -10%)";
-      }
+      el.style.transform = "translate(-50%, -50%) scale(0.8) translate(-10%, -10%)";
     });
 
     // Get access to the camera!

@@ -13,6 +13,9 @@ import { withStyles } from '@material-ui/core/styles';
 import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormHelperText from '@material-ui/core/FormHelperText';
+import Radio from '@material-ui/core/Radio';
+import RadioGroup from '@material-ui/core/RadioGroup';
+import FormLabel from '@material-ui/core/FormLabel';
 import FormControl from '@material-ui/core/FormControl';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Tooltip from '@material-ui/core/Tooltip';
@@ -240,6 +243,7 @@ export default function(props) {
   const [shadowRad, setShadowRad] = React.useState(3);
   const [border, setBorder] = React.useState(false);
   const [backCast, setBackCast] = React.useState(0);
+  const [textAlign, setTextAlign] = React.useState('middle');
 
   const addStyle = (styleName, newStyle) => {
     const fullStyle = {
@@ -251,7 +255,8 @@ export default function(props) {
       shadow,
       shadowRad,
       border,
-      backCast
+      backCast,
+      textAlign
     };
     Object.keys(newStyle).forEach(s => {
       fullStyle[s] = newStyle[s];
@@ -289,6 +294,15 @@ export default function(props) {
     setSize(newSize);
     if (save) {
       addStyle(currentStyle, {size: newSize});
+    }
+  };
+
+  const handleTextAlign = (newAlign, save) => {
+    newAlign = newAlign || 'middle';
+    window.setWordsStyle({'textAlign': newAlign});
+    setTextAlign(newAlign);
+    if (save) {
+      addStyle(currentStyle, {textAlign: newAlign});
     }
   };
 
@@ -354,6 +368,7 @@ export default function(props) {
       handleShadowRad(vals.shadowRad, false);
       handleBorder(vals.border, false);
       handleBackCast(vals.backCast, false);
+      handleTextAlign(vals.textAlign, false);
     }
   };
 
@@ -551,6 +566,17 @@ export default function(props) {
               handleBackCast(backCast, true);
             }}
           />
+
+
+        <FormControl component="fieldset">
+          <FormLabel component="legend">Text Alignment</FormLabel>
+          <RadioGroup name="textAlign" value={textAlign} onChange={(e, val) => {handleTextAlign(val, true);}}>
+            <FormControlLabel value="top" control={<Radio />} label="Top" />
+            <FormControlLabel value="middle" control={<Radio />} label="Middle" />
+            <FormControlLabel value="bottom" control={<Radio />} label="Bottom" />
+          </RadioGroup>
+        </FormControl>
+
         </div>
 
 
