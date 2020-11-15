@@ -511,8 +511,8 @@ ipcRenderer.on('playWebcam', async (event, val) => {
         // Not adding `{ audio: true }` since we only want video now
         navigator.mediaDevices.getUserMedia({ 
           video: {
-            width: { min: 640, ideal: 1280, max: 1920 },
-            height: { min: 480, ideal: 720, max: 1080 }
+            width: { min: 640, ideal: 1920, max: 3840 },
+            height: { min: 480, ideal: 1080, max: 2160 }
           }
         }).then(function(stream) {
             console.log('Webcam stream');
@@ -552,14 +552,12 @@ const webcamSizer = () => {
       webcam.style.visibility = 'hidden';
     } else if (large) {
       webcam.style.visibility = 'visible';
-      webcam.style.minWidth = "100%";
-      webcam.style.minHeight = "100%";
-      webcam.style.width = "";
+      webcam.style.width = "100%";
+      webcam.style.height = "100%";
     } else {
       webcam.style.visibility = 'visible';
       webcam.style.width = "30%";
-      webcam.style.minWidth = "";
-      webcam.style.minHeight = "";
+      webcam.style.height = "30%";
     }
 
     webcamSizer();
