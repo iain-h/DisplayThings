@@ -511,8 +511,8 @@ ipcRenderer.on('playWebcam', async (event, val) => {
         // Not adding `{ audio: true }` since we only want video now
         navigator.mediaDevices.getUserMedia({ 
           video: {
-            width: { min: 640, ideal: 1920, max: 3840 },
-            height: { min: 480, ideal: 1080, max: 2160 }
+            width: { ideal: 4096 },
+            height: { ideal: 2160 } 
           }
         }).then(function(stream) {
             console.log('Webcam stream');
@@ -520,6 +520,8 @@ ipcRenderer.on('playWebcam', async (event, val) => {
             webcam.srcObject = stream;
             webcam.play();
             webcamSizer();
+        }).catch(err => {
+          console.log(err);
         });
     }
   } else if (!val) {
