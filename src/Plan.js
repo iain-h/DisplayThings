@@ -311,7 +311,7 @@ const getListStyle = isDraggingOver => ({
 
 const isVideo = name => {
   const lower = name.toLowerCase();
-  return lower.endsWith('.mp4');
+  return lower.endsWith('.mp4') || lower.endsWith('.webm') || lower.endsWith('.mov') || lower.endsWith('.ogg') || lower.endsWith('.wav');
 };
 
 const isAudio = name => {

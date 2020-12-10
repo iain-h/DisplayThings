@@ -146,8 +146,8 @@ ipcRenderer.on('shadow', (event, newShadow) => {
   const displayDiv2 = document.getElementById(toggleFade2);
   if (!displayDiv1 || !displayDiv2) return;
   if (newShadow) {
-    displayDiv1.style.textShadow = `2px 2px ${Math.abs(shadowRad)}px ${shadowRad < 0 ? '#fff' :  '#000'}`;
-    displayDiv2.style.textShadow = `2px 2px ${Math.abs(shadowRad)}px ${shadowRad < 0 ? '#fff' :  '#000'}`;
+    displayDiv1.style.textShadow = `2px 2px ${Math.abs(shadowRad)}px ${shadowRad < 0 ? '#fff' :  '#000'}, 2px 2px ${Math.abs(shadowRad)}px ${shadowRad < 0 ? '#fff' :  '#000'}`;
+    displayDiv2.style.textShadow = `2px 2px ${Math.abs(shadowRad)}px ${shadowRad < 0 ? '#fff' :  '#000'}, 2px 2px ${Math.abs(shadowRad)}px ${shadowRad < 0 ? '#fff' :  '#000'}`;
   } else {
     displayDiv1.style.textShadow = '';
     displayDiv2.style.textShadow = '';
@@ -161,8 +161,8 @@ ipcRenderer.on('shadowRad', (event, newShadowRad) => {
   const displayDiv2 = document.getElementById(toggleFade2);
   if (!displayDiv1 || !displayDiv2) return;
   if (displayDiv1.style.textShadow) {
-    displayDiv1.style.textShadow = `1px 1px ${Math.abs(shadowRad)}px ${shadowRad < 0 ? '#fff' :  '#000'}`;
-    displayDiv2.style.textShadow = `1px 1px ${Math.abs(shadowRad)}px ${shadowRad < 0 ? '#fff' :  '#000'}`;
+    displayDiv1.style.textShadow = `2px 2px ${Math.abs(shadowRad)}px ${shadowRad < 0 ? '#fff' :  '#000'}, 2px 2px ${Math.abs(shadowRad)}px ${shadowRad < 0 ? '#fff' :  '#000'}`;
+    displayDiv2.style.textShadow = `2px 2px ${Math.abs(shadowRad)}px ${shadowRad < 0 ? '#fff' :  '#000'}, 2px 2px ${Math.abs(shadowRad)}px ${shadowRad < 0 ? '#fff' :  '#000'}`;
   }
 });
 

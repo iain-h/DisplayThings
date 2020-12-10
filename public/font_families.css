@@ -51,14 +51,6 @@
   src: url(Fonts/DancingScript-Regular.ttf);
 }
 @font-face {
-  font-family: DancingScript-SemiBold;
-  src: url(Fonts/DancingScript-SemiBold.ttf);
-}
-@font-face {
-  font-family: DancingScript-VariableFont_wght;
-  src: url(Fonts/DancingScript-VariableFont_wght.ttf);
-}
-@font-face {
   font-family: FredokaOne-Regular;
   src: url(Fonts/FredokaOne-Regular.ttf);
 }
@@ -111,40 +103,12 @@
   src: url(Fonts/Modak-Regular.ttf);
 }
 @font-face {
-  font-family: MontserratAlternates-Black;
-  src: url(Fonts/MontserratAlternates-Black.ttf);
-}
-@font-face {
-  font-family: MontserratAlternates-BlackItalic;
-  src: url(Fonts/MontserratAlternates-BlackItalic.ttf);
-}
-@font-face {
   font-family: MontserratAlternates-Bold;
   src: url(Fonts/MontserratAlternates-Bold.ttf);
 }
 @font-face {
-  font-family: MontserratAlternates-BoldItalic;
-  src: url(Fonts/MontserratAlternates-BoldItalic.ttf);
-}
-@font-face {
   font-family: MontserratAlternates-ExtraBold;
   src: url(Fonts/MontserratAlternates-ExtraBold.ttf);
-}
-@font-face {
-  font-family: MontserratAlternates-ExtraBoldItalic;
-  src: url(Fonts/MontserratAlternates-ExtraBoldItalic.ttf);
-}
-@font-face {
-  font-family: MontserratAlternates-ExtraLight;
-  src: url(Fonts/MontserratAlternates-ExtraLight.ttf);
-}
-@font-face {
-  font-family: MontserratAlternates-ExtraLightItalic;
-  src: url(Fonts/MontserratAlternates-ExtraLightItalic.ttf);
-}
-@font-face {
-  font-family: MontserratAlternates-Italic;
-  src: url(Fonts/MontserratAlternates-Italic.ttf);
 }
 @font-face {
   font-family: MontserratAlternates-Light;
@@ -155,32 +119,8 @@
   src: url(Fonts/MontserratAlternates-LightItalic.ttf);
 }
 @font-face {
-  font-family: MontserratAlternates-Medium;
-  src: url(Fonts/MontserratAlternates-Medium.ttf);
-}
-@font-face {
-  font-family: MontserratAlternates-MediumItalic;
-  src: url(Fonts/MontserratAlternates-MediumItalic.ttf);
-}
-@font-face {
   font-family: MontserratAlternates-Regular;
   src: url(Fonts/MontserratAlternates-Regular.ttf);
-}
-@font-face {
-  font-family: MontserratAlternates-SemiBold;
-  src: url(Fonts/MontserratAlternates-SemiBold.ttf);
-}
-@font-face {
-  font-family: MontserratAlternates-SemiBoldItalic;
-  src: url(Fonts/MontserratAlternates-SemiBoldItalic.ttf);
-}
-@font-face {
-  font-family: MontserratAlternates-Thin;
-  src: url(Fonts/MontserratAlternates-Thin.ttf);
-}
-@font-face {
-  font-family: MontserratAlternates-ThinItalic;
-  src: url(Fonts/MontserratAlternates-ThinItalic.ttf);
 }
 @font-face {
   font-family: OpenSans-Bold;
@@ -219,10 +159,6 @@
   src: url(Fonts/OpenSans-SemiBold.ttf);
 }
 @font-face {
-  font-family: OpenSans-SemiBoldItalic;
-  src: url(Fonts/OpenSans-SemiBoldItalic.ttf);
-}
-@font-face {
   font-family: Pacifico-Regular;
   src: url(Fonts/Pacifico-Regular.ttf);
 }
@@ -231,20 +167,8 @@
   src: url(Fonts/Righteous-Regular.ttf);
 }
 @font-face {
-  font-family: Roboto-Black;
-  src: url(Fonts/Roboto-Black.ttf);
-}
-@font-face {
-  font-family: Roboto-BlackItalic;
-  src: url(Fonts/Roboto-BlackItalic.ttf);
-}
-@font-face {
   font-family: Roboto-Bold;
   src: url(Fonts/Roboto-Bold.ttf);
-}
-@font-face {
-  font-family: Roboto-BoldItalic;
-  src: url(Fonts/Roboto-BoldItalic.ttf);
 }
 @font-face {
   font-family: Roboto-Italic;
@@ -259,24 +183,8 @@
   src: url(Fonts/Roboto-LightItalic.ttf);
 }
 @font-face {
-  font-family: Roboto-Medium;
-  src: url(Fonts/Roboto-Medium.ttf);
-}
-@font-face {
-  font-family: Roboto-MediumItalic;
-  src: url(Fonts/Roboto-MediumItalic.ttf);
-}
-@font-face {
   font-family: Roboto-Regular;
   src: url(Fonts/Roboto-Regular.ttf);
-}
-@font-face {
-  font-family: Roboto-Thin;
-  src: url(Fonts/Roboto-Thin.ttf);
-}
-@font-face {
-  font-family: Roboto-ThinItalic;
-  src: url(Fonts/Roboto-ThinItalic.ttf);
 }
 @font-face {
   font-family: Satisfy-Regular;
@@ -305,44 +213,4 @@
 @font-face {
   font-family: SourceCodePro-BoldItalic;
   src: url(Fonts/SourceCodePro-BoldItalic.ttf);
-}
-@font-face {
-  font-family: SourceCodePro-ExtraLight;
-  src: url(Fonts/SourceCodePro-ExtraLight.ttf);
-}
-@font-face {
-  font-family: SourceCodePro-ExtraLightItalic;
-  src: url(Fonts/SourceCodePro-ExtraLightItalic.ttf);
-}
-@font-face {
-  font-family: SourceCodePro-Italic;
-  src: url(Fonts/SourceCodePro-Italic.ttf);
-}
-@font-face {
-  font-family: SourceCodePro-Light;
-  src: url(Fonts/SourceCodePro-Light.ttf);
-}
-@font-face {
-  font-family: SourceCodePro-LightItalic;
-  src: url(Fonts/SourceCodePro-LightItalic.ttf);
-}
-@font-face {
-  font-family: SourceCodePro-Medium;
-  src: url(Fonts/SourceCodePro-Medium.ttf);
-}
-@font-face {
-  font-family: SourceCodePro-MediumItalic;
-  src: url(Fonts/SourceCodePro-MediumItalic.ttf);
-}
-@font-face {
-  font-family: SourceCodePro-Regular;
-  src: url(Fonts/SourceCodePro-Regular.ttf);
-}
-@font-face {
-  font-family: SourceCodePro-SemiBold;
-  src: url(Fonts/SourceCodePro-SemiBold.ttf);
-}
-@font-face {
-  font-family: SourceCodePro-SemiBoldItalic;
-  src: url(Fonts/SourceCodePro-SemiBoldItalic.ttf);
 }
