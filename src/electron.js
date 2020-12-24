@@ -132,8 +132,6 @@ if (typeof fs.existsSync === 'function') {
             label: 'View',
             submenu: [
             { role: 'reload' },
-            { role: 'forcereload' },
-            { role: 'toggledevtools' },
             { type: 'separator' },
             { role: 'resetzoom' },
             { role: 'zoomin' },
@@ -176,7 +174,19 @@ if (typeof fs.existsSync === 'function') {
 
         if (fs.existsSync(path.join(basePath, "prefs.json"))) {
             try {
-                prefs = JSON.parse(fs.readFileSync(path.join(basePath, "prefs.json")));
+                const in_prefs = JSON.parse(fs.readFileSync(path.join(basePath, "prefs.json")));
+                let displays = screen.getAllDisplays();
+                displays.forEach(disp => {
+
+                    // Validate position and size.
+                    if (in_prefs.x >= disp.bounds.x && in_prefs.x <= disp.bounds.x + disp.bounds.width &&
+                        in_prefs.y >= disp.bounds.y && in_prefs.y <= disp.bounds.y + disp.bounds.height &&
+                        in_prefs.width > 100 && in_prefs.height > 100 &&
+                        in_prefs.width <= disp.bounds.width && in_prefs.height <= disp.bounds.height) {
+                        prefs = in_prefs;
+                    }
+                });
+
             } catch (err) {
                 // Not json
             }
@@ -278,8 +288,8 @@ if (typeof fs.existsSync === 'function') {
         if (displayWindow && mainWindow && displayWindow.isFullScreen()) {
             const mainBounds = mainWindow.getContentBounds();
             const displayBounds = displayWindow.getContentBounds();
-            if (mainBounds.x >= displayBounds.x && mainBounds.x <= displayBounds.x + displayBounds.width &&
-                mainBounds.y >= displayBounds.y && mainBounds.y <= displayBounds.y + displayBounds.height) {
+            if (mainBounds.x > displayBounds.x && mainBounds.x < displayBounds.x + displayBounds.width &&
+                mainBounds.y > displayBounds.y && mainBounds.y < displayBounds.y + displayBounds.height) {
                 displayWindow.close();
                 displayWindow = undefined;
             }
