@@ -82,6 +82,10 @@ ipcRenderer.on('hideDisplay', (event, redisplay) => {
     window.hideDisplay(redisplay);
 });
 
+ipcRenderer.on('initialWebcam', (event, val) => {
+    window.setInitialWebcam(val);
+});
+
 ipcRenderer.on('reshowFullscreen', event => {
     window.reshowFullscreen();
 });
