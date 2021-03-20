@@ -335,14 +335,12 @@ class App extends Component {
           }}
           setVideo={file => {
             this.setState({video: file});
-            window.setVideo(file);
           }}
           setAudio={file => {
             this.setState({audio: file});
           }}
           setYouTube={name => {
             this.setState({youtube: name});
-            window.setYouTube(name);
           }}
           setPicture={file => {
             this.setState({picture: file});

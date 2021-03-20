@@ -788,10 +788,10 @@ if (typeof fs.existsSync === 'function') {
     };
 
 
-    exports.setVideo = file => {
+    exports.setVideo = (file, time) => {
         console.log('setVideo', file);
         if (!displayWindow) return;
-        displayWindow.webContents.send('setVideo', file || '');
+        displayWindow.webContents.send('setVideo', JSON.stringify({file: file || '', time: time}) );
     };
 
     exports.playVideo = control => {
@@ -800,7 +800,7 @@ if (typeof fs.existsSync === 'function') {
         displayWindow.webContents.send('playVideo', JSON.stringify(control));
     };
 
-    exports.setYouTube = name => {
+    exports.setYouTube = (name, time) => {
         console.log('setYouTube', name);
         if (!displayWindow) return;
         let id = undefined;
@@ -808,7 +808,7 @@ if (typeof fs.existsSync === 'function') {
             id = name.split('youtube://')[1];
             console.log(id);
         }
-        displayWindow.webContents.send('setYouTube', id || '');
+        displayWindow.webContents.send('setYouTube',JSON.stringify({name: id || '', time: time}));
     };
 
     exports.playYouTube = control => {

@@ -226,7 +226,8 @@ const setupVideoUpdate = () => {
   };
 };
 
-ipcRenderer.on('setVideo', (event, file) => {
+ipcRenderer.on('setVideo', (event, control) => {
+  const {file, time} = JSON.parse(control);
   const videoElement = document.getElementById('video');
   if (!videoElement) return;
 
@@ -243,6 +244,9 @@ ipcRenderer.on('setVideo', (event, file) => {
     videoElement.style.display = 'inline-block';
     videoElement.src = encodeURI(file);
     videoElement.play();
+    if (time) {
+      videoElement.currentTime = time;
+    }
     setupVideoUpdate();
     }, 300);
 });
@@ -281,6 +285,9 @@ ipcRenderer.on('playVideo', (event, controlStr) => {
   console.log(control);
   if (control.action === 'play') {
     videoElement.play();
+    if (control.time != undefined) {
+      videoElement.currentTime = control.time;
+    }
   } else if (control.action === 'pause') {
     videoElement.pause();
   } else if (control.action === 'skip') {
@@ -457,7 +464,9 @@ const playYouTube = control => {
   function onPlayerReady() {
     setupYouTubeUpdate();
     if (control.action === 'play') {
-      player.loadVideoById(control.videoId);
+      if (control.videoId) {
+        player.loadVideoById({videoId: control.videoId, startSeconds: control.time || 0});
+      }
       player.playVideo();
       var element = document.getElementById("youtube");
       if (!element) return;
@@ -470,8 +479,9 @@ const playYouTube = control => {
   }
 };
 
-ipcRenderer.on('setYouTube', async (event, name) => {
+ipcRenderer.on('setYouTube', async (event, control) => {
   console.log('Set YouTube');
+  const {name, time} = JSON.parse(control);
   var element = document.getElementById("youtube");
   if (!element) return;
   if (name === '') {
@@ -481,7 +491,7 @@ ipcRenderer.on('setYouTube', async (event, name) => {
   } else {
     const videoId = name.replace('youtube://', '');
     setBackdrop('Backdrops/black.png');
-    playYouTube({action: 'play', videoId});
+    playYouTube({action: 'play', videoId, time});
   }
 });
 
