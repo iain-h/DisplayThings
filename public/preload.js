@@ -530,8 +530,11 @@ ipcRenderer.on('playWebcam', async (event, val) => {
       el.style.transform = "translate(-50%, -50%)";
     });
 
-    webcam.srcObject = undefined;
     webcam.style.display = 'none';
+    webcam.srcObject.getTracks().forEach(function(track) {
+      track.stop();
+    });
+    webcam.srcObject = undefined;
   }
 });
 
