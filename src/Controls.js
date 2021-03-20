@@ -20,7 +20,7 @@ const lightTheme = createMuiTheme({
 
 export default class Controls extends Component {
 
-  state = {show: true, webcam: true};
+  state = {show: true, webcam: false};
 
   handleChange(e) {
     if (e) {
@@ -67,6 +67,11 @@ export default class Controls extends Component {
       window.setWebcam(this.state.webcam);
     };
     window.setShow(this.state.show);
+    window.setInitialWebcam = val => {
+      if (typeof val == 'boolean') {
+        this.setState({webcam: val});
+      }
+    };
   }
 
   render() {

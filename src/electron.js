@@ -166,11 +166,13 @@ if (typeof fs.existsSync === 'function') {
 
     createMenu();
 
+    let webcam = false;
+
     function createWindow() {
 
       serverInstance = server.listen(port, () => {
 
-        let prefs = {x: 20, y:20, width: 800, height: 800};
+        let prefs = {x: 20, y:20, width: 800, height: 800, webcam: false};
 
         if (fs.existsSync(path.join(basePath, "prefs.json"))) {
             try {
@@ -228,12 +230,16 @@ if (typeof fs.existsSync === 'function') {
         });
 
         mainWindow.on('close', () => {
-            fs.writeFileSync(path.join(basePath, "prefs.json"), JSON.stringify(mainWindow.getContentBounds()));
+            let newPrefs = JSON.parse(JSON.stringify(mainWindow.getContentBounds()));
+            newPrefs.webcam = webcam;
+            fs.writeFileSync(path.join(basePath, "prefs.json"), JSON.stringify(newPrefs));
             serverInstance.close();
             app.exit(0);
         });
 
         mainWindow.webContents.once('dom-ready', () => { 
+
+            mainWindow.webContents.send('initialWebcam', prefs.webcam);
         });
 
         // Open the DevTools.
@@ -996,6 +1002,7 @@ if (typeof fs.existsSync === 'function') {
     exports.getColorTheme = () => colorTheme;
 
     exports.setWebcam = val => {
+        webcam = val;
         if (displayWindow) {
             displayWindow.webContents.send('playWebcam', val);
         }
