@@ -12,6 +12,7 @@ import Slider from '@material-ui/core/Slider';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { createMuiTheme, ThemeProvider  } from '@material-ui/core/styles';
+import {Checkbox, FormGroup, FormControlLabel} from '@material-ui/core';
 
 const darkTheme = createMuiTheme({
   palette: {
@@ -70,7 +71,8 @@ export default class VideoControls extends Component {
     youtube: this.props.youtube,
     time: 0,
     video: undefined,
-    audio: undefined
+    audio: undefined,
+    resume: false
   };
 
   progressDiv;
@@ -80,11 +82,17 @@ export default class VideoControls extends Component {
   title='';
   timer;
 
+  startTimes = {};
+
   playAudio(control) {
     const audioElement = document.getElementById('audio');
     if (audioElement) {
       if (control.action === 'play') {
         audioElement.play();
+        console.log("audio time", control.time);
+        if (control.time !== undefined){
+          audioElement.currentTime = control.time;
+        }
         audioElement.ontimeupdate = () => {
           let time = audioElement.currentTime;
           let duration = audioElement.duration;
@@ -125,11 +133,50 @@ export default class VideoControls extends Component {
         this.updateStatus();
         this.setState({playing: false});
         this.getStatusTimer();
+
+        if (this.state.resume) {
+          const item = this.state.audio || this.state.youtube || this.state.video;
+          this.setResumeTime(item);
+        }
       } else {
-        this.playVideo({action: 'play'});
+        let time = undefined;
+        const item = this.state.audio || this.state.youtube || this.state.video;
+        if (this.state.resume && item && this.startTimes[item] != undefined) {
+          time =  this.startTimes[item];
+          this.setState({time: time});
+        }
+        console.log("play video", time);
+        this.playVideo({action: 'play', time: time});
         this.setState({playing: true});
         this.getStatusTimer();
       }
+  }
+
+  handleResumeChange(e) {
+    this.setState({resume: e.target.checked});
+    if (!e.target.checked) {
+      const item = this.state.audio || this.state.youtube || this.state.video;
+      if (item) {
+        this.startTimes[item] = undefined;
+      }
+    }
+  }
+
+  setResumeTime(item) {
+    if (item && this.state.resume) {
+      this.startTimes[item] = this.state.time;
+    }
+  }
+
+  updateResumeCheckbox(item) {
+    if (item && this.startTimes[item] !== undefined) {
+      this.setState({resume: true});
+      const item = this.state.audio || this.state.youtube || this.state.video;
+      this.setResumeTime(item);
+    }
+    else {
+      this.setState({resume: false});
+    }
   }
 
   handleSkipStart() {
@@ -183,21 +230,29 @@ export default class VideoControls extends Component {
   componentWillUpdate(nextProps, nextState) {
     if (nextProps.video !== this.props.video) {
       if (!this.timer) this.getStatusTimer();
+      this.setResumeTime(this.props.video);
       this.setState({video: nextProps.video});
+      this.updateResumeCheckbox(nextProps.video);
+      window.setVideo(nextProps.video, this.startTimes[nextProps.video]);
     }
     if (nextProps.youtube !== this.props.youtube) {
       if (!this.timer) this.getStatusTimer();
+      this.setResumeTime(this.props.youtube);
       this.setState({youtube: nextProps.youtube});
+      this.updateResumeCheckbox(nextProps.youtube);
+      window.setYouTube(nextProps.youtube, this.startTimes[nextProps.youtube]);
     }
     if (nextProps.audio !== this.props.audio) {
+      this.setResumeTime(this.props.audio);
       this.setState({audio: nextProps.audio});
+      this.updateResumeCheckbox(nextProps.audio);
       if (nextProps.audio) {
         const audioElement = document.getElementById('audio');
         if (audioElement){
           console.log('Set audio src');
           audioElement.src = nextProps.audio;
         }
-        this.playAudio({action: 'play'});
+        this.playAudio({action: 'play', time: this.startTimes[nextProps.audio]});
       } else {
         this.stopAudio();
       }
@@ -279,6 +334,25 @@ export default class VideoControls extends Component {
             <div style={{padding: '20px'}}>
             {this.state.status.title ? this.state.status.title : null}
             </div>
+
+            <div style={{padding: '20px'}}>
+        <Tooltip title="Resume playback from last played position">
+            <FormControlLabel
+              control={
+                <Checkbox
+                checked={this.state.resume}
+                onChange={e => this.handleResumeChange(e)}
+                value="show"
+                color="primary"
+                style={{color: this.props.colorTheme === 'Dark' ? '#fff' : '#000'}}
+              />
+              }
+              style={{color: this.props.colorTheme === 'Dark' ? '#fff' : '#000'}}
+              label="Resume from last played"
+            />
+         </Tooltip>
+         </div>
+
         </Paper>
         </ThemeProvider>
 
