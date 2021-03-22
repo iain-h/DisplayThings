@@ -314,11 +314,11 @@ export default class VideoControls extends Component {
                 this.setState({time: val});
                 this.playVideo({action: 'skip', time: val, allowSeekAhead: false});
                 if (this.timer) clearTimeout(this.timer);
-                this.setResumeTime();
               }}
               onChangeCommitted={e => {
                 this.playVideo({action: 'skip', time: this.state.time, allowSeekAhead: true});
                 setTimeout(this.getStatusTimer.bind(this), 2000);
+                this.setResumeTime();
               }}
             />
 
