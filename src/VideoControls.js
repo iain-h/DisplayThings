@@ -135,8 +135,7 @@ export default class VideoControls extends Component {
         this.getStatusTimer();
 
         if (this.state.resume) {
-          const item = this.state.audio || this.state.youtube || this.state.video;
-          this.setResumeTime(item);
+          this.setResumeTime();
         }
       } else {
         let time = undefined;
@@ -163,6 +162,7 @@ export default class VideoControls extends Component {
   }
 
   setResumeTime(item) {
+    item = item || this.state.audio || this.state.youtube || this.state.video;
     if (item && this.state.resume) {
       this.startTimes[item] = this.state.time;
     }
@@ -171,7 +171,6 @@ export default class VideoControls extends Component {
   updateResumeCheckbox(item) {
     if (item && this.startTimes[item] !== undefined) {
       this.setState({resume: true});
-      const item = this.state.audio || this.state.youtube || this.state.video;
       this.setResumeTime(item);
     }
     else {
@@ -182,6 +181,10 @@ export default class VideoControls extends Component {
   handleSkipStart() {
     this.playVideo({action: 'skip', time: 0});
     this.getStatusTimer();
+    const item = this.state.audio || this.state.youtube || this.state.video;
+    if (item && this.state.resume) {
+      this.startTimes[item] = 0;
+    }
   }
 
   updateStatus() {
@@ -311,6 +314,7 @@ export default class VideoControls extends Component {
                 this.setState({time: val});
                 this.playVideo({action: 'skip', time: val, allowSeekAhead: false});
                 if (this.timer) clearTimeout(this.timer);
+                this.setResumeTime();
               }}
               onChangeCommitted={e => {
                 this.playVideo({action: 'skip', time: this.state.time, allowSeekAhead: true});
