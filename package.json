@@ -18,7 +18,7 @@
     "flexsearch": "^0.6.32",
     "mousetrap": "^1.6.5",
     "node-dir": "^0.1.17",
-    "node-sass": "^4.13.1",
+    "node-sass": "^7.0.0",
     "react": "^16.1.1",
     "react-beautiful-dnd": "11.0.5",
     "react-color": "^2.18.0",
