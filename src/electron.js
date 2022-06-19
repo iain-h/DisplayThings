@@ -337,6 +337,8 @@ if (typeof fs.existsSync === 'function') {
 
     setTimeout(checkDisplay, 2000);
 
+    app.commandLine.appendSwitch('audio-buffer-size', '4096');
+
     // This method will be called when Electron has finished
     // initialization and is ready to create browser windows.
     // Some APIs can only be used after this event occurs.
