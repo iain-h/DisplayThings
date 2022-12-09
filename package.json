@@ -14,7 +14,7 @@
     "@material-ui/lab": "^4.0.0-alpha.49",
     "async": "^3.2.2",
     "electron-notarize": "^1.0.0",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "flexsearch": "^0.6.32",
     "mousetrap": "^1.6.5",
     "node-dir": "^0.1.17",
